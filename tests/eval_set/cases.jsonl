@@ -1,0 +1,1 @@
+{"id": "case_001", "input": "Toi can mua 50 ghe van phong, ngan sach 50 trieu, giao trong 14 ngay", "expected": {"hard_constraints": {"budget_max": 50000000, "quantity": 50, "delivery_deadline_days": 14}}}

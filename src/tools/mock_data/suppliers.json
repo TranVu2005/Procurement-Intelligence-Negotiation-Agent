@@ -1,0 +1,17 @@
+[
+  {
+    "MaNCC": "NCC001",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "Ghe van phong",
+    "ChatLieu": "Nhua + khung thep",
+    "Gia": 850000,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 150,
+    "ThoiGianGiao": 10,
+    "BaoHanh": 24,
+    "ChietKhauTheoSoLuong": "5% cho don >=50 cai",
+    "DiemUyTin": 4.5,
+    "KhuVuc": "Ha Noi"
+  }
+]
