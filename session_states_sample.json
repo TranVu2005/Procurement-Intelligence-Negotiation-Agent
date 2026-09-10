@@ -1,0 +1,50 @@
+{
+  "sess_001": {
+    "session_id": "sess_001",
+    "created_at": "2026-09-09T09:00:00",
+    "updated_at": "2026-09-09T09:05:00",
+    "hard_constraints": {
+      "product_type": "ghế văn phòng",
+      "quantity": 20,
+      "budget_max": 40000000,
+      "delivery_deadline_days": 10
+    },
+    "soft_constraints": {
+      "material_preference": "vai_boc",
+      "region_preference": "Ha Noi",
+      "min_trust_score": 4.0
+    },
+    "conversation_history": [
+      {
+        "role": "user",
+        "content": "Can mua 20 ghe van phong ngan sach 40 trieu",
+        "timestamp": "2026-09-09T09:00:00"
+      }
+    ],
+    "decisions_made": []
+  },
+  "sess_002": {
+    "session_id": "sess_002",
+    "created_at": "2026-09-09T09:02:00",
+    "updated_at": "2026-09-09T09:04:00",
+    "hard_constraints": {
+      "product_type": "sofa",
+      "quantity": 3,
+      "budget_max": 90000000,
+      "delivery_deadline_days": 20
+    },
+    "soft_constraints": {
+      "material_preference": "da_that",
+      "region_preference": null,
+      "min_trust_score": null
+    },
+    "conversation_history": [
+      {
+        "role": "user",
+        "content": "Tim sofa da that cho phong khach VIP",
+        "timestamp": "2026-09-09T09:02:00"
+      }
+    ],
+    "decisions_made": []
+  }
+}
