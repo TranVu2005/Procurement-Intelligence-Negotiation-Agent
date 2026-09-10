@@ -2,16 +2,853 @@
   {
     "MaNCC": "NCC001",
     "TenNCC": "Noi That Hoa Phat",
-    "LoaiSanPham": "Ghe van phong",
-    "ChatLieu": "Nhua + khung thep",
-    "Gia": 850000,
+    "LoaiSanPham": "ghế văn phòng",
+    "ChatLieu": "da_that",
+    "Gia": 1677150,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 71,
+    "ThoiGianGiao": 6,
+    "BaoHanh": 36,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": 4.3,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC002",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "sofa",
+    "ChatLieu": "da_that",
+    "Gia": 12806804,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 13,
+    "ThoiGianGiao": 20,
+    "BaoHanh": 6,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": 4.6,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC003",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "tủ hồ sơ",
+    "ChatLieu": "kim_loai",
+    "Gia": 6743118,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 3,
+    "ThoiGianGiao": 8,
+    "BaoHanh": 24,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": 4.9,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC004",
+    "TenNCC": "Noi That Xuan Hoa",
+    "LoaiSanPham": "ghế văn phòng",
+    "ChatLieu": "da_that",
+    "Gia": 1055657,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 176,
+    "ThoiGianGiao": 22,
+    "BaoHanh": 12,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": 4.5,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC005",
+    "TenNCC": "Noi That Xuan Hoa",
+    "LoaiSanPham": "sofa",
+    "ChatLieu": "vai_boc",
+    "Gia": 7644095,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 150,
+    "ThoiGianGiao": 23,
+    "BaoHanh": 36,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": 4.3,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC006",
+    "TenNCC": "Noi That 190",
+    "LoaiSanPham": "ghế văn phòng",
+    "ChatLieu": "luoi_nhua",
+    "Gia": 1605874,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 40,
+    "ThoiGianGiao": 10,
+    "BaoHanh": 0,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": 4.6,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC007",
+    "TenNCC": "Noi That Fami",
+    "LoaiSanPham": "tủ hồ sơ",
+    "ChatLieu": "kim_loai",
+    "Gia": 3557472,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 36,
+    "ThoiGianGiao": 22,
+    "BaoHanh": 6,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": 4.0,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC008",
+    "TenNCC": "Sieu Thi Noi That GOVI",
+    "LoaiSanPham": "sofa",
+    "ChatLieu": "vai_boc",
+    "Gia": 6876966,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 16,
+    "ThoiGianGiao": 13,
+    "BaoHanh": 24,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": 4.2,
+    "KhuVuc": "TP.HCM"
+  },
+  {
+    "MaNCC": "NCC009",
+    "TenNCC": "Sieu Thi Noi That GOVI",
+    "LoaiSanPham": "bàn làm việc",
+    "ChatLieu": "kim_loai",
+    "Gia": 3539709,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 255,
+    "ThoiGianGiao": 15,
+    "BaoHanh": 24,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": 4.0,
+    "KhuVuc": "TP.HCM"
+  },
+  {
+    "MaNCC": "NCC010",
+    "TenNCC": "Noi That Le Vin Decor",
+    "LoaiSanPham": "tủ hồ sơ",
+    "ChatLieu": "kim_loai",
+    "Gia": 4836646,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 70,
+    "ThoiGianGiao": 19,
+    "BaoHanh": 24,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": 3.5,
+    "KhuVuc": "TP.HCM"
+  },
+  {
+    "MaNCC": "NCC011",
+    "TenNCC": "Noi That Le Vin Decor",
+    "LoaiSanPham": "kệ",
+    "ChatLieu": "go_cong_nghiep",
+    "Gia": 2470667,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 32,
+    "ThoiGianGiao": 15,
+    "BaoHanh": 24,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": 3.6,
+    "KhuVuc": "TP.HCM"
+  },
+  {
+    "MaNCC": "NCC012",
+    "TenNCC": "Noi That Le Vin Decor",
+    "LoaiSanPham": "sofa",
+    "ChatLieu": "da_that",
+    "Gia": 27826523,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 274,
+    "ThoiGianGiao": 11,
+    "BaoHanh": 12,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": 3.7,
+    "KhuVuc": "TP.HCM"
+  },
+  {
+    "MaNCC": "NCC013",
+    "TenNCC": "Noi That Van Phong Proce",
+    "LoaiSanPham": "tủ hồ sơ",
+    "ChatLieu": "go_cong_nghiep",
+    "Gia": 7045398,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 259,
+    "ThoiGianGiao": 22,
+    "BaoHanh": 6,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": 3.8,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC014",
+    "TenNCC": "Noi That Van Phong Proce",
+    "LoaiSanPham": "bàn làm việc",
+    "ChatLieu": "kim_loai",
+    "Gia": 904797,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 165,
+    "ThoiGianGiao": 18,
+    "BaoHanh": 0,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": 4.1,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC015",
+    "TenNCC": "Noi That Van Phong Proce",
+    "LoaiSanPham": "sofa",
+    "ChatLieu": "vai_boc",
+    "Gia": 13034686,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 123,
+    "ThoiGianGiao": 21,
+    "BaoHanh": 0,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": 3.5,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC016",
+    "TenNCC": "MyChair",
+    "LoaiSanPham": "bàn làm việc",
+    "ChatLieu": "go_tu_nhien",
+    "Gia": 2285185,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 270,
+    "ThoiGianGiao": 22,
+    "BaoHanh": 24,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": 4.3,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC017",
+    "TenNCC": "MyChair",
+    "LoaiSanPham": "sofa",
+    "ChatLieu": "da_that",
+    "Gia": 15459463,
     "DonViTinh": "cai",
     "MOQ": 20,
-    "TonKho": 150,
-    "ThoiGianGiao": 10,
+    "TonKho": 191,
+    "ThoiGianGiao": 17,
+    "BaoHanh": 36,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": 3.8,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC018",
+    "TenNCC": "MyChair",
+    "LoaiSanPham": "tủ hồ sơ",
+    "ChatLieu": "go_cong_nghiep",
+    "Gia": 6735091,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 117,
+    "ThoiGianGiao": 21,
+    "BaoHanh": 6,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": 3.8,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC019",
+    "TenNCC": "Noi That Ngoc Diep",
+    "LoaiSanPham": "ghế văn phòng",
+    "ChatLieu": "da_that",
+    "Gia": 947197,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 121,
+    "ThoiGianGiao": 11,
     "BaoHanh": 24,
-    "ChietKhauTheoSoLuong": "5% cho don >=50 cai",
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
     "DiemUyTin": 4.5,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC020",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "sofa",
+    "ChatLieu": "vai_boc",
+    "Gia": 18658665,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 48,
+    "ThoiGianGiao": 6,
+    "BaoHanh": 24,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": 4.2,
+    "KhuVuc": "TP.HCM"
+  },
+  {
+    "MaNCC": "NCC021",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "kệ",
+    "ChatLieu": "go_cong_nghiep",
+    "Gia": 3440790,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 31,
+    "ThoiGianGiao": 15,
+    "BaoHanh": 12,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": 3.8,
+    "KhuVuc": "TP.HCM"
+  },
+  {
+    "MaNCC": "NCC022",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "ghế văn phòng",
+    "ChatLieu": "luoi_nhua",
+    "Gia": 2531621,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 216,
+    "ThoiGianGiao": 8,
+    "BaoHanh": 12,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": 3.7,
+    "KhuVuc": "TP.HCM"
+  },
+  {
+    "MaNCC": "NCC023",
+    "TenNCC": "AmiA",
+    "LoaiSanPham": "ghế văn phòng",
+    "ChatLieu": "luoi_nhua",
+    "Gia": 4156553,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 47,
+    "ThoiGianGiao": 10,
+    "BaoHanh": 6,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": 3.8,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC024",
+    "TenNCC": "AmiA",
+    "LoaiSanPham": "sofa",
+    "ChatLieu": "da_that",
+    "Gia": 10524305,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 1,
+    "ThoiGianGiao": 15,
+    "BaoHanh": 12,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": 3.5,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC025",
+    "TenNCC": "AmiA",
+    "LoaiSanPham": "tủ hồ sơ",
+    "ChatLieu": "kim_loai",
+    "Gia": 3098529,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 151,
+    "ThoiGianGiao": 9,
+    "BaoHanh": 0,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": 3.7,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC026",
+    "TenNCC": "Melinh Plaza",
+    "LoaiSanPham": "ghế văn phòng",
+    "ChatLieu": "luoi_nhua",
+    "Gia": 2649795,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 271,
+    "ThoiGianGiao": 8,
+    "BaoHanh": 0,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": 4.1,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC027",
+    "TenNCC": "Noi That ERADO",
+    "LoaiSanPham": "ghế văn phòng",
+    "ChatLieu": "vai_boc",
+    "Gia": 4599340,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 126,
+    "ThoiGianGiao": 21,
+    "BaoHanh": 36,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": 4.0,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC028",
+    "TenNCC": "Noi That ERADO",
+    "LoaiSanPham": "bàn làm việc",
+    "ChatLieu": "kim_loai",
+    "Gia": 5285419,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 133,
+    "ThoiGianGiao": 9,
+    "BaoHanh": 12,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": 4.0,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC029",
+    "TenNCC": "Noi That ERADO",
+    "LoaiSanPham": "kệ",
+    "ChatLieu": "kim_loai",
+    "Gia": 2617738,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 37,
+    "ThoiGianGiao": 3,
+    "BaoHanh": 24,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": 3.7,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "NCC030",
+    "TenNCC": "Inter Office",
+    "LoaiSanPham": "bàn làm việc",
+    "ChatLieu": "go_tu_nhien",
+    "Gia": 1477063,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 189,
+    "ThoiGianGiao": 12,
+    "BaoHanh": 6,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": 4.4,
+    "KhuVuc": "TP.HCM"
+  },
+  {
+    "MaNCC": "NCC031",
+    "TenNCC": "Inter Office",
+    "LoaiSanPham": "tủ hồ sơ",
+    "ChatLieu": "go_cong_nghiep",
+    "Gia": 7402442,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 153,
+    "ThoiGianGiao": 24,
+    "BaoHanh": 0,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": 4.3,
+    "KhuVuc": "TP.HCM"
+  },
+  {
+    "MaNCC": "NCC032",
+    "TenNCC": "Inter Office",
+    "LoaiSanPham": "ghế văn phòng",
+    "ChatLieu": "vai_boc",
+    "Gia": 3763921,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 79,
+    "ThoiGianGiao": 11,
+    "BaoHanh": 12,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": 4.3,
+    "KhuVuc": "TP.HCM"
+  },
+  {
+    "MaNCC": "EDGE001",
+    "TenNCC": "Noi That Cao Cap Kim Long",
+    "LoaiSanPham": "ghế văn phòng",
+    "ChatLieu": "da_that",
+    "Gia": 4500000,
+    "DonViTinh": "cai",
+    "MOQ": 100,
+    "TonKho": 150,
+    "ThoiGianGiao": 20,
+    "BaoHanh": 24,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 5
+      }
+    ],
+    "DiemUyTin": 4.2,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "EDGE002",
+    "TenNCC": "Noi That Thanh Cong Moi",
+    "LoaiSanPham": "bàn làm việc",
+    "ChatLieu": "go_cong_nghiep",
+    "Gia": 1450000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 80,
+    "ThoiGianGiao": 7,
+    "BaoHanh": 12,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 4
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang"
+  },
+  {
+    "MaNCC": "EDGE003",
+    "TenNCC": "Noi That Song Hong",
+    "LoaiSanPham": "tủ hồ sơ",
+    "ChatLieu": "kim_loai",
+    "Gia": 2300000,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 40,
+    "ThoiGianGiao": 10,
+    "BaoHanh": 12,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 5,
+        "phan_tram_giam": 2
+      }
+    ],
+    "DiemUyTin": 3.8,
+    "KhuVuc": "TP.HCM"
+  },
+  {
+    "MaNCC": "EDGE004A",
+    "TenNCC": "Noi That Viet Tin",
+    "LoaiSanPham": "sofa",
+    "ChatLieu": "da_that",
+    "Gia": 15000000,
+    "DonViTinh": "bo",
+    "MOQ": 1,
+    "TonKho": 10,
+    "ThoiGianGiao": 15,
+    "BaoHanh": 24,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 5,
+        "phan_tram_giam": 5
+      }
+    ],
+    "DiemUyTin": 4.0,
+    "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "EDGE004B",
+    "TenNCC": "Noi That Viet Tin",
+    "LoaiSanPham": "sofa",
+    "ChatLieu": "da_that",
+    "Gia": 19800000,
+    "DonViTinh": "bo",
+    "MOQ": 1,
+    "TonKho": 10,
+    "ThoiGianGiao": 15,
+    "BaoHanh": 24,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 5,
+        "phan_tram_giam": 5
+      }
+    ],
+    "DiemUyTin": 4.0,
     "KhuVuc": "Ha Noi"
   }
 ]
