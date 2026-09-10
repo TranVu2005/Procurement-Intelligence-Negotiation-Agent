@@ -54,8 +54,6 @@ def _configure_gemini() -> None:
         )
     genai.configure(api_key=api_key)
 
-_configure_gemini()
-
 # ---------------------------------------------------------------------------
 # Hằng số
 # ---------------------------------------------------------------------------
@@ -148,6 +146,7 @@ Quy tắc:
 
 def _call_gemini(system_prompt: str, user_text: str) -> dict:
     """Gọi Gemini với JSON output mode, trả về dict đã parse."""
+    _configure_gemini()
     model = genai.GenerativeModel(
         model_name=_GEMINI_MODEL,
         system_instruction=system_prompt,
