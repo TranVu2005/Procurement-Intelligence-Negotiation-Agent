@@ -1,5 +1,6 @@
 langchain
 langchain-community
 langchain-anthropic
+langchain-google-genai
 python-dotenv
 pydantic
