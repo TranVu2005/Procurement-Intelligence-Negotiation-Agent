@@ -1,0 +1,99 @@
+[
+  {
+    "id": "tc_conflict_moq_budget",
+    "tool_sequence": [
+      "search_suppliers",
+      "compare_price"
+    ],
+    "input": {
+      "search_suppliers": {
+        "product_type": "ghế văn phòng",
+        "material": null,
+        "region": null
+      },
+      "compare_price": {
+        "supplier_ids": [
+          "EDGE001"
+        ],
+        "quantity": 20
+      }
+    },
+    "expected_behavior": "quantity=20 < MOQ=100 cua EDGE001. Agent phai canh bao ro rang buoc khong thoa (MOQ), khong duoc tu y bo qua budget_max hoac ha quantity ngam.",
+    "rubric_ref": "Reasoning: Thoa man va uu tien rang buoc (2.5d); SYSTEM-RULES muc 3"
+  },
+  {
+    "id": "tc_missing_trust_score",
+    "tool_sequence": [
+      "get_supplier_detail"
+    ],
+    "input": {
+      "get_supplier_detail": {
+        "supplier_id": "EDGE002"
+      }
+    },
+    "expected_behavior": "DiemUyTin=null trong khi soft_constraints.min_trust_score co the duoc yeu cau. Agent phai hoi lai hoac neu ro gia dinh dang dung, KHONG tu dien gia tri DiemUyTin.",
+    "rubric_ref": "Perception: khong tu dien thong tin (0d neu vi pham); SYSTEM-RULES muc 3"
+  },
+  {
+    "id": "tc_partial_tool_error",
+    "tool_sequence": [
+      "compare_price"
+    ],
+    "input": {
+      "compare_price": {
+        "supplier_ids": [
+          "EDGE003",
+          "NCC_KHONG_TON_TAI"
+        ],
+        "quantity": 5
+      }
+    },
+    "expected_behavior": "EDGE003 tra ket qua binh thuong; 'NCC_KHONG_TON_TAI' tra loi rieng dang {error:true, error_type:'no_match', message:...} nhung KHONG lam fail toan bo response compare_price.",
+    "rubric_ref": "Action/Tool Use: xu ly loi ky thuat an toan (1.5d); SYSTEM-RULES muc 2.3"
+  },
+  {
+    "id": "tc_conflicting_source_data",
+    "tool_sequence": [
+      "get_supplier_detail",
+      "get_supplier_detail"
+    ],
+    "input": {
+      "get_supplier_detail": [
+        {
+          "supplier_id": "EDGE004A"
+        },
+        {
+          "supplier_id": "EDGE004B"
+        }
+      ]
+    },
+    "expected_behavior": "get_supplier_detail chi nhan 1 supplier_id/lan goi (dung tool contract) nen phai goi rieng cho EDGE004A va EDGE004B. Ca 2 ban ghi cung TenNCC='Noi That Viet Tin', cung LoaiSanPham=sofa nhung Gia khac nhau (15tr vs 19.8tr). Sau khi co ca 2 ket qua, Agent phai neu ro co su mau thuan giua 2 nguon, khong tu chon dai 1 gia tri roi bao cao nhu the chac chan.",
+    "rubric_ref": "Perception: nhan biet mau thuan (1.5d)"
+  },
+  {
+    "id": "tc_replan_limit_exceeded",
+    "tool_sequence": [
+      "search_suppliers (gia lap loi 4 lan lien tiep)"
+    ],
+    "input": {
+      "simulate_error": "timeout",
+      "consecutive_failures": 4
+    },
+    "expected_behavior": "replan_count khong duoc vuot qua 3. Sau lan re-plan thu 3 that bai, Agent phai tra loi 'chua du bang chung / can ho tro them', khong lap lai tool call vo han. Moi lan re-plan phai tao plan_id moi, khong sua de plan cu.",
+    "rubric_ref": "SYSTEM-RULES muc 4 (gioi han 3 lan re-plan); Reliability & Fault Tolerance"
+  },
+  {
+    "id": "tc_session_isolation",
+    "tool_sequence": [
+      "read_state"
+    ],
+    "input": {
+      "session_ids": [
+        "sess_001",
+        "sess_002"
+      ]
+    },
+    "expected_behavior": "conversation_history va decisions_made cua sess_001 (ghe van phong, 40 trieu) khong duoc xuat hien trong response/state cua sess_002 (sofa, 90 trieu) va nguoc lai.",
+    "rubric_ref": "Memory: gioi han pham vi, rieng tu (1.0d); SYSTEM-RULES muc 5"
+  }
+]

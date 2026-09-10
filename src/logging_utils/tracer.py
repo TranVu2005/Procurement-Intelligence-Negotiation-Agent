@@ -9,7 +9,7 @@ import uuid
 SENSITIVE_KEYS = {"api_key", "anthropic_api_key", "password", "token"}
 
 logger = logging.getLogger("procurement_agent")
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s:%(name)s:%(message)s")
 
 
 def new_trace_id() -> str:
