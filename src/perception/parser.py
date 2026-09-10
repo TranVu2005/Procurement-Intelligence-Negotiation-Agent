@@ -68,7 +68,7 @@ VALID_PRODUCT_TYPES = {
     "sofa",
 }
 
-_GEMINI_MODEL = "gemini-2.5-flash"
+_GEMINI_MODEL = "gemini-3.6-flash"
 
 # ---------------------------------------------------------------------------
 # Custom exceptions

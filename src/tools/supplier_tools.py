@@ -9,6 +9,7 @@ Load du lieu tu mock_data/suppliers.json (sinh boi generate_mock_data.py).
 
 import json
 import time
+import unicodedata
 from pathlib import Path
 
 from langchain_core.tools import StructuredTool
@@ -22,6 +23,19 @@ DATA_PATH = Path(__file__).parent / "mock_data" / "suppliers.json"
 def _load_data():
     with open(DATA_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def _normalize(text: str | None) -> str | None:
+    """Bo dau, ha thuong, gop khoang trang/underscore de so khop khong phan biet
+    dinh dang giua tieng Viet co dau (A xuat ra tu Gemini) va slug khong dau
+    (mock data). Chi dung de SO SANH, khong lam thay doi gia tri goc tra ve."""
+    if text is None:
+        return None
+    text = text.replace("đ", "d").replace("Đ", "D")
+    text = unicodedata.normalize("NFD", text)
+    text = "".join(c for c in text if unicodedata.category(c) != "Mn")
+    text = text.replace("_", " ").strip().lower()
+    return " ".join(text.split())
 
 
 def _error(error_type: str, message: str) -> dict:
@@ -58,14 +72,22 @@ def search_suppliers(product_type: str, material: str | None = None, region: str
         return result
 
     data = _load_data()
-    matches = [r for r in data if r.get("LoaiSanPham") == product_type]
+    norm_product_type = _normalize(product_type)
+    matches = [r for r in data if _normalize(r.get("LoaiSanPham")) == norm_product_type]
     if material:
-        matches = [r for r in matches if r.get("ChatLieu") == material]
+        norm_material = _normalize(material)
+        matches = [r for r in matches if _normalize(r.get("ChatLieu")) == norm_material]
     if region:
-        matches = [r for r in matches if r.get("KhuVuc") == region]
+        norm_region = _normalize(region)
+        matches = [r for r in matches if _normalize(r.get("KhuVuc")) == norm_region]
 
     if not matches:
-        result = _error("no_match", f"Khong tim thay nha cung cap cho product_type='{product_type}'")
+        filters = [f"product_type='{product_type}'"]
+        if material:
+            filters.append(f"material='{material}'")
+        if region:
+            filters.append(f"region='{region}'")
+        result = _error("no_match", f"Khong tim thay nha cung cap voi bo loc: {', '.join(filters)}")
         _log_end(trace_id, start, "search_suppliers", "error")
         return result
 
