@@ -1,9 +1,10 @@
 import time
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from src.logging_utils.tracer import audit_entry, log_tool_call, new_trace_id, redact
-from src.tools.supplier_tools import compare_price, get_supplier_detail, search_suppliers
+from src.tools.retry import call_with_retry
+from src.tools.supplier_tools import compare_price, confirm_order, get_supplier_detail, search_suppliers
 
 # Du lieu gia lap doc lap voi mock_data/suppliers.json that - tranh test vo tinh
 # gay ra boi nguoi khac sua dataset. T002 co y thieu field MOQ de test duong loi
@@ -110,6 +111,79 @@ class ComparePriceTests(unittest.TestCase):
     def test_non_positive_quantity_is_invalid_input(self) -> None:
         result = compare_price(["T001"], quantity=0)
         self.assertEqual(result["error_type"], "invalid_input")
+
+
+class ConfirmOrderTests(unittest.TestCase):
+    def test_confirmed_false_is_blocked_as_invalid_input(self) -> None:
+        # GATE: hanh dong hau qua cao khong duoc tu dong thuc thi (SYSTEM-RULES.md).
+        with patch_data():
+            result = confirm_order("T001", quantity=5, confirmed=False)
+        self.assertEqual(result["error_type"], "invalid_input")
+
+    def test_confirmed_missing_defaults_to_blocked(self) -> None:
+        with patch_data():
+            result = confirm_order("T001", quantity=5)
+        self.assertEqual(result["error_type"], "invalid_input")
+
+    def test_confirmed_true_returns_order_confirmed(self) -> None:
+        with patch_data():
+            result = confirm_order("T001", quantity=5, confirmed=True)
+        self.assertEqual(
+            result,
+            {
+                "order_confirmed": True,
+                "supplier_id": "T001",
+                "quantity": 5,
+                "confirmed_at": result["confirmed_at"],
+            },
+        )
+        # ISO 8601, khong co "đ"/dau phay theo SYSTEM-RULES.md
+        time.strptime(result["confirmed_at"], "%Y-%m-%dT%H:%M:%S")
+
+    def test_unknown_supplier_is_no_match_even_if_confirmed(self) -> None:
+        with patch_data():
+            result = confirm_order("KHONG_TON_TAI", quantity=5, confirmed=True)
+        self.assertEqual(result["error_type"], "no_match")
+
+    def test_non_positive_quantity_is_invalid_input(self) -> None:
+        with patch_data():
+            result = confirm_order("T001", quantity=0, confirmed=True)
+        self.assertEqual(result["error_type"], "invalid_input")
+
+
+class RetryTests(unittest.TestCase):
+    def test_recovers_after_transient_timeout(self) -> None:
+        fn = Mock(
+            side_effect=[
+                {"error": True, "error_type": "timeout", "message": "x"},
+                {"suppliers": ["ok"]},
+            ]
+        )
+        fn.__name__ = "search_suppliers"
+        result = call_with_retry(fn, "ghế văn phòng", backoff_base=0.001)
+        self.assertEqual(result, {"suppliers": ["ok"]})
+        self.assertEqual(fn.call_count, 2)
+
+    def test_gives_up_after_max_retries_and_returns_last_error(self) -> None:
+        fn = Mock(return_value={"error": True, "error_type": "timeout", "message": "always"})
+        fn.__name__ = "search_suppliers"
+        result = call_with_retry(fn, "ghế văn phòng", max_retries=2, backoff_base=0.001)
+        self.assertEqual(result["error_type"], "timeout")
+        self.assertEqual(fn.call_count, 3)  # 1 lan dau + 2 retry
+
+    def test_non_retryable_error_returns_immediately_no_retry(self) -> None:
+        fn = Mock(return_value={"error": True, "error_type": "no_match", "message": "x"})
+        fn.__name__ = "search_suppliers"
+        result = call_with_retry(fn, "ghế văn phòng", backoff_base=0.001)
+        self.assertEqual(result["error_type"], "no_match")
+        self.assertEqual(fn.call_count, 1)
+
+    def test_success_on_first_try_no_retry(self) -> None:
+        fn = Mock(return_value={"suppliers": []})
+        fn.__name__ = "search_suppliers"
+        result = call_with_retry(fn, "ghế văn phòng", backoff_base=0.001)
+        self.assertEqual(result, {"suppliers": []})
+        self.assertEqual(fn.call_count, 1)
 
 
 class TracerTests(unittest.TestCase):

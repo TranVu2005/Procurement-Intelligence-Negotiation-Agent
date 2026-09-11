@@ -10,6 +10,7 @@ Load du lieu tu mock_data/suppliers.json (sinh boi generate_mock_data.py).
 import json
 import time
 import unicodedata
+from datetime import datetime, timezone
 from pathlib import Path
 
 from langchain_core.tools import StructuredTool
@@ -202,6 +203,56 @@ def compare_price(supplier_ids: list[str], quantity: int) -> dict:
     return {"comparisons": comparisons}
 
 
+def confirm_order(supplier_id: str, quantity: int, confirmed: bool = False) -> dict:
+    """
+    Input: {"supplier_id": str (required), "quantity": int (required), "confirmed": bool (required)}
+    Output neu confirmed=True va hop le: {"order_confirmed": true, "supplier_id", "quantity", "confirmed_at"}
+    Output neu confirmed=False/thieu: loi invalid_input - day la GATE chan lai, KHONG tu dong chot don
+    (SYSTEM-RULES.md: hanh dong hau qua cao phai co xac nhan ro rang, khong duoc tu dong thuc thi).
+    Tool nay chi xac nhan/tu choi - khong tu ghi vao decisions_made (thuoc src/memory, Nguoi A so huu).
+    """
+    trace_id = new_trace_id()
+    start = time.perf_counter()
+    params = {"supplier_id": supplier_id, "quantity": quantity, "confirmed": confirmed}
+    log_event(trace_id, "tool_call_start", tool_name="confirm_order", **params)
+
+    if not supplier_id:
+        result = _error("invalid_input", "supplier_id la truong bat buoc")
+        log_tool_call(trace_id, "confirm_order", start, "error", params=params)
+        return result
+
+    if not quantity or quantity <= 0:
+        result = _error("invalid_input", "quantity phai la so nguyen duong")
+        log_tool_call(trace_id, "confirm_order", start, "error", params=params)
+        return result
+
+    data = _load_data()
+    record = next((r for r in data if r["MaNCC"] == supplier_id), None)
+    if record is None:
+        result = _error("no_match", f"supplier_id='{supplier_id}' khong ton tai")
+        log_tool_call(trace_id, "confirm_order", start, "error", params=params)
+        return result
+
+    if confirmed is not True:
+        # GATE: chua duoc xac nhan ro rang -> chan lai, khong tu dong chot don thay nguoi dung
+        result = _error(
+            "invalid_input",
+            "Can xac nhan ro rang (confirmed=true) truoc khi chot don - khong tu dong "
+            "xac nhan thay nguoi dung.",
+        )
+        log_tool_call(trace_id, "confirm_order", start, "blocked", params=params)
+        return result
+
+    confirmed_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+    log_tool_call(trace_id, "confirm_order", start, "confirmed", params=params)
+    return {
+        "order_confirmed": True,
+        "supplier_id": supplier_id,
+        "quantity": quantity,
+        "confirmed_at": confirmed_at,
+    }
+
+
 # --- LangChain Tool wrapper (B goi qua day; args_schema chi lo public field,
 # khong expose _simulate_error - do chi de test noi bo) ---
 
@@ -236,6 +287,16 @@ class ComparePriceArgs(BaseModel):
     quantity: int = Field(
         description="Số lượng dự kiến đặt mua (số nguyên dương). Bắt buộc -- dùng để tính chiết khấu "
         "theo bậc và kiểm tra có đạt MOQ hay không."
+    )
+
+
+class ConfirmOrderArgs(BaseModel):
+    supplier_id: str = Field(description="Mã NCC (MaNCC) đã chọn để chốt đơn, vd 'NCC001'. Bắt buộc.")
+    quantity: int = Field(description="Số lượng chốt mua (số nguyên dương). Bắt buộc.")
+    confirmed: bool = Field(
+        description="CHỈ được đặt true khi người dùng đã xác nhận rõ ràng trong hội thoại "
+        "(vd 'đồng ý', 'chốt đơn đi', 'ok chốt'). KHÔNG được tự đặt true thay người dùng nếu "
+        "chưa có xác nhận rõ ràng -- để false và hỏi lại người dùng trước."
     )
 
 
@@ -278,6 +339,19 @@ compare_price_tool = StructuredTool.from_function(
     args_schema=ComparePriceArgs,
 )
 
+confirm_order_tool = StructuredTool.from_function(
+    func=confirm_order,
+    name="confirm_order",
+    description=(
+        "Chốt đơn giả lập với 1 NCC -- HÀNH ĐỘNG HẬU QUẢ CAO, chỉ được gọi với confirmed=true "
+        "SAU KHI người dùng đã xác nhận rõ ràng trong hội thoại (không được tự suy diễn). "
+        "DÙNG KHI: người dùng đã chọn xong 1 NCC/số lượng cụ thể và nói rõ đồng ý chốt đơn. "
+        "KHÔNG DÙNG KHI: người dùng mới đang so sánh/cân nhắc (dùng search_suppliers/compare_price); "
+        "chưa nhận được xác nhận rõ ràng từ người dùng (gọi với confirmed=false hoặc hỏi lại trước)."
+    ),
+    args_schema=ConfirmOrderArgs,
+)
+
 
 if __name__ == "__main__":
     import sys
@@ -287,3 +361,5 @@ if __name__ == "__main__":
     print(json.dumps(search_suppliers("ghế văn phòng"), ensure_ascii=False, indent=2)[:500])
     print(json.dumps(get_supplier_detail("EDGE002"), ensure_ascii=False, indent=2))
     print(json.dumps(compare_price(["EDGE003", "NCC_KHONG_TON_TAI"], quantity=5), ensure_ascii=False, indent=2))
+    print(json.dumps(confirm_order("EDGE003", quantity=5, confirmed=False), ensure_ascii=False, indent=2))
+    print(json.dumps(confirm_order("EDGE003", quantity=5, confirmed=True), ensure_ascii=False, indent=2))
