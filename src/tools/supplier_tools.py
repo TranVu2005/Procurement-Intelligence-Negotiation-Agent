@@ -15,7 +15,7 @@ from pathlib import Path
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field
 
-from src.logging_utils.tracer import log_event, new_trace_id
+from src.logging_utils.tracer import log_event, log_tool_call, new_trace_id
 
 DATA_PATH = Path(__file__).parent / "mock_data" / "suppliers.json"
 
@@ -43,12 +43,6 @@ def _error(error_type: str, message: str) -> dict:
     return {"error": True, "error_type": error_type, "message": message}
 
 
-def _log_end(trace_id: str, start: float, tool_name: str, status: str, **extra) -> None:
-    # latency bat buoc theo SYSTEM-RULES.md muc 6
-    log_event(trace_id, "tool_call_end", tool_name=tool_name, status=status,
-              latency_ms=round((time.perf_counter() - start) * 1000, 2), **extra)
-
-
 def search_suppliers(product_type: str, material: str | None = None, region: str | None = None,
                       _simulate_error: str | None = None) -> dict:
     """
@@ -58,17 +52,17 @@ def search_suppliers(product_type: str, material: str | None = None, region: str
     """
     trace_id = new_trace_id()
     start = time.perf_counter()
-    log_event(trace_id, "tool_call_start", tool_name="search_suppliers",
-              product_type=product_type, material=material, region=region)
+    params = {"product_type": product_type, "material": material, "region": region}
+    log_event(trace_id, "tool_call_start", tool_name="search_suppliers", **params)
 
     if _simulate_error:
         result = _error(_simulate_error, f"Gia lap loi '{_simulate_error}' cho search_suppliers")
-        _log_end(trace_id, start, "search_suppliers", "error")
+        log_tool_call(trace_id, "search_suppliers", start, "error", params=params)
         return result
 
     if not product_type:
         result = _error("invalid_input", "product_type la truong bat buoc")
-        _log_end(trace_id, start, "search_suppliers", "error")
+        log_tool_call(trace_id, "search_suppliers", start, "error", params=params)
         return result
 
     data = _load_data()
@@ -88,21 +82,23 @@ def search_suppliers(product_type: str, material: str | None = None, region: str
         if region:
             filters.append(f"region='{region}'")
         result = _error("no_match", f"Khong tim thay nha cung cap voi bo loc: {', '.join(filters)}")
-        _log_end(trace_id, start, "search_suppliers", "error")
+        log_tool_call(trace_id, "search_suppliers", start, "error", params=params)
         return result
 
     suppliers = [
         {
             "MaNCC": r["MaNCC"],
             "TenNCC": r["TenNCC"],
-            "Gia": r["Gia"],
-            "MOQ": r["MOQ"],
-            "ThoiGianGiao": r["ThoiGianGiao"],
-            "DiemUyTin": r["DiemUyTin"],
+            # .get() thay vi r[...]: dataset thieu field khong duoc lam crash ca
+            # response (cung nguyen tac voi compare_price, muc 3 interface-contracts.md)
+            "Gia": r.get("Gia"),
+            "MOQ": r.get("MOQ"),
+            "ThoiGianGiao": r.get("ThoiGianGiao"),
+            "DiemUyTin": r.get("DiemUyTin"),
         }
         for r in matches
     ]
-    _log_end(trace_id, start, "search_suppliers", "ok", result_count=len(suppliers))
+    log_tool_call(trace_id, "search_suppliers", start, "ok", params=params, result_count=len(suppliers))
     return {"suppliers": suppliers}
 
 
@@ -113,26 +109,27 @@ def get_supplier_detail(supplier_id: str, _simulate_error: str | None = None) ->
     """
     trace_id = new_trace_id()
     start = time.perf_counter()
-    log_event(trace_id, "tool_call_start", tool_name="get_supplier_detail", supplier_id=supplier_id)
+    params = {"supplier_id": supplier_id}
+    log_event(trace_id, "tool_call_start", tool_name="get_supplier_detail", **params)
 
     if _simulate_error:
         result = _error(_simulate_error, f"Gia lap loi '{_simulate_error}' cho get_supplier_detail")
-        _log_end(trace_id, start, "get_supplier_detail", "error")
+        log_tool_call(trace_id, "get_supplier_detail", start, "error", params=params)
         return result
 
     if not supplier_id:
         result = _error("invalid_input", "supplier_id la truong bat buoc")
-        _log_end(trace_id, start, "get_supplier_detail", "error")
+        log_tool_call(trace_id, "get_supplier_detail", start, "error", params=params)
         return result
 
     data = _load_data()
     for r in data:
         if r["MaNCC"] == supplier_id:
-            _log_end(trace_id, start, "get_supplier_detail", "ok")
+            log_tool_call(trace_id, "get_supplier_detail", start, "ok", params=params)
             return r  # da dung 13 field theo dinh nghia
 
     result = _error("no_match", f"Khong tim thay supplier_id='{supplier_id}'")
-    _log_end(trace_id, start, "get_supplier_detail", "error")
+    log_tool_call(trace_id, "get_supplier_detail", start, "error", params=params)
     return result
 
 
@@ -155,12 +152,18 @@ def compare_price(supplier_ids: list[str], quantity: int) -> dict:
     """
     trace_id = new_trace_id()
     start = time.perf_counter()
-    log_event(trace_id, "tool_call_start", tool_name="compare_price",
-              supplier_ids=supplier_ids, quantity=quantity)
+    params = {"supplier_ids": supplier_ids, "quantity": quantity}
+    log_event(trace_id, "tool_call_start", tool_name="compare_price", **params)
 
+    # --- validate-first: chan het truoc khi dung data, khong de loi throw giua chung ---
     if not quantity or quantity <= 0:
         result = _error("invalid_input", "quantity phai la so nguyen duong")
-        _log_end(trace_id, start, "compare_price", "error")
+        log_tool_call(trace_id, "compare_price", start, "error", params=params)
+        return result
+
+    if not supplier_ids:
+        result = _error("invalid_input", "supplier_ids phai co it nhat 1 phan tu")
+        log_tool_call(trace_id, "compare_price", start, "error", params=params)
         return result
 
     data = _load_data()
@@ -176,16 +179,26 @@ def compare_price(supplier_ids: list[str], quantity: int) -> dict:
             })
             continue
 
-        unit_price, pct = _apply_discount(record["Gia"], quantity, record.get("ChietKhauTheoSoLuong"))
-        comparisons.append({
-            "MaNCC": sid,
-            "unit_price": unit_price,
-            "discount_applied": f"{pct}%",
-            "total_price": unit_price * quantity,
-            "meets_moq": quantity >= record["MOQ"],
-        })
+        try:
+            unit_price, pct = _apply_discount(record["Gia"], quantity, record.get("ChietKhauTheoSoLuong"))
+            comparisons.append({
+                "MaNCC": sid,
+                "unit_price": unit_price,
+                "discount_applied": f"{pct}%",
+                "total_price": unit_price * quantity,
+                "meets_moq": quantity >= record["MOQ"],
+            })
+        except KeyError as e:
+            # dataset thieu field (vd Gia/MOQ) -> loi rieng phan tu nay, khong fail ca response
+            comparisons.append({
+                "MaNCC": sid,
+                **_error("tool_unavailable", f"Du lieu NCC '{sid}' thieu truong {e}"),
+            })
 
-    _log_end(trace_id, start, "compare_price", "ok", result_count=len(comparisons))
+    error_count = sum(1 for c in comparisons if c.get("error"))
+    status = "error" if error_count == len(comparisons) else "ok"
+    log_tool_call(trace_id, "compare_price", start, status, params=params,
+                  result_count=len(comparisons), error_count=error_count)
     return {"comparisons": comparisons}
 
 
