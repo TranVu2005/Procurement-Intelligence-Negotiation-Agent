@@ -83,6 +83,19 @@
     "rubric_ref": "SYSTEM-RULES muc 4 (gioi han 3 lan re-plan); Reliability & Fault Tolerance"
   },
   {
+    "id": "tc_out_of_stock",
+    "tool_sequence": [
+      "get_supplier_detail"
+    ],
+    "input": {
+      "get_supplier_detail": {
+        "supplier_id": "EDGE005"
+      }
+    },
+    "expected_behavior": "TonKho=0 nghia la NCC het hang/tam ngung cung cap dong san pham nay. Agent khong duoc de xuat EDGE005 nhu 1 lua chon kha thi; phai bao ro het hang va re-plan sang NCC khac hoac hoi lai nguoi dung, khong lap lai cung 1 ke hoach.",
+    "rubric_ref": "Reasoning: re-plan khi het hang; SYSTEM-RULES muc 3 va muc 4"
+  },
+  {
     "id": "tc_session_isolation",
     "tool_sequence": [
       "read_state"
