@@ -285,11 +285,20 @@ def update_state(existing_state: dict, new_text: str) -> dict:
             raise InvalidProductTypeError(extracted["product_type"])
         updated_hard["product_type"] = p
     if extracted.get("quantity") is not None:
-        updated_hard["quantity"] = int(extracted["quantity"])
+        qty = int(extracted["quantity"])
+        if qty <= 0:
+            raise ValueError(f"quantity phải > 0, nhận được: {qty}")
+        updated_hard["quantity"] = qty
     if extracted.get("budget_max") is not None:
-        updated_hard["budget_max"] = float(extracted["budget_max"])
+        bmax = float(extracted["budget_max"])
+        if bmax <= 0:
+            raise ValueError(f"budget_max phải > 0, nhận được: {bmax}")
+        updated_hard["budget_max"] = bmax
     if extracted.get("delivery_deadline_days") is not None:
-        updated_hard["delivery_deadline_days"] = int(extracted["delivery_deadline_days"])
+        ddays = int(extracted["delivery_deadline_days"])
+        if ddays <= 0:
+            raise ValueError(f"delivery_deadline_days phải > 0, nhận được: {ddays}")
+        updated_hard["delivery_deadline_days"] = ddays
 
     updated_soft = dict(existing_state["soft_constraints"])
     if extracted.get("material_preference") is not None:
@@ -297,7 +306,10 @@ def update_state(existing_state: dict, new_text: str) -> dict:
     if extracted.get("region_preference") is not None:
         updated_soft["region_preference"] = extracted["region_preference"]
     if extracted.get("min_trust_score") is not None:
-        updated_soft["min_trust_score"] = float(extracted["min_trust_score"])
+        min_trust = float(extracted["min_trust_score"])
+        if 1.0 <= min_trust <= 5.0:
+            updated_soft["min_trust_score"] = min_trust
+        # Nếu ngoài range [1,5] → bỏ qua, giữ nguyên giá trị cũ (không ghi đè None)
 
     # Append turn mới vào conversation_history
     history = list(existing_state.get("conversation_history", []))

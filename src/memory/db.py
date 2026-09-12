@@ -6,7 +6,11 @@ Cung cấp:
 - init_db()            : tạo bảng theo schema.sql
 - save_session()       : upsert toàn bộ state (ghi đè nếu đã tồn tại)
 - load_session()       : load state theo session_id
+- session_exists()     : kiểm tra session_id có tồn tại không
+- delete_session()     : xóa toàn bộ dữ liệu 1 phiên (sessions + history + decisions)
+- list_sessions()      : liệt kê tất cả session_id hiện có
 - append_conversation(): ghi thêm 1 turn hội thoại
+- load_conversation()  : đọc lịch sử hội thoại
 - save_decision()      : ghi nhận NCC đã được chốt
 - load_decisions()     : lấy danh sách NCC đã chốt trong phiên
 """
@@ -109,6 +113,43 @@ def session_exists(session_id: str) -> bool:
             "SELECT 1 FROM sessions WHERE session_id = ?", (session_id,)
         ).fetchone()
     return row is not None
+
+
+def delete_session(session_id: str) -> bool:
+    """Xóa toàn bộ dữ liệu của 1 phiên (sessions, conversation_history, decisions_made).
+
+    Dùng để reset phiên hoặc kiểm tra session isolation — đảm bảo dữ liệu của
+    phiên này không rò sang phiên khác sau khi xóa.
+
+    Args:
+        session_id: ID phiên cần xóa.
+
+    Returns:
+        True nếu session tồn tại và đã xóa, False nếu không tìm thấy.
+    """
+    with get_connection() as conn:
+        # Xóa theo thứ tự để không vi phạm foreign key constraint
+        conn.execute("DELETE FROM decisions_made WHERE session_id = ?", (session_id,))
+        conn.execute("DELETE FROM conversation_history WHERE session_id = ?", (session_id,))
+        result = conn.execute(
+            "DELETE FROM sessions WHERE session_id = ?", (session_id,)
+        )
+        return result.rowcount > 0
+
+
+def list_sessions() -> list[str]:
+    """Liệt kê tất cả session_id hiện có trong DB, sắp xếp theo created_at.
+
+    Dùng chủ yếu để debug và kiểm tra session isolation.
+
+    Returns:
+        List[str] — danh sách session_id theo thứ tự thời gian tạo.
+    """
+    with get_connection() as conn:
+        rows = conn.execute(
+            "SELECT session_id FROM sessions ORDER BY created_at ASC"
+        ).fetchall()
+    return [r["session_id"] for r in rows]
 
 
 # ---------------------------------------------------------------------------
