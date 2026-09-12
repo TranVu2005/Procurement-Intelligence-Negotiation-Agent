@@ -109,6 +109,10 @@ Nếu hai bản ghi cùng tên nhà cung cấp và cùng loại sản phẩm nh�
 thuẫn, kết quả chuyển sang `evidence_conflict` và không chọn nhà cung cấp cho tới khi
 nguồn được xác minh.
 
+Mỗi ứng viên được xếp hạng còn có chiến lược đàm phán gồm mức chiết khấu mục tiêu,
+đòn bẩy có bằng chứng (sản lượng/MOQ, số phương án thay thế, bảo hành, uy tín), nhượng
+bộ có thể chấp nhận và guardrail không vượt ngân sách/không tự động chốt đơn.
+
 ## 5. Các nhánh re-plan bắt buộc
 
 | Tình huống | Nguyên nhân được ghi | Hướng thay thế |

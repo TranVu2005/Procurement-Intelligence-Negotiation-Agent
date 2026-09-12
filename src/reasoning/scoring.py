@@ -249,18 +249,87 @@ def explain_score(
     }
 
 
+def generate_negotiation_strategy(
+    supplier: dict[str, Any],
+    state: dict[str, Any],
+    *,
+    alternative_count: int = 0,
+) -> dict[str, Any]:
+    """Build an evidence-based negotiation brief without executing a purchase."""
+
+    hard = state["hard_constraints"]
+    quantity = hard["quantity"]
+    moq = _number(supplier, "MOQ")
+    total_price = _number(supplier, "total_price")
+    budget = hard["budget_max"]
+    warranty = supplier.get("BaoHanh")
+    trust = supplier.get("DiemUyTin")
+
+    levers = []
+    discount_target = 2
+    if quantity >= 2 * moq:
+        discount_target += 3
+        levers.append(
+            f"Đơn hàng {quantity} sản phẩm đạt ít nhất 2 lần MOQ {moq:g}; yêu cầu chiết khấu theo sản lượng."
+        )
+    if alternative_count >= 2:
+        discount_target += 2
+        levers.append(
+            f"Có {alternative_count} phương án hợp lệ để đối chiếu giá và điều kiện."
+        )
+    if total_price < budget:
+        levers.append(
+            f"Giá hiện tại {total_price:,.0f} VND đã trong ngân sách; ưu tiên thương lượng thêm giá trị thay vì vượt trần."
+        )
+    if isinstance(warranty, (int, float)) and warranty < 24:
+        levers.append(f"Bảo hành hiện chỉ {warranty:g} tháng; đề nghị nâng lên ít nhất 24 tháng.")
+    if trust is None:
+        levers.append("Điểm uy tín chưa có dữ liệu; yêu cầu hồ sơ tham chiếu hoặc điều khoản nghiệm thu.")
+    elif trust < 4:
+        levers.append(
+            f"Điểm uy tín {trust:g}/5 còn thấp; yêu cầu nghiệm thu và thanh toán theo giai đoạn."
+        )
+    if not levers:
+        levers.append("Dùng giá, thời gian giao và bảo hành đã xác minh làm cơ sở thương lượng.")
+
+    discount_target = min(discount_target, 10)
+    return {
+        "supplier_id": supplier.get("MaNCC"),
+        "target_discount_percent": discount_target,
+        "opening_position": (
+            f"Đề nghị giảm {discount_target}% trên tổng giá đã báo hoặc quy đổi tương đương "
+            "sang bảo hành/vận chuyển."
+        ),
+        "evidence_levers": levers,
+        "acceptable_concessions": [
+            "Giữ nguyên giá nếu được tăng bảo hành hoặc miễn phí vận chuyển/lắp đặt.",
+            "Chấp nhận giao nhiều đợt chỉ khi vẫn đáp ứng deadline đã xác nhận.",
+        ],
+        "guardrails": [
+            f"Không vượt tổng ngân sách {budget:,.0f} VND.",
+            "Không tự động chốt đơn; bắt buộc người dùng xác nhận.",
+        ],
+    }
+
+
 def rank_suppliers(
     suppliers: Iterable[dict[str, Any]],
     state: dict[str, Any],
 ) -> list[dict[str, Any]]:
     """Score eligible suppliers and return best-first, with deterministic ties."""
 
+    supplier_list = list(suppliers)
     ranked = []
-    for supplier in suppliers:
+    for supplier in supplier_list:
         breakdown = score_breakdown(supplier, state["hard_constraints"])
         item = dict(supplier)
         item["leverage_score"] = leverage_score(supplier, state["hard_constraints"])
         item["explanation"] = explain_score(supplier, state, breakdown)
+        item["negotiation_strategy"] = generate_negotiation_strategy(
+            supplier,
+            state,
+            alternative_count=max(0, len(supplier_list) - 1),
+        )
         ranked.append(item)
     return sorted(ranked, key=lambda item: (-item["leverage_score"], str(item.get("MaNCC", ""))))
 

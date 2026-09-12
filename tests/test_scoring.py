@@ -5,6 +5,7 @@ from src.reasoning.scoring import (
     evaluate_candidates,
     detect_evidence_conflicts,
     filter_hard_constraints,
+    generate_negotiation_strategy,
     leverage_score,
     rank_suppliers,
     score_breakdown,
@@ -145,6 +146,16 @@ class ScoringTests(unittest.TestCase):
 
         self.assertEqual(len(conflicts), 1)
         self.assertEqual(conflicts[0]["differing_fields"]["Gia"], [15_000_000, 19_800_000])
+
+    def test_negotiation_strategy_uses_evidence_and_requires_confirmation(self) -> None:
+        record = supplier(MOQ=5, BaoHanh=12, DiemUyTin=3.5)
+
+        strategy = generate_negotiation_strategy(record, STATE, alternative_count=3)
+
+        self.assertGreater(strategy["target_discount_percent"], 2)
+        self.assertTrue(any("2 lần MOQ" in lever for lever in strategy["evidence_levers"]))
+        self.assertTrue(any("bảo hành" in lever.lower() for lever in strategy["evidence_levers"]))
+        self.assertTrue(any("Không tự động chốt đơn" in rule for rule in strategy["guardrails"]))
 
 
 if __name__ == "__main__":
