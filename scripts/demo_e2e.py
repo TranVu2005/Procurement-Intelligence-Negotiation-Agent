@@ -39,10 +39,44 @@ def main() -> None:
     print("[B - REASONING] Plan params:", step["params"])
 
     print("=" * 70)
-    from src.tools.supplier_tools import search_suppliers_tool
-    result = search_suppliers_tool.invoke(step["params"])
-    print("[C - TOOL] search_suppliers ->", len(result.get("suppliers", [])), "ket qua")
-    print(json.dumps(result, ensure_ascii=False, indent=2)[:800])
+    from src.tools.supplier_tools import (
+        compare_price_tool,
+        get_supplier_detail_tool,
+        search_suppliers_tool,
+    )
+    search_result = search_suppliers_tool.invoke(step["params"])
+    print("[C - TOOL] search_suppliers ->", len(search_result.get("suppliers", [])), "ket qua")
+    print(json.dumps(search_result, ensure_ascii=False, indent=2)[:800])
+
+    if search_result.get("error"):
+        from src.reasoning.planner import propose_tool_replan
+        proposal = propose_tool_replan(plan, search_result)
+        print("[B - REASONING] Tool failure / re-plan proposal:")
+        print(json.dumps(proposal, ensure_ascii=False, indent=2))
+        return
+
+    print("=" * 70)
+    supplier_ids = [item["MaNCC"] for item in search_result.get("suppliers", [])]
+    details = [
+        get_supplier_detail_tool.invoke({"supplier_id": supplier_id})
+        for supplier_id in supplier_ids
+    ]
+    price_result = compare_price_tool.invoke({
+        "supplier_ids": supplier_ids,
+        "quantity": state["hard_constraints"]["quantity"],
+    })
+
+    from src.reasoning.scoring import evaluate_candidates
+    decision = evaluate_candidates(state, details, price_result)
+    print("[B - REASONING] Decision status:", decision["status"])
+    print("[B - REASONING] Recommended:", decision["recommended_supplier_id"])
+    print(json.dumps(decision, ensure_ascii=False, indent=2)[:2000])
+
+    if decision["status"] == "no_eligible_supplier":
+        from src.reasoning.planner import propose_replan
+        proposal = propose_replan(plan, decision["rejected_suppliers"])
+        print("[B - REASONING] Re-plan proposal:")
+        print(json.dumps(proposal, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

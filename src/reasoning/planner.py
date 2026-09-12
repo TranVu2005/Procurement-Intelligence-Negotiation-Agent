@@ -7,6 +7,7 @@ tool calls from C's tool contract without changing either contract.
 from __future__ import annotations
 
 from copy import deepcopy
+from collections import Counter
 from typing import Any
 from uuid import uuid4
 
@@ -105,11 +106,12 @@ def make_plan(
         raise PlanningError("replan_reason is required when replan_count is greater than 0")
 
     hard = state["hard_constraints"]
-    soft = state.get("soft_constraints") or {}
     search_params = {
         "product_type": hard["product_type"],
-        "material": soft.get("material_preference"),
-        "region": soft.get("region_preference"),
+        # Material and region are soft preferences. Filtering by them here would
+        # incorrectly turn them into hard constraints and hide valid trade-offs.
+        "material": None,
+        "region": None,
     }
 
     return {
@@ -163,3 +165,104 @@ def make_replan(
         replan_count=previous_count + 1,
         replan_reason=reason.strip(),
     )
+
+
+_RECOVERY_OPTIONS = {
+    "stock_below_quantity": [
+        "Chia đơn hàng cho nhiều nhà cung cấp.",
+        "Giảm số lượng giao đợt đầu và giao phần còn lại sau.",
+    ],
+    "quantity_below_moq": [
+        "Đàm phán MOQ thấp hơn với nhà cung cấp.",
+        "Gom nhu cầu mua để đạt MOQ hoặc chọn nhà cung cấp khác.",
+    ],
+    "delivery_deadline_unmet": [
+        "Xin người dùng xác nhận nới deadline.",
+        "Chia giao hàng thành nhiều đợt hoặc mở rộng khu vực nhà cung cấp.",
+    ],
+    "budget_exceeded": [
+        "Xin xác nhận tăng ngân sách hoặc giảm số lượng.",
+        "Đề xuất chất liệu/phương án tương đương có giá thấp hơn.",
+    ],
+    "missing_price_evidence": [
+        "Gọi lại compare_price; nếu vẫn lỗi thì thông báo chưa thể xác minh tổng giá.",
+    ],
+    "tool_result_error": [
+        "Retry có giới hạn hoặc dùng nguồn/tool fallback trước khi kết luận.",
+    ],
+}
+
+
+def propose_replan(
+    previous_plan: dict[str, Any],
+    rejected_suppliers: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Diagnose failed candidates and propose safe, non-automatic alternatives.
+
+    This function never relaxes user constraints itself. A first-class new plan
+    is created only after the user confirms a change and A updates the state.
+    """
+
+    previous_count = previous_plan.get("replan_count", 0)
+    if not isinstance(previous_count, int) or isinstance(previous_count, bool):
+        raise PlanningError("previous plan has an invalid replan_count")
+    if previous_count >= MAX_REPLAN_COUNT:
+        return {
+            "status": "graceful_failure",
+            "reason": "Đã đạt giới hạn 3 lần re-plan; chưa đủ bằng chứng/cần hỗ trợ thêm.",
+            "requires_user_confirmation": False,
+            "causes": [],
+            "alternatives": [],
+        }
+
+    codes = Counter(
+        violation.get("code")
+        for rejected in rejected_suppliers
+        for violation in rejected.get("violations", [])
+        if violation.get("code")
+    )
+    alternatives: list[str] = []
+    for code, _count in codes.most_common():
+        for option in _RECOVERY_OPTIONS.get(code, []):
+            if option not in alternatives:
+                alternatives.append(option)
+
+    if not alternatives:
+        alternatives.append("Yêu cầu thêm dữ liệu hoặc hỗ trợ thủ công trước khi tiếp tục.")
+
+    return {
+        "status": "needs_replan",
+        "reason": "Không có nhà cung cấp thỏa toàn bộ ràng buộc cứng.",
+        "requires_user_confirmation": True,
+        "next_replan_count": previous_count + 1,
+        "causes": [
+            {"code": code, "affected_suppliers": count}
+            for code, count in codes.most_common()
+        ],
+        "alternatives": alternatives,
+    }
+
+
+def propose_tool_replan(
+    previous_plan: dict[str, Any],
+    tool_result: dict[str, Any],
+) -> dict[str, Any]:
+    """Convert C's standard tool error into a bounded recovery proposal."""
+
+    if not isinstance(tool_result, dict) or tool_result.get("error") is not True:
+        raise PlanningError("tool_result must use the standard error contract")
+    rejected = [{
+        "supplier_id": None,
+        "violations": [{
+            "code": "tool_result_error",
+            "field": "error_type",
+            "actual": tool_result.get("error_type"),
+            "required": "successful evidence",
+        }],
+    }]
+    proposal = propose_replan(previous_plan, rejected)
+    proposal["tool_error"] = {
+        "error_type": tool_result.get("error_type"),
+        "message": tool_result.get("message"),
+    }
+    return proposal

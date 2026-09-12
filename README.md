@@ -19,7 +19,9 @@ module. Dùng các lệnh dưới đây để chạy/test từng phần đã có
 ## Chạy test
 
 ```bash
-python -m unittest tests.test_planner -v      # Reasoning (B)
+python -m unittest discover -s tests -p "test_planner.py" -v  # Planning/re-plan (B)
+python -m unittest discover -s tests -p "test_scoring.py" -v  # Filtering/scoring (B)
+python -m unittest discover -s tests -p "test_reasoning_tools_integration.py" -v
 python tests/test_parse_and_memory.py         # Perception + Memory (A) — chạy trực
                                                # tiếp, không qua unittest discover (script
                                                # tự sys.exit(), gọi Gemini API thật nên có

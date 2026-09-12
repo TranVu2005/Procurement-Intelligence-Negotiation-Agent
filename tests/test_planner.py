@@ -6,6 +6,8 @@ from src.reasoning.planner import (
     ReplanLimitReached,
     make_plan,
     make_replan,
+    propose_replan,
+    propose_tool_replan,
 )
 
 
@@ -39,8 +41,8 @@ class PlannerTests(unittest.TestCase):
             plan["steps"][0]["params"],
             {
                 "product_type": "ghế văn phòng",
-                "material": "gỗ tự nhiên",
-                "region": "Hà Nội",
+                "material": None,
+                "region": None,
             },
         )
         self.assertEqual(plan["steps"][0]["action"], "search_suppliers")
@@ -79,6 +81,49 @@ class PlannerTests(unittest.TestCase):
 
         with self.assertRaises(ReplanLimitReached):
             make_replan(valid_state(), plan, "try again")
+
+    def test_replan_proposal_diagnoses_inventory_moq_and_delivery(self) -> None:
+        plan = make_plan(valid_state())
+        rejected = [{
+            "supplier_id": "NCC001",
+            "violations": [
+                {"code": "stock_below_quantity"},
+                {"code": "quantity_below_moq"},
+                {"code": "delivery_deadline_unmet"},
+            ],
+        }]
+
+        proposal = propose_replan(plan, rejected)
+
+        self.assertEqual(proposal["status"], "needs_replan")
+        self.assertTrue(proposal["requires_user_confirmation"])
+        self.assertEqual(proposal["next_replan_count"], 1)
+        self.assertGreaterEqual(len(proposal["alternatives"]), 3)
+
+    def test_replan_proposal_gracefully_fails_at_limit(self) -> None:
+        plan = make_plan(
+            valid_state(),
+            replan_count=MAX_REPLAN_COUNT,
+            replan_reason="all prior alternatives failed",
+        )
+
+        proposal = propose_replan(plan, [])
+
+        self.assertEqual(proposal["status"], "graceful_failure")
+        self.assertFalse(proposal["requires_user_confirmation"])
+
+    def test_tool_error_becomes_auditable_replan_proposal(self) -> None:
+        plan = make_plan(valid_state())
+
+        proposal = propose_tool_replan(plan, {
+            "error": True,
+            "error_type": "timeout",
+            "message": "search timed out",
+        })
+
+        self.assertEqual(proposal["status"], "needs_replan")
+        self.assertEqual(proposal["tool_error"]["error_type"], "timeout")
+        self.assertTrue(any("Retry" in option for option in proposal["alternatives"]))
 
 
 if __name__ == "__main__":
