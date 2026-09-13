@@ -15,9 +15,9 @@ ownership" below.
 python3 -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env             # fill in ANTHROPIC_API_KEY
+cp .env.example .env             # fill in GOOGLE_API_KEY
 
-python src/agent.py                                          # run the agent
+python -m src.agent                                          # run the agent
 sqlite3 src/memory/state.db < src/memory/schema.sql           # (re)init SQLite state DB
 python scripts/run_autoeval.py --eval-set tests/eval_set/cases.jsonl   # run AutoEval
 ```

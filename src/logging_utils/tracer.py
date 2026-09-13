@@ -7,7 +7,10 @@ import logging
 import time
 import uuid
 
-SENSITIVE_KEYS = {"api_key", "anthropic_api_key", "password", "token"}
+SENSITIVE_KEYS = {
+    "api_key", "google_api_key", "anthropic_api_key",
+    "password", "token", "access_token", "refresh_token", "secret",
+}
 
 logger = logging.getLogger("procurement_agent")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s:%(name)s:%(message)s")
