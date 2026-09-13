@@ -161,6 +161,49 @@ def _call_gemini(system_prompt: str, user_text: str) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Internal validation helpers (dùng chung bởi parse_request & update_state)
+# ---------------------------------------------------------------------------
+
+
+def _parse_product_type(raw: str) -> str:
+    """Normalize và validate product_type. Raise InvalidProductTypeError nếu không hợp lệ."""
+    p = str(raw).strip().lower()
+    if p not in VALID_PRODUCT_TYPES:
+        raise InvalidProductTypeError(raw)
+    return p
+
+
+def _parse_quantity(raw) -> int:
+    """Chuyển về int và đảm bảo > 0."""
+    qty = int(raw)
+    if qty <= 0:
+        raise ValueError(f"quantity phải > 0, nhận được: {qty}")
+    return qty
+
+
+def _parse_budget(raw) -> float:
+    """Chuyển về float và đảm bảo > 0."""
+    b = float(raw)
+    if b <= 0:
+        raise ValueError(f"budget_max phải > 0, nhận được: {b}")
+    return b
+
+
+def _parse_deadline(raw) -> int:
+    """Chuyển về int và đảm bảo > 0."""
+    d = int(raw)
+    if d <= 0:
+        raise ValueError(f"delivery_deadline_days phải > 0, nhận được: {d}")
+    return d
+
+
+def _parse_trust_score(raw) -> "float | None":
+    """Chuyển về float trong [1,5] hoặc None nếu ngoài range."""
+    t = float(raw)
+    return t if 1.0 <= t <= 5.0 else None
+
+
+# ---------------------------------------------------------------------------
 # Core function
 # ---------------------------------------------------------------------------
 
@@ -181,6 +224,7 @@ def parse_request(text: str, session_id: Optional[str] = None) -> dict:
     Raises:
         MissingFieldError:       Nếu thiếu ≥1 hard constraint bắt buộc.
         InvalidProductTypeError: Nếu product_type không thuộc enum hợp lệ.
+        ValueError:              Nếu numeric field có giá trị không hợp lệ (≤ 0).
     """
     if session_id is None:
         session_id = f"sess_{uuid.uuid4().hex[:8]}"
@@ -190,7 +234,7 @@ def parse_request(text: str, session_id: Optional[str] = None) -> dict:
     # --- Gọi Gemini để trích xuất ---
     extracted = _call_gemini(_EXTRACT_SYSTEM_PROMPT, text)
 
-    # --- Validate hard constraints ---
+    # --- Kiểm tra field bắt buộc còn thiếu ---
     missing = []
     if not extracted.get("product_type"):
         missing.append("loại sản phẩm (ghế văn phòng, bàn làm việc, tủ hồ sơ, kệ, sofa)")
@@ -204,54 +248,31 @@ def parse_request(text: str, session_id: Optional[str] = None) -> dict:
     if missing:
         raise MissingFieldError(missing)
 
-    # --- Validate product_type ---
-    product_type = str(extracted["product_type"]).strip().lower()
-    if product_type not in VALID_PRODUCT_TYPES:
-        raise InvalidProductTypeError(extracted["product_type"])
-
-    # --- Validate numeric fields ---
-    quantity = int(extracted["quantity"])
-    if quantity <= 0:
-        raise ValueError(f"quantity phải > 0, nhận được: {quantity}")
-
-    budget_max = float(extracted["budget_max"])
-    if budget_max <= 0:
-        raise ValueError(f"budget_max phải > 0, nhận được: {budget_max}")
-
-    delivery_deadline_days = int(extracted["delivery_deadline_days"])
-    if delivery_deadline_days <= 0:
-        raise ValueError(f"delivery_deadline_days phải > 0, nhận được: {delivery_deadline_days}")
-
-    # --- Validate soft constraints ---
-    min_trust = extracted.get("min_trust_score")
-    if min_trust is not None:
-        min_trust = float(min_trust)
-        if not (1.0 <= min_trust <= 5.0):
-            min_trust = None  # Bỏ qua giá trị ngoài range thay vì crash
-
-    # --- Xây dựng state dict theo SYSTEM-RULES §2.1 ---
-    state = {
-        "session_id": session_id,
-        "created_at": now,
-        "updated_at": now,
-        "hard_constraints": {
-            "product_type": product_type,
-            "quantity": quantity,
-            "budget_max": budget_max,
-            "delivery_deadline_days": delivery_deadline_days,
-        },
-        "soft_constraints": {
-            "material_preference": extracted.get("material_preference"),
-            "region_preference": extracted.get("region_preference"),
-            "min_trust_score": min_trust,
-        },
-        "conversation_history": [
-            {"role": "user", "content": text, "timestamp": now}
-        ],
-        "decisions_made": [],
+    # --- Validate & build hard constraints ---
+    hard = {
+        "product_type":           _parse_product_type(extracted["product_type"]),
+        "quantity":               _parse_quantity(extracted["quantity"]),
+        "budget_max":             _parse_budget(extracted["budget_max"]),
+        "delivery_deadline_days": _parse_deadline(extracted["delivery_deadline_days"]),
     }
 
-    return state
+    # --- Validate & build soft constraints ---
+    raw_trust = extracted.get("min_trust_score")
+    soft = {
+        "material_preference": extracted.get("material_preference"),
+        "region_preference":   extracted.get("region_preference"),
+        "min_trust_score":     _parse_trust_score(raw_trust) if raw_trust is not None else None,
+    }
+
+    return {
+        "session_id":           session_id,
+        "created_at":           now,
+        "updated_at":           now,
+        "hard_constraints":     hard,
+        "soft_constraints":     soft,
+        "conversation_history": [{"role": "user", "content": text, "timestamp": now}],
+        "decisions_made":       [],
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -270,45 +291,47 @@ def update_state(existing_state: dict, new_text: str) -> dict:
         new_text:       Câu yêu cầu mới của khách.
 
     Returns:
-        State dict đã được cập nhật.
+        State dict đã được cập nhật (không mutate existing_state).
+
+    Raises:
+        InvalidProductTypeError: Nếu product_type mới không thuộc enum hợp lệ.
+        ValueError:              Nếu numeric field có giá trị không hợp lệ (≤ 0).
     """
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
 
-    # Trích xuất thông tin thay đổi
+    # Trích xuất thông tin thay đổi từ LLM
     extracted = _call_gemini(_UPDATE_SYSTEM_PROMPT, new_text)
 
-    # Ghi đè chỉ những field có giá trị mới (không None)
+    # Ghi đè chỉ những field được đề cập (không None) — dùng helper để validate
     updated_hard = dict(existing_state["hard_constraints"])
-    if extracted.get("product_type") is not None:
-        p = str(extracted["product_type"]).strip().lower()
-        if p not in VALID_PRODUCT_TYPES:
-            raise InvalidProductTypeError(extracted["product_type"])
-        updated_hard["product_type"] = p
-    if extracted.get("quantity") is not None:
-        updated_hard["quantity"] = int(extracted["quantity"])
-    if extracted.get("budget_max") is not None:
-        updated_hard["budget_max"] = float(extracted["budget_max"])
-    if extracted.get("delivery_deadline_days") is not None:
-        updated_hard["delivery_deadline_days"] = int(extracted["delivery_deadline_days"])
+    _HARD_PARSERS = {
+        "product_type":           _parse_product_type,
+        "quantity":               _parse_quantity,
+        "budget_max":             _parse_budget,
+        "delivery_deadline_days": _parse_deadline,
+    }
+    for field, parser in _HARD_PARSERS.items():
+        if extracted.get(field) is not None:
+            updated_hard[field] = parser(extracted[field])
 
     updated_soft = dict(existing_state["soft_constraints"])
-    if extracted.get("material_preference") is not None:
-        updated_soft["material_preference"] = extracted["material_preference"]
-    if extracted.get("region_preference") is not None:
-        updated_soft["region_preference"] = extracted["region_preference"]
+    for field in ("material_preference", "region_preference"):
+        if extracted.get(field) is not None:
+            updated_soft[field] = extracted[field]
     if extracted.get("min_trust_score") is not None:
-        updated_soft["min_trust_score"] = float(extracted["min_trust_score"])
+        parsed = _parse_trust_score(extracted["min_trust_score"])
+        if parsed is not None:  # chỉ ghi đè khi giá trị hợp lệ; ngoài range giữ nguyên
+            updated_soft["min_trust_score"] = parsed
 
     # Append turn mới vào conversation_history
     history = list(existing_state.get("conversation_history", []))
     history.append({"role": "user", "content": new_text, "timestamp": now})
 
-    updated_state = {
+    return {
         **existing_state,
-        "updated_at": now,
-        "hard_constraints": updated_hard,
-        "soft_constraints": updated_soft,
+        "updated_at":           now,
+        "hard_constraints":     updated_hard,
+        "soft_constraints":     updated_soft,
         "conversation_history": history,
     }
 
-    return updated_state
