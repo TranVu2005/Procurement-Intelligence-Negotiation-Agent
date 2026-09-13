@@ -67,8 +67,8 @@ Planner dùng nguyên state schema trong `SYSTEM-RULES.md`:
       "action": "search_suppliers",
       "params": {
         "product_type": "ghế văn phòng",
-        "material": "gỗ tự nhiên",
-        "region": "Hà Nội"
+        "material": null,
+        "region": null
       },
       "reason": "Tìm ứng viên trước khi kiểm tra các ràng buộc",
       "depends_on": []
@@ -79,6 +79,9 @@ Planner dùng nguyên state schema trong `SYSTEM-RULES.md`:
 
 Chỉ tool call thực sự mới nằm trong `steps`. Các bước suy luận nằm trong `workflow`,
 vì rule chung quy định `steps[*].action` phải trùng chính xác tên tool của C.
+
+Chất liệu và khu vực là ràng buộc mềm nên plan tìm rộng theo loại sản phẩm; chúng được
+dùng để xếp hạng và giải thích trade-off, không được âm thầm biến thành điều kiện loại.
 
 `compare_price` chưa được đưa ngay vào executable steps vì `supplier_ids` chỉ tồn tại
 sau khi `search_suppliers` trả kết quả. Orchestrator phải lấy ID thật từ tool output rồi
@@ -97,8 +100,18 @@ Ràng buộc cứng được kiểm tra trước khi chấm điểm:
 giữ lại trong danh sách phương án thay thế nhưng phải ghi rõ điều kiện bị vi phạm.
 
 Ràng buộc mềm dùng để xếp hạng/trade-off: chất liệu, khu vực, uy tín, bảo hành. Trọng
-số leverage score sẽ được chốt ở deliverable kế tiếp sau khi A/B/C thống nhất ý nghĩa
-và miền giá trị của các field.
+số leverage score hiện dùng: giá 30%, MOQ 15%, giao hàng 20%, bảo hành 15%, uy tín
+20%. Mỗi thành phần được chuẩn hóa về 0–100 và được trả kèm breakdown để audit.
+Nếu bảo hành/uy tín bị thiếu, giá trị giữ nguyên là `null`; công thức tái chuẩn hóa trên
+các trọng số còn bằng chứng thay vì tự điền một con số giả.
+
+Nếu hai bản ghi cùng tên nhà cung cấp và cùng loại sản phẩm nhưng có giá/thông số mâu
+thuẫn, kết quả chuyển sang `evidence_conflict` và không chọn nhà cung cấp cho tới khi
+nguồn được xác minh.
+
+Mỗi ứng viên được xếp hạng còn có chiến lược đàm phán gồm mức chiết khấu mục tiêu,
+đòn bẩy có bằng chứng (sản lượng/MOQ, số phương án thay thế, bảo hành, uy tín), nhượng
+bộ có thể chấp nhận và guardrail không vượt ngân sách/không tự động chốt đơn.
 
 ## 5. Các nhánh re-plan bắt buộc
 
@@ -128,4 +141,7 @@ Từ thư mục gốc repository:
 
 ```bash
 python -m unittest discover -s tests -p "test_planner.py" -v
+python -m unittest discover -s tests -p "test_scoring.py" -v
+python -m unittest discover -s tests -p "test_reasoning_tools_integration.py" -v
+python -m scripts.demo_e2e
 ```
