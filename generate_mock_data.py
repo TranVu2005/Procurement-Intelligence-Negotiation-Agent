@@ -163,7 +163,20 @@ def add_edge_cases(next_idx):
         "DiemUyTin": 4.0, "KhuVuc": "Ha Noi",
     })
 
-    # EDGE 5 - khong phai du lieu san pham, ma la 2 session state mau dung
+    # EDGE 5 - TonKho=0 (het hang / NCC tam ngung cung cap dong san pham nay).
+    # Khong the phat hien qua search_suppliers/compare_price (2 tool nay khong
+    # tra field TonKho theo contract) - chi lo ra khi goi get_supplier_detail.
+    # Dung cho buoi hop 4: B phai re-plan thay vi de xuat NCC nay.
+    records.append({
+        "MaNCC": "EDGE005", "TenNCC": "Noi That Kho Rong",
+        "LoaiSanPham": "kệ", "ChatLieu": "go_cong_nghiep",
+        "Gia": 1_200_000, "DonViTinh": "cai", "MOQ": 10, "TonKho": 0,
+        "ThoiGianGiao": 14, "BaoHanh": 12,
+        "ChietKhauTheoSoLuong": [{"tu_so_luong": 10, "phan_tram_giam": 3}],
+        "DiemUyTin": 3.5, "KhuVuc": "Ha Noi",
+    })
+
+    # EDGE 6 - khong phai du lieu san pham, ma la 2 session state mau dung
     # rieng cho test "session isolation" (rule 5). Luu tach o file khac.
     return records
 
@@ -279,6 +292,17 @@ def gen_eval_cases():
                 "Moi lan re-plan phai tao plan_id moi, khong sua de plan cu."
             ),
             "rubric_ref": "SYSTEM-RULES muc 4 (gioi han 3 lan re-plan); Reliability & Fault Tolerance",
+        },
+        {
+            "id": "tc_out_of_stock",
+            "tool_sequence": ["get_supplier_detail"],
+            "input": {"get_supplier_detail": {"supplier_id": "EDGE005"}},
+            "expected_behavior": (
+                "TonKho=0 nghia la NCC het hang/tam ngung cung cap dong san pham nay. "
+                "Agent khong duoc de xuat EDGE005 nhu 1 lua chon kha thi; phai bao ro het hang "
+                "va re-plan sang NCC khac hoac hoi lai nguoi dung, khong lap lai cung 1 ke hoach."
+            ),
+            "rubric_ref": "Reasoning: re-plan khi het hang; SYSTEM-RULES muc 3 va muc 4",
         },
         {
             "id": "tc_session_isolation",

@@ -850,5 +850,25 @@
     ],
     "DiemUyTin": 4.0,
     "KhuVuc": "Ha Noi"
+  },
+  {
+    "MaNCC": "EDGE005",
+    "TenNCC": "Noi That Kho Rong",
+    "LoaiSanPham": "kệ",
+    "ChatLieu": "go_cong_nghiep",
+    "Gia": 1200000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 0,
+    "ThoiGianGiao": 14,
+    "BaoHanh": 12,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": 3.5,
+    "KhuVuc": "Ha Noi"
   }
 ]

@@ -10,12 +10,13 @@ Load du lieu tu mock_data/suppliers.json (sinh boi generate_mock_data.py).
 import json
 import time
 import unicodedata
+from datetime import datetime, timezone
 from pathlib import Path
 
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field
 
-from src.logging_utils.tracer import log_event, new_trace_id
+from src.logging_utils.tracer import log_event, log_tool_call, new_trace_id
 
 DATA_PATH = Path(__file__).parent / "mock_data" / "suppliers.json"
 
@@ -43,12 +44,6 @@ def _error(error_type: str, message: str) -> dict:
     return {"error": True, "error_type": error_type, "message": message}
 
 
-def _log_end(trace_id: str, start: float, tool_name: str, status: str, **extra) -> None:
-    # latency bat buoc theo SYSTEM-RULES.md muc 6
-    log_event(trace_id, "tool_call_end", tool_name=tool_name, status=status,
-              latency_ms=round((time.perf_counter() - start) * 1000, 2), **extra)
-
-
 def search_suppliers(product_type: str, material: str | None = None, region: str | None = None,
                       _simulate_error: str | None = None) -> dict:
     """
@@ -58,17 +53,17 @@ def search_suppliers(product_type: str, material: str | None = None, region: str
     """
     trace_id = new_trace_id()
     start = time.perf_counter()
-    log_event(trace_id, "tool_call_start", tool_name="search_suppliers",
-              product_type=product_type, material=material, region=region)
+    params = {"product_type": product_type, "material": material, "region": region}
+    log_event(trace_id, "tool_call_start", tool_name="search_suppliers", **params)
 
     if _simulate_error:
         result = _error(_simulate_error, f"Gia lap loi '{_simulate_error}' cho search_suppliers")
-        _log_end(trace_id, start, "search_suppliers", "error")
+        log_tool_call(trace_id, "search_suppliers", start, "error", params=params)
         return result
 
     if not product_type:
         result = _error("invalid_input", "product_type la truong bat buoc")
-        _log_end(trace_id, start, "search_suppliers", "error")
+        log_tool_call(trace_id, "search_suppliers", start, "error", params=params)
         return result
 
     data = _load_data()
@@ -88,21 +83,23 @@ def search_suppliers(product_type: str, material: str | None = None, region: str
         if region:
             filters.append(f"region='{region}'")
         result = _error("no_match", f"Khong tim thay nha cung cap voi bo loc: {', '.join(filters)}")
-        _log_end(trace_id, start, "search_suppliers", "error")
+        log_tool_call(trace_id, "search_suppliers", start, "error", params=params)
         return result
 
     suppliers = [
         {
             "MaNCC": r["MaNCC"],
             "TenNCC": r["TenNCC"],
-            "Gia": r["Gia"],
-            "MOQ": r["MOQ"],
-            "ThoiGianGiao": r["ThoiGianGiao"],
-            "DiemUyTin": r["DiemUyTin"],
+            # .get() thay vi r[...]: dataset thieu field khong duoc lam crash ca
+            # response (cung nguyen tac voi compare_price, muc 3 interface-contracts.md)
+            "Gia": r.get("Gia"),
+            "MOQ": r.get("MOQ"),
+            "ThoiGianGiao": r.get("ThoiGianGiao"),
+            "DiemUyTin": r.get("DiemUyTin"),
         }
         for r in matches
     ]
-    _log_end(trace_id, start, "search_suppliers", "ok", result_count=len(suppliers))
+    log_tool_call(trace_id, "search_suppliers", start, "ok", params=params, result_count=len(suppliers))
     return {"suppliers": suppliers}
 
 
@@ -113,26 +110,27 @@ def get_supplier_detail(supplier_id: str, _simulate_error: str | None = None) ->
     """
     trace_id = new_trace_id()
     start = time.perf_counter()
-    log_event(trace_id, "tool_call_start", tool_name="get_supplier_detail", supplier_id=supplier_id)
+    params = {"supplier_id": supplier_id}
+    log_event(trace_id, "tool_call_start", tool_name="get_supplier_detail", **params)
 
     if _simulate_error:
         result = _error(_simulate_error, f"Gia lap loi '{_simulate_error}' cho get_supplier_detail")
-        _log_end(trace_id, start, "get_supplier_detail", "error")
+        log_tool_call(trace_id, "get_supplier_detail", start, "error", params=params)
         return result
 
     if not supplier_id:
         result = _error("invalid_input", "supplier_id la truong bat buoc")
-        _log_end(trace_id, start, "get_supplier_detail", "error")
+        log_tool_call(trace_id, "get_supplier_detail", start, "error", params=params)
         return result
 
     data = _load_data()
     for r in data:
         if r["MaNCC"] == supplier_id:
-            _log_end(trace_id, start, "get_supplier_detail", "ok")
+            log_tool_call(trace_id, "get_supplier_detail", start, "ok", params=params)
             return r  # da dung 13 field theo dinh nghia
 
     result = _error("no_match", f"Khong tim thay supplier_id='{supplier_id}'")
-    _log_end(trace_id, start, "get_supplier_detail", "error")
+    log_tool_call(trace_id, "get_supplier_detail", start, "error", params=params)
     return result
 
 
@@ -155,12 +153,18 @@ def compare_price(supplier_ids: list[str], quantity: int) -> dict:
     """
     trace_id = new_trace_id()
     start = time.perf_counter()
-    log_event(trace_id, "tool_call_start", tool_name="compare_price",
-              supplier_ids=supplier_ids, quantity=quantity)
+    params = {"supplier_ids": supplier_ids, "quantity": quantity}
+    log_event(trace_id, "tool_call_start", tool_name="compare_price", **params)
 
+    # --- validate-first: chan het truoc khi dung data, khong de loi throw giua chung ---
     if not quantity or quantity <= 0:
         result = _error("invalid_input", "quantity phai la so nguyen duong")
-        _log_end(trace_id, start, "compare_price", "error")
+        log_tool_call(trace_id, "compare_price", start, "error", params=params)
+        return result
+
+    if not supplier_ids:
+        result = _error("invalid_input", "supplier_ids phai co it nhat 1 phan tu")
+        log_tool_call(trace_id, "compare_price", start, "error", params=params)
         return result
 
     data = _load_data()
@@ -176,17 +180,77 @@ def compare_price(supplier_ids: list[str], quantity: int) -> dict:
             })
             continue
 
-        unit_price, pct = _apply_discount(record["Gia"], quantity, record.get("ChietKhauTheoSoLuong"))
-        comparisons.append({
-            "MaNCC": sid,
-            "unit_price": unit_price,
-            "discount_applied": f"{pct}%",
-            "total_price": unit_price * quantity,
-            "meets_moq": quantity >= record["MOQ"],
-        })
+        try:
+            unit_price, pct = _apply_discount(record["Gia"], quantity, record.get("ChietKhauTheoSoLuong"))
+            comparisons.append({
+                "MaNCC": sid,
+                "unit_price": unit_price,
+                "discount_applied": f"{pct}%",
+                "total_price": unit_price * quantity,
+                "meets_moq": quantity >= record["MOQ"],
+            })
+        except KeyError as e:
+            # dataset thieu field (vd Gia/MOQ) -> loi rieng phan tu nay, khong fail ca response
+            comparisons.append({
+                "MaNCC": sid,
+                **_error("tool_unavailable", f"Du lieu NCC '{sid}' thieu truong {e}"),
+            })
 
-    _log_end(trace_id, start, "compare_price", "ok", result_count=len(comparisons))
+    error_count = sum(1 for c in comparisons if c.get("error"))
+    status = "error" if error_count == len(comparisons) else "ok"
+    log_tool_call(trace_id, "compare_price", start, status, params=params,
+                  result_count=len(comparisons), error_count=error_count)
     return {"comparisons": comparisons}
+
+
+def confirm_order(supplier_id: str, quantity: int, confirmed: bool = False) -> dict:
+    """
+    Input: {"supplier_id": str (required), "quantity": int (required), "confirmed": bool (required)}
+    Output neu confirmed=True va hop le: {"order_confirmed": true, "supplier_id", "quantity", "confirmed_at"}
+    Output neu confirmed=False/thieu: loi invalid_input - day la GATE chan lai, KHONG tu dong chot don
+    (SYSTEM-RULES.md: hanh dong hau qua cao phai co xac nhan ro rang, khong duoc tu dong thuc thi).
+    Tool nay chi xac nhan/tu choi - khong tu ghi vao decisions_made (thuoc src/memory, Nguoi A so huu).
+    """
+    trace_id = new_trace_id()
+    start = time.perf_counter()
+    params = {"supplier_id": supplier_id, "quantity": quantity, "confirmed": confirmed}
+    log_event(trace_id, "tool_call_start", tool_name="confirm_order", **params)
+
+    if not supplier_id:
+        result = _error("invalid_input", "supplier_id la truong bat buoc")
+        log_tool_call(trace_id, "confirm_order", start, "error", params=params)
+        return result
+
+    if not quantity or quantity <= 0:
+        result = _error("invalid_input", "quantity phai la so nguyen duong")
+        log_tool_call(trace_id, "confirm_order", start, "error", params=params)
+        return result
+
+    data = _load_data()
+    record = next((r for r in data if r["MaNCC"] == supplier_id), None)
+    if record is None:
+        result = _error("no_match", f"supplier_id='{supplier_id}' khong ton tai")
+        log_tool_call(trace_id, "confirm_order", start, "error", params=params)
+        return result
+
+    if confirmed is not True:
+        # GATE: chua duoc xac nhan ro rang -> chan lai, khong tu dong chot don thay nguoi dung
+        result = _error(
+            "invalid_input",
+            "Can xac nhan ro rang (confirmed=true) truoc khi chot don - khong tu dong "
+            "xac nhan thay nguoi dung.",
+        )
+        log_tool_call(trace_id, "confirm_order", start, "blocked", params=params)
+        return result
+
+    confirmed_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+    log_tool_call(trace_id, "confirm_order", start, "confirmed", params=params)
+    return {
+        "order_confirmed": True,
+        "supplier_id": supplier_id,
+        "quantity": quantity,
+        "confirmed_at": confirmed_at,
+    }
 
 
 # --- LangChain Tool wrapper (B goi qua day; args_schema chi lo public field,
@@ -223,6 +287,16 @@ class ComparePriceArgs(BaseModel):
     quantity: int = Field(
         description="Số lượng dự kiến đặt mua (số nguyên dương). Bắt buộc -- dùng để tính chiết khấu "
         "theo bậc và kiểm tra có đạt MOQ hay không."
+    )
+
+
+class ConfirmOrderArgs(BaseModel):
+    supplier_id: str = Field(description="Mã NCC (MaNCC) đã chọn để chốt đơn, vd 'NCC001'. Bắt buộc.")
+    quantity: int = Field(description="Số lượng chốt mua (số nguyên dương). Bắt buộc.")
+    confirmed: bool = Field(
+        description="CHỈ được đặt true khi người dùng đã xác nhận rõ ràng trong hội thoại "
+        "(vd 'đồng ý', 'chốt đơn đi', 'ok chốt'). KHÔNG được tự đặt true thay người dùng nếu "
+        "chưa có xác nhận rõ ràng -- để false và hỏi lại người dùng trước."
     )
 
 
@@ -265,6 +339,19 @@ compare_price_tool = StructuredTool.from_function(
     args_schema=ComparePriceArgs,
 )
 
+confirm_order_tool = StructuredTool.from_function(
+    func=confirm_order,
+    name="confirm_order",
+    description=(
+        "Chốt đơn giả lập với 1 NCC -- HÀNH ĐỘNG HẬU QUẢ CAO, chỉ được gọi với confirmed=true "
+        "SAU KHI người dùng đã xác nhận rõ ràng trong hội thoại (không được tự suy diễn). "
+        "DÙNG KHI: người dùng đã chọn xong 1 NCC/số lượng cụ thể và nói rõ đồng ý chốt đơn. "
+        "KHÔNG DÙNG KHI: người dùng mới đang so sánh/cân nhắc (dùng search_suppliers/compare_price); "
+        "chưa nhận được xác nhận rõ ràng từ người dùng (gọi với confirmed=false hoặc hỏi lại trước)."
+    ),
+    args_schema=ConfirmOrderArgs,
+)
+
 
 if __name__ == "__main__":
     import sys
@@ -274,3 +361,5 @@ if __name__ == "__main__":
     print(json.dumps(search_suppliers("ghế văn phòng"), ensure_ascii=False, indent=2)[:500])
     print(json.dumps(get_supplier_detail("EDGE002"), ensure_ascii=False, indent=2))
     print(json.dumps(compare_price(["EDGE003", "NCC_KHONG_TON_TAI"], quantity=5), ensure_ascii=False, indent=2))
+    print(json.dumps(confirm_order("EDGE003", quantity=5, confirmed=False), ensure_ascii=False, indent=2))
+    print(json.dumps(confirm_order("EDGE003", quantity=5, confirmed=True), ensure_ascii=False, indent=2))
