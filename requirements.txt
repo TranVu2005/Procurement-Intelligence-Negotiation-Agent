@@ -1,7 +1,25 @@
-langchain
-langchain-community
-langchain-anthropic
-langchain-google-genai
-google-generativeai
-python-dotenv
-pydantic
+# Phien ban duoc ghim theo moi truong da chay thuc te (Python 3.14).
+# Ca 3 thanh vien phai cai dung bo nay, neu khong code se chay o may nay ma chet o may kia.
+#
+#     pip install -r requirements.txt
+#
+# Luu y: langchain >= 1.0 da BO AgentExecutor. Kien truc moi dung LangGraph
+# StateGraph (xem architecture.md muc 2), khong can AgentExecutor nua.
+
+# --- Core LLM / orchestration ---
+langchain==1.4.0
+langchain-core==1.6.2
+langgraph==1.2.11
+langchain-google-genai==4.4.0
+
+# --- Con dung tam boi src/perception/parser.py ---
+# Package nay da ngung ho tro (phat FutureWarning). Go bo sau khi A chuyen
+# parser.py sang ChatGoogleGenerativeAI (architecture.md muc 3.1).
+google-generativeai==0.8.6
+
+# --- Ha tang ---
+pydantic==2.13.4
+python-dotenv==1.2.3
+
+# --- Do CPU/RAM cho load test (architecture.md muc 5.6) ---
+psutil==7.2.2
