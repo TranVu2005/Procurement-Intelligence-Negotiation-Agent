@@ -39,7 +39,7 @@ class GetLLMTests(unittest.TestCase):
         self.assertIn("GOOGLE_API_KEY", str(ctx.exception))
 
     def test_model_name_is_single_source_of_truth(self) -> None:
-        self.assertEqual(MODEL_NAME, "gemini-2.5-flash")
+        self.assertEqual(MODEL_NAME, "gemini-3.6-flash")
 
 
 class UsageOfTests(unittest.TestCase):

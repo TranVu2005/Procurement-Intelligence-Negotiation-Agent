@@ -88,6 +88,23 @@ class RespondTests(unittest.TestCase):
         self.assertEqual(out["status"], "graceful_fail")
         self.assertEqual(out["llm_calls"], 0)
 
+    def test_list_shaped_chunk_content_is_flattened_not_crashed(self) -> None:
+        # Gemini voi AFC bat co the tra content la list cac content-block thay
+        # vi str thuan - phat hien qua goi that voi gemini-3.6-flash (Task 16).
+        class ListContentLLM:
+            def stream(self, messages, **_kwargs):
+                yield AIMessage(content=[{"text": "NCC Mot "}])
+                yield AIMessage(content=[{"text": "(T001) gia tot nhat."}])
+                yield AIMessage(content="", usage_metadata={
+                    "input_tokens": 10, "output_tokens": 5, "total_tokens": 15,
+                })
+
+        with patch("src.nodes.respond.get_llm", return_value=ListContentLLM()):
+            out = respond(state_with())
+        self.assertEqual(out["answer"], "NCC Mot (T001) gia tot nhat.")
+        self.assertEqual(out["status"], "success")
+        self.assertEqual(out["llm_calls"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

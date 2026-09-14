@@ -14,11 +14,13 @@ import time
 
 from langchain_core.messages import AIMessage
 
-MODEL_NAME = "gemini-2.5-flash"
+MODEL_NAME = "gemini-3.6-flash"
 
-# Do tre gia lap cua stub: do thuc te o muc 1-5 CCU roi thay hai so nay.
-STUB_LATENCY_MEAN_S = 1.2
-STUB_LATENCY_STDDEV_S = 0.3
+# Do tre gia lap cua stub. Do thuc te bang scripts/run_loadtest.py --levels 1
+# --requests-per-level 5 --llm real (Task 16 buoc 6): p50=17542ms, p95=20966ms
+# tren gemini-3.6-flash, CCU=1, ngay 2026-09-14.
+STUB_LATENCY_MEAN_S = 17.5
+STUB_LATENCY_STDDEV_S = 1.7
 
 _STUB_TEXT = (
     "[STUB] Da tim duoc nha cung cap phu hop. Day la phan hoi co dinh dung cho "

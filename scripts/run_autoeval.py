@@ -18,6 +18,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from dotenv import load_dotenv  # noqa: E402
+
+load_dotenv(ROOT / ".env")
+
 from src.eval.scoring import METRIC_NAMES, aggregate, grade_case  # noqa: E402
 
 VERSION_PATH = ROOT / "src" / "tools" / "mock_data" / "VERSION"

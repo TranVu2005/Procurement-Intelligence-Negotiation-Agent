@@ -64,6 +64,23 @@ def build_evidence_block(state: AgentState) -> str:
     return "\n".join(lines)
 
 
+def _chunk_text(content) -> str:
+    """Chuan hoa noi dung 1 chunk streaming thanh str.
+
+    Voi AFC bat (function calling), ChatGoogleGenerativeAI co the tra ve
+    content la list cac content-block ({"text": ...}) thay vi str thuan -
+    "".join() se vo neu khong chuan hoa truoc.
+    """
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        return "".join(
+            block.get("text", "") if isinstance(block, dict) else str(block)
+            for block in content
+        )
+    return str(content) if content else ""
+
+
 def _deterministic_answer(evidence: str) -> str:
     """Duong lui khi LLM khong dung duoc - van dung bang chung, khong bia them."""
     return ("Ket qua tot nhat theo du lieu hien co (trinh bay tu dong, khong qua mo hinh "
@@ -99,7 +116,7 @@ def respond(state: AgentState) -> dict:
             if ttft_ms is None:
                 ttft_ms = round((time.perf_counter() - started) * 1000, 2)
             if chunk.content:
-                parts.append(chunk.content)
+                parts.append(_chunk_text(chunk.content))
             chunk_in, chunk_out = usage_of(chunk)
             tokens_in += chunk_in
             tokens_out += chunk_out
