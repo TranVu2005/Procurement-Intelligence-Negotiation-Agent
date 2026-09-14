@@ -105,25 +105,33 @@ Mọi tool trả lỗi theo **cùng một format** để B xử lý re-plan th�
 - **Output:**
 ```json
 {"suppliers": [
-  {"MaNCC": "NCC001", "TenNCC": "Nội Thất Hòa Phát", "Gia": 850000, "MOQ": 20, "ThoiGianGiao": 10, "DiemUyTin": 4.5}
+  {"MaNCC": "NCC001", "TenNCC": "Nội Thất Hòa Phát", "Gia": 850000, "MOQ": 20,
+   "ThoiGianGiao": 10, "DiemUyTin": 4.5,
+   "nguon_url": "https://...", "nguon_type": "public_listing",
+   "fetched_at": "2026-09-13", "simulated_fields": ["Gia", "MOQ", "TonKho"]}
 ]}
 ```
-(chỉ trả field tóm tắt, không trả full record)
+(chỉ trả field tóm tắt, không trả full record). Bốn trường nguồn luôn có mặt; nếu bản ghi gốc
+thiếu, `nguon_url`/`nguon_type`/`fetched_at` là `null` và `simulated_fields` là `[]` — không được
+làm crash response (Quyết định 2, architecture.md §8.2).
 
 ### `get_supplier_detail`
 - **Input:** `{"supplier_id": "string (required)"}`
-- **Output:** toàn bộ 13 field gốc của NCC (MaNCC, TenNCC, LoaiSanPham, ChatLieu, Gia, DonViTinh, MOQ, TonKho, ThoiGianGiao, BaoHanh, ChietKhauTheoSoLuong, DiemUyTin, KhuVuc)
+- **Output:** toàn bộ 13 field gốc của NCC (MaNCC, TenNCC, LoaiSanPham, ChatLieu, Gia, DonViTinh, MOQ, TonKho, ThoiGianGiao, BaoHanh, ChietKhauTheoSoLuong, DiemUyTin, KhuVuc) cộng bốn trường nguồn (`nguon_url`, `nguon_type`, `fetched_at`, `simulated_fields`) đã có sẵn trên bản ghi gốc — tool này không cần sửa để lộ chúng ra.
 
 ### `compare_price`
 - **Input:** `{"supplier_ids": ["string", "..."], "quantity": "int (required)"}`
 - **Output:**
 ```json
 {"comparisons": [
-  {"MaNCC": "NCC001", "unit_price": 850000, "discount_applied": "5%", "total_price": 40375000, "meets_moq": true}
+  {"MaNCC": "NCC001", "unit_price": 850000, "discount_applied": "5%", "total_price": 40375000,
+   "meets_moq": true, "nguon_url": "https://...", "simulated_fields": ["Gia", "MOQ", "TonKho"]}
 ]}
 ```
 
-**Quy tắc:** nếu 1 supplier_id không tồn tại hoặc dataset thiếu field → trả lỗi theo format chung ở trên cho riêng phần tử đó, không làm fail cả response.
+**Quy tắc:** nếu 1 supplier_id không tồn tại hoặc dataset thiếu field → trả lỗi theo format chung ở trên cho riêng phần tử đó, không làm fail cả response. Phần tử không lỗi mang thêm `nguon_url` và
+`simulated_fields` để mọi claim về `total_price` truy được về nguồn. Phần tử lỗi giữ nguyên shape
+lỗi chuẩn, không có hai trường này.
 
 ### `confirm_order` — ĐỀ XUẤT MỚI (buổi họp 4, 15/9) — CẦN A/B XÁC NHẬN LẠI
 - **Input:** `{"supplier_id": "string (required)", "quantity": "int (required)", "confirmed": "bool (required)"}`

@@ -96,6 +96,12 @@ def search_suppliers(product_type: str, material: str | None = None, region: str
             "MOQ": r.get("MOQ"),
             "ThoiGianGiao": r.get("ThoiGianGiao"),
             "DiemUyTin": r.get("DiemUyTin"),
+            # Truong nguon - respond phai gan vao moi con so neu ra, va
+            # verify_output truy nguoc bang chung qua day (architecture.md muc 4.1)
+            "nguon_url": r.get("nguon_url"),
+            "nguon_type": r.get("nguon_type"),
+            "fetched_at": r.get("fetched_at"),
+            "simulated_fields": r.get("simulated_fields") or [],
         }
         for r in matches
     ]
@@ -194,6 +200,8 @@ def compare_price(supplier_ids: list[str], quantity: int,
                 "discount_applied": f"{pct}%",
                 "total_price": unit_price * quantity,
                 "meets_moq": quantity >= record["MOQ"],
+                "nguon_url": record.get("nguon_url"),
+                "simulated_fields": record.get("simulated_fields") or [],
             })
         except KeyError as e:
             # dataset thieu field (vd Gia/MOQ) -> loi rieng phan tu nay, khong fail ca response
