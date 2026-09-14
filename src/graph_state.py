@@ -41,6 +41,7 @@ class AgentState(TypedDict, total=False):
     llm_calls: Annotated[int, operator.add]
     tokens_in: Annotated[int, operator.add]
     tokens_out: Annotated[int, operator.add]
+    ttft_ms: float
 
 
 def new_state(

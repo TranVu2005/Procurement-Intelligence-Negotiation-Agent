@@ -27,7 +27,7 @@ class NodeContractTests(unittest.TestCase):
 
     def test_every_node_is_marked_as_stub_for_now(self) -> None:
         # Node da lam that thi bo khoi danh sach nay (tool_search: Task 7)
-        done = {"tool_search", "tool_compare", "tool_detail", "confirm_gate"}
+        done = {"tool_search", "tool_compare", "tool_detail", "confirm_gate", "respond"}
         for node in ALL_NODES:
             if node.__name__ in done:
                 continue
@@ -47,8 +47,8 @@ class StubShapeTests(unittest.TestCase):
         self.assertIsInstance(verdict, dict)
         self.assertEqual(set(verdict), {"passed", "violations", "claims"})
 
-    def test_respond_stub_counts_one_llm_call(self) -> None:
-        self.assertEqual(respond(new_state("x"))["llm_calls"], 1)
+    def test_respond_without_evidence_calls_no_llm(self) -> None:
+        self.assertEqual(respond(new_state("x"))["llm_calls"], 0)
 
 
 if __name__ == "__main__":
