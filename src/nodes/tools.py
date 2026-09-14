@@ -118,16 +118,53 @@ def tool_search(state: AgentState) -> dict:
 
 
 def tool_compare(state: AgentState) -> dict:
-    return {"tool_results": [], "candidates": []}
+    """Nhanh compare_specific: so sanh dung danh sach MaNCC nguoi dung neu ra."""
+    req = state.get("req") or {}
+    hard = req.get("hard_constraints") or {}
+    supplier_ids = list(req.get("target_supplier_ids") or [])
+
+    if not supplier_ids:
+        return {"tool_results": [], "candidates": [],
+                "status": "needs_input", "answer": _NEED_SUPPLIER_IDS}
+
+    details, entries = _fetch_details(state, supplier_ids)
+
+    quantity = hard.get("quantity")
+    if not quantity:
+        return {"tool_results": entries, "candidates": [],
+                "status": "needs_input", "answer": _NEED_QUANTITY}
+
+    found_ids = [d["MaNCC"] for d in details]
+    if not found_ids:
+        return {"tool_results": entries, "candidates": []}
+
+    price_result, price_entry = run_tool(
+        state, "compare_price", {"supplier_ids": found_ids, "quantity": quantity})
+    entries.append(price_entry)
+    if price_result.get("error"):
+        return {"tool_results": entries, "candidates": []}
+
+    return {"tool_results": entries,
+            "candidates": merge_supplier_evidence(details, price_result)}
 
 
 def tool_detail(state: AgentState) -> dict:
-    return {"tool_results": [], "candidates": []}
+    """Nhanh supplier_detail: tra full record cua DUNG 1 NCC.
+
+    get_supplier_detail chi nhan 1 MaNCC moi lan goi (interface-contracts.md
+    muc 3), nen chi lay ma dau tien.
+    """
+    supplier_ids = list((state.get("req") or {}).get("target_supplier_ids") or [])
+    if not supplier_ids:
+        return {"tool_results": [], "candidates": [],
+                "status": "needs_input", "answer": _NEED_SUPPLIER_IDS}
+
+    details, entries = _fetch_details(state, supplier_ids[:1])
+    return {"tool_results": entries, "candidates": details}
 
 
 def confirm_gate(state: AgentState) -> dict:
     return {"pending_confirmation": None}
 
 
-for _node in (tool_compare, tool_detail, confirm_gate):
-    _node.__stub__ = True
+confirm_gate.__stub__ = True

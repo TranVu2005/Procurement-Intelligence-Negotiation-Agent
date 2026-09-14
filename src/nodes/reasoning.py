@@ -35,8 +35,18 @@ def filter_hard(state: AgentState) -> dict:
 
     Goi filter_hard_constraints(); GHI DE state["candidates"] bang phan
     eligible. Router route_after_filter doc chinh khoa nay.
+
+    NGOAI LE BAT BUOC (B phai giu khi viet node that): voi
+    state["intent"] == "supplier_detail", nguoi dung chi hoi thong tin, khong
+    co rang buoc cung nao de doi chieu. Cho record di thang qua, KHONG goi
+    filter_hard_constraints - neu goi, moi record se bi loai vi thieu
+    total_price va vong re-plan se chay vo ich cho den khi cham tran 3 lan.
     """
-    return {"candidates": list(state.get("candidates") or []), "rejected": []}
+    candidates = list(state.get("candidates") or [])
+    if state.get("intent") == "supplier_detail":
+        return {"candidates": candidates, "rejected": []}
+    # Stub chua loc gi; B thay dong duoi day bang filter_hard_constraints()
+    return {"candidates": candidates, "rejected": []}
 
 
 def score_rank(state: AgentState) -> dict:
