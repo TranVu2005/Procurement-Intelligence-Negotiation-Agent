@@ -3,9 +3,13 @@
 Owner: Nguoi C
 """
 
+import json
 import logging
+import os
 import time
 import uuid
+from datetime import datetime, timezone
+from pathlib import Path
 
 SENSITIVE_KEYS = {
     "api_key", "google_api_key", "anthropic_api_key",
@@ -14,6 +18,10 @@ SENSITIVE_KEYS = {
 
 logger = logging.getLogger("procurement_agent")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s:%(name)s:%(message)s")
+
+# Ghi ra file de doc lai duoc sau khi chay - stdout khong tai lap duoc
+# (architecture.md muc 3.6). Doi cho ghi bang bien moi truong AGENT_LOG_DIR.
+LOG_DIR = Path(os.getenv("AGENT_LOG_DIR") or (Path(__file__).resolve().parents[2] / "logs"))
 
 
 def new_trace_id() -> str:
@@ -24,8 +32,56 @@ def redact(payload: dict) -> dict:
     return {k: ("***" if k.lower() in SENSITIVE_KEYS else v) for k, v in payload.items()}
 
 
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+
+
+def _append_jsonl(path: Path, record: dict) -> Path:
+    """Ghi 1 dong JSON. Loi ghi file khong duoc lam gay request dang chay."""
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
+    except OSError as exc:  # noqa: BLE001 - log hong thi van phai tra loi nguoi dung
+        logger.warning("khong ghi duoc log file %s: %s", path, exc)
+    return path
+
+
+def write_jsonl(trace_id: str, event: str, payload: dict) -> Path:
+    """Noi them 1 dong vao logs/<trace_id>.jsonl. payload da phai qua redact()."""
+    record = {"ts": _now_iso(), "trace_id": trace_id, "event": event, **payload}
+    return _append_jsonl(LOG_DIR / f"{trace_id}.jsonl", record)
+
+
+def write_run_record(final: dict) -> Path:
+    """Mot dong tong ket cho 1 request, ghi vao logs/runs.jsonl.
+
+    Day la nguon so lieu cho P50/P95, so lan goi LLM trung binh va chi phi
+    (architecture.md muc 5.5, 5.7). Chi ghi so dem, khong ghi payload tool.
+    """
+    tool_results = final.get("tool_results") or []
+    record = {
+        "ts": _now_iso(),
+        "trace_id": final.get("trace_id"),
+        "session_id": final.get("session_id"),
+        "intent": final.get("intent"),
+        "status": final.get("status"),
+        "llm_calls": final.get("llm_calls", 0),
+        "tool_calls": len(tool_results),
+        "tool_errors": sum(1 for e in tool_results if e.get("status") == "error"),
+        "replan_count": final.get("replan_count", 0),
+        "tokens_in": final.get("tokens_in", 0),
+        "tokens_out": final.get("tokens_out", 0),
+        "latency_ms": final.get("latency_ms"),
+        "ttft_ms": final.get("ttft_ms"),
+    }
+    return _append_jsonl(LOG_DIR / "runs.jsonl", record)
+
+
 def log_event(trace_id: str, event: str, **fields) -> None:
-    logger.info("[%s] %s %s", trace_id, event, redact(fields))
+    payload = redact(fields)
+    logger.info("[%s] %s %s", trace_id, event, payload)
+    write_jsonl(trace_id, event, payload)
 
 
 def audit_entry(trace_id: str, tool: str, params: dict, status: str, latency_ms: float, **extra) -> dict:

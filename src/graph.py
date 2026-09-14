@@ -11,7 +11,7 @@ from functools import lru_cache
 from langgraph.graph import END, START, StateGraph
 
 from src.graph_state import MAX_REPLAN, AgentState, new_state
-from src.logging_utils.tracer import log_event
+from src.logging_utils.tracer import log_event, write_run_record
 from src.nodes.perceive import perceive
 from src.nodes.reasoning import (
     diagnose, filter_hard, graceful_fail, plan, replan, respond_limits, score_rank, verify_output,
@@ -155,4 +155,5 @@ def run_request(
     log_event(state["trace_id"], "request_end", status=final["status"],
               llm_calls=final.get("llm_calls", 0), tool_calls=len(final.get("tool_results", [])),
               latency_ms=final["latency_ms"])
+    write_run_record(final)
     return final
