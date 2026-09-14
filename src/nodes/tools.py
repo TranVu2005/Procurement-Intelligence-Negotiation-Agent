@@ -7,9 +7,13 @@ vi search_suppliers chi tra 6 field tom tat, thieu TonKho/LoaiSanPham ma
 hard_constraint_violations cua B doc.
 """
 
+import time
+import unicodedata
+
 from src.graph_state import AgentState, tool_result_entry
 from src.nodes.tool_exec import run_tool
 from src.reasoning.scoring import merge_supplier_evidence
+from src.tools.supplier_tools import confirm_order
 
 _NEED_QUANTITY = (
     "Toi can biet số lượng du kien dat mua truoc khi so sanh gia va kiem tra MOQ. "
@@ -163,8 +167,81 @@ def tool_detail(state: AgentState) -> dict:
     return {"tool_results": entries, "candidates": details}
 
 
+# Cum xac nhan tuong minh. Cac cum phu dinh phai duoc kiem TRUOC (xem _is_confirmed).
+CONFIRM_WORDS = ("chot don", "dong y", "ok chot", "xac nhan dat", "dat hang di", "chot luon")
+_REFUSAL_WORDS = ("khong dong y", "khong chot", "chua chot", "khoan da", "de sau")
+
+
+def _fold(text: str) -> str:
+    """Bo dau tieng Viet, ha thuong - chi de so khop, khong doi du lieu goc."""
+    text = (text or "").replace("đ", "d").replace("Đ", "D")
+    text = unicodedata.normalize("NFD", text)
+    return "".join(c for c in text if unicodedata.category(c) != "Mn").lower()
+
+
+def _is_confirmed(user_input: str) -> bool:
+    """True chi khi nguoi dung xac nhan tuong minh o CHINH luot nay.
+
+    Khong bao gio suy dien tu ngu canh truoc do (SYSTEM-RULES.md muc 3:
+    hanh dong hau qua cao phai co xac nhan ro rang).
+    """
+    folded = _fold(user_input)
+    if any(word in folded for word in _REFUSAL_WORDS):
+        return False
+    return any(word in folded for word in CONFIRM_WORDS)
+
+
 def confirm_gate(state: AgentState) -> dict:
-    return {"pending_confirmation": None}
+    """Chan buoc chot don lai, cho den khi nguoi dung xac nhan tuong minh."""
+    ranked = state.get("ranked") or []
+    if not ranked:
+        return {"pending_confirmation": None, "status": state.get("status") or "success"}
 
+    top = ranked[0]
+    supplier_id = top.get("MaNCC")
+    quantity = ((state.get("req") or {}).get("hard_constraints") or {}).get("quantity")
 
-confirm_gate.__stub__ = True
+    if not _is_confirmed(state.get("user_input", "")) or not supplier_id or not quantity:
+        return {
+            "pending_confirmation": {
+                "supplier_id": supplier_id,
+                "supplier_name": top.get("TenNCC"),
+                "quantity": quantity,
+                "total_price": top.get("total_price"),
+            },
+            "status": "needs_confirmation",
+            "answer": (
+                f"{state.get('answer', '')}\n\n"
+                f"Ban co muon chot don voi {top.get('TenNCC')} ({supplier_id}), "
+                f"so luong {quantity}? Toi chi thuc hien khi ban xac nhan ro rang "
+                f"(vi du: 'chot don di')."
+            ).strip(),
+        }
+
+    started = time.perf_counter()
+    result = confirm_order(supplier_id=supplier_id, quantity=quantity, confirmed=True)
+    entry = tool_result_entry(
+        tool="confirm_order",
+        params={"supplier_id": supplier_id, "quantity": quantity, "confirmed": True},
+        status="error" if result.get("error") else "ok",
+        result=result,
+        latency_ms=round((time.perf_counter() - started) * 1000, 2),
+        trace_id=state.get("trace_id", ""),
+        error_type=result.get("error_type"),
+    )
+
+    if result.get("error"):
+        return {"tool_results": [entry], "pending_confirmation": None,
+                "status": "graceful_fail",
+                "answer": f"Khong chot duoc don: {result.get('message')}"}
+
+    return {
+        "tool_results": [entry],
+        "pending_confirmation": None,
+        "status": "success",
+        "answer": (
+            f"{state.get('answer', '')}\n\n"
+            f"Da chot don voi {top.get('TenNCC')} ({supplier_id}), so luong {quantity}, "
+            f"luc {result['confirmed_at']}."
+        ).strip(),
+    }

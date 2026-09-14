@@ -27,7 +27,7 @@ class NodeContractTests(unittest.TestCase):
 
     def test_every_node_is_marked_as_stub_for_now(self) -> None:
         # Node da lam that thi bo khoi danh sach nay (tool_search: Task 7)
-        done = {"tool_search", "tool_compare", "tool_detail"}
+        done = {"tool_search", "tool_compare", "tool_detail", "confirm_gate"}
         for node in ALL_NODES:
             if node.__name__ in done:
                 continue
