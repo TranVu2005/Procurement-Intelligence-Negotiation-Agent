@@ -145,7 +145,8 @@ def _apply_discount(price: int, quantity: int, tiers: list[dict]) -> tuple[int, 
     return unit_price, pct
 
 
-def compare_price(supplier_ids: list[str], quantity: int) -> dict:
+def compare_price(supplier_ids: list[str], quantity: int,
+                  _simulate_error: str | None = None) -> dict:
     """
     Input: {"supplier_ids": [str], "quantity": int (required)}
     Output: {"comparisons": [{"MaNCC","unit_price","discount_applied","total_price","meets_moq"}]}
@@ -155,6 +156,11 @@ def compare_price(supplier_ids: list[str], quantity: int) -> dict:
     start = time.perf_counter()
     params = {"supplier_ids": supplier_ids, "quantity": quantity}
     log_event(trace_id, "tool_call_start", tool_name="compare_price", **params)
+
+    if _simulate_error:
+        result = _error(_simulate_error, f"Gia lap loi '{_simulate_error}' cho compare_price")
+        log_tool_call(trace_id, "compare_price", start, "error", params=params)
+        return result
 
     # --- validate-first: chan het truoc khi dung data, khong de loi throw giua chung ---
     if not quantity or quantity <= 0:
@@ -203,7 +209,8 @@ def compare_price(supplier_ids: list[str], quantity: int) -> dict:
     return {"comparisons": comparisons}
 
 
-def confirm_order(supplier_id: str, quantity: int, confirmed: bool = False) -> dict:
+def confirm_order(supplier_id: str, quantity: int, confirmed: bool = False,
+                  _simulate_error: str | None = None) -> dict:
     """
     Input: {"supplier_id": str (required), "quantity": int (required), "confirmed": bool (required)}
     Output neu confirmed=True va hop le: {"order_confirmed": true, "supplier_id", "quantity", "confirmed_at"}
@@ -215,6 +222,11 @@ def confirm_order(supplier_id: str, quantity: int, confirmed: bool = False) -> d
     start = time.perf_counter()
     params = {"supplier_id": supplier_id, "quantity": quantity, "confirmed": confirmed}
     log_event(trace_id, "tool_call_start", tool_name="confirm_order", **params)
+
+    if _simulate_error:
+        result = _error(_simulate_error, f"Gia lap loi '{_simulate_error}' cho confirm_order")
+        log_tool_call(trace_id, "confirm_order", start, "error", params=params)
+        return result
 
     if not supplier_id:
         result = _error("invalid_input", "supplier_id la truong bat buoc")
