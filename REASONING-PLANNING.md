@@ -134,6 +134,11 @@ Kết quả gồm `passed`, danh sách `violations` và danh sách `claims`. Nó
 Nếu verdict không đạt, agent phải diagnose/re-plan hoặc graceful-fail; không được trình
 bày một phương án chưa xác minh như kết quả chắc chắn.
 
+Prompt ở `src/reasoning/prompts.py` chỉ nhận verdict đã pass. Mọi claim số phải có
+`MaNCC` và `nguon_url`, field mô phỏng phải được nói rõ, và câu trả lời chỉ được đề nghị
+xác nhận chứ không tự chốt đơn. Nhánh `out_of_scope` dùng prompt giới hạn riêng và
+không gọi tool.
+
 ### Các nhánh re-plan bắt buộc
 
 | Tình huống | Nguyên nhân được ghi | Hướng thay thế |
@@ -164,6 +169,7 @@ Từ thư mục gốc repository:
 python -m unittest discover -s tests -p "test_planner.py" -v
 python -m unittest discover -s tests -p "test_scoring.py" -v
 python -m unittest discover -s tests -p "test_verification.py" -v
+python -m unittest discover -s tests -p "test_response_prompts.py" -v
 python -m unittest discover -s tests -p "test_reasoning_tools_integration.py" -v
 python -m scripts.demo_e2e
 ```
