@@ -33,17 +33,24 @@ def _is_retryable_error(result: Any) -> bool:
 def call_with_retry(tool_func: Callable[..., dict], *args,
                      max_retries: int = MAX_RETRIES,
                      backoff_base: float = BACKOFF_BASE_SECONDS,
+                     stats: dict | None = None,
                      **kwargs) -> dict:
     """Goi tool_func(*args, **kwargs); tu dong retry voi backoff mu 2
     (backoff_base, 2*backoff_base, 4*backoff_base, ...) khi ket qua la loi
     thuoc RETRYABLE_ERROR_TYPES. Tra ve ket qua thanh cong dau tien, hoac
-    loi cuoi cung sau khi het luot retry."""
+    loi cuoi cung sau khi het luot retry.
+
+    stats: neu truyen vao 1 dict, ham dien stats["attempts"] = tong so lan
+    da goi tool (1 = khong retry lan nao). Dung cho audit trail cua node tool.
+    """
     retry_trace_id = new_trace_id()
     tool_name = getattr(tool_func, "__name__", str(tool_func))
 
     attempt = 0
     while True:
         result = tool_func(*args, **kwargs)
+        if stats is not None:
+            stats["attempts"] = attempt + 1
 
         if not _is_retryable_error(result):
             if attempt > 0:
