@@ -1,4 +1,4 @@
-# Reasoning & Planning — thiết kế cho buổi họp 10/09
+# Reasoning & Planning — trạng thái triển khai
 
 **Owner:** Người B  
 **Phạm vi:** đọc state của A, lập kế hoạch và ra quyết định; chỉ gọi tool theo contract của C.
@@ -37,23 +37,28 @@ Re-plan luôn tạo `plan_id` mới, ghi `replan_reason`, tăng `replan_count` v
 tối đa 3 lần. Khi quá giới hạn, agent graceful-fail và nói rõ chưa đủ bằng chứng hoặc
 cần người dùng điều chỉnh yêu cầu.
 
-## 2. Input của planner
+## 2. Input và intent của planner
 
 Planner dùng nguyên state schema trong `SYSTEM-RULES.md`:
 
-- Bắt buộc: `session_id`, `product_type`, `quantity`, `budget_max`,
+- Với `search_new`: bắt buộc `session_id`, `product_type`, `quantity`, `budget_max`,
   `delivery_deadline_days`.
+- Với `compare_specific`: bắt buộc `session_id`, `quantity` và danh sách
+  `supplier_ids`.
+- Với `supplier_detail`: bắt buộc `session_id` và `supplier_id`.
+- Với `out_of_scope`: chỉ cần `session_id`; planner không tạo tool call mua hàng.
 - Tùy chọn: `material_preference`, `region_preference`, `min_trust_score`.
 - Không tự suy đoán field bắt buộc còn thiếu.
 
 ## 3. Output của planner
 
-`make_plan(state)` trả đúng plan contract:
+`make_plan(state, intent=...)` trả plan theo đúng intent:
 
 ```json
 {
   "plan_id": "plan_<unique-id>",
   "session_id": "sess_001",
+  "intent": "search_new",
   "status": "draft",
   "replan_count": 0,
   "replan_reason": null,
@@ -66,9 +71,7 @@ Planner dùng nguyên state schema trong `SYSTEM-RULES.md`:
       "step_id": 1,
       "action": "search_suppliers",
       "params": {
-        "product_type": "ghế văn phòng",
-        "material": null,
-        "region": null
+        "product_type": "ghế văn phòng"
       },
       "reason": "Tìm ứng viên trước khi kiểm tra các ràng buộc",
       "depends_on": []
@@ -83,9 +86,11 @@ vì rule chung quy định `steps[*].action` phải trùng chính xác tên tool
 Chất liệu và khu vực là ràng buộc mềm nên plan tìm rộng theo loại sản phẩm; chúng được
 dùng để xếp hạng và giải thích trade-off, không được âm thầm biến thành điều kiện loại.
 
-`compare_price` chưa được đưa ngay vào executable steps vì `supplier_ids` chỉ tồn tại
-sau khi `search_suppliers` trả kết quả. Orchestrator phải lấy ID thật từ tool output rồi
-mới tạo call, không dùng ID giả hoặc hard-code.
+Với `search_new`, `compare_price` chưa được đưa ngay vào executable steps vì
+`supplier_ids` chỉ tồn tại sau khi `search_suppliers` trả kết quả. Orchestrator phải lấy
+ID thật từ tool output rồi mới tạo call, không dùng ID giả hoặc hard-code. Với
+`compare_specific`, planner nhận ID do A trích xuất và tạo trực tiếp bước
+`compare_price`.
 
 ## 4. Quy tắc lọc và xếp hạng
 
@@ -113,7 +118,23 @@ Mỗi ứng viên được xếp hạng còn có chiến lược đàm phán g�
 đòn bẩy có bằng chứng (sản lượng/MOQ, số phương án thay thế, bảo hành, uy tín), nhượng
 bộ có thể chấp nhận và guardrail không vượt ngân sách/không tự động chốt đơn.
 
-## 5. Các nhánh re-plan bắt buộc
+## 5. Chẩn đoán, xác minh và re-plan
+
+`diagnose(rejected_suppliers)` gom các mã vi phạm hard constraint, đếm số nhà cung
+cấp bị ảnh hưởng và tạo `replan_reason` có cấu trúc. Lý do này được chuyển cho
+`make_replan`; plan mới luôn có ID mới và tăng `replan_count`.
+
+`verify_output(ranked, req, tool_results)` là cổng cuối trước khi trả lời người dùng.
+Kết quả gồm `passed`, danh sách `violations` và danh sách `claims`. Nó kiểm tra lại:
+
+- hard constraints và phép tính tổng tiền;
+- nhà cung cấp được đề xuất có thật trong tool output;
+- claim quan trọng có evidence và `nguon_url` để trích dẫn.
+
+Nếu verdict không đạt, agent phải diagnose/re-plan hoặc graceful-fail; không được trình
+bày một phương án chưa xác minh như kết quả chắc chắn.
+
+### Các nhánh re-plan bắt buộc
 
 | Tình huống | Nguyên nhân được ghi | Hướng thay thế |
 |---|---|---|
@@ -142,6 +163,7 @@ Từ thư mục gốc repository:
 ```bash
 python -m unittest discover -s tests -p "test_planner.py" -v
 python -m unittest discover -s tests -p "test_scoring.py" -v
+python -m unittest discover -s tests -p "test_verification.py" -v
 python -m unittest discover -s tests -p "test_reasoning_tools_integration.py" -v
 python -m scripts.demo_e2e
 ```
