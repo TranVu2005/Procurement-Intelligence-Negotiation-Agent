@@ -153,6 +153,25 @@ def parse_kesatngoctin(html: str) -> list[RawProduct]:
     return products
 
 
+def parse_giakedehangpro(html: str) -> list[RawProduct]:
+    """giakedehangpro.com - gia cong khai dang '1.830.000₫' (co the la gia
+    sale, la gia dau tien gap - dung lam gia hien tai). Loc trung link theo
+    url vi <a> bao anh va <a> bao ten cung tro toi 1 san pham."""
+    pattern = re.compile(
+        r'<a href="(/[^"]+)" title="([^"]+)">.*?<span class="price">([\d.]+)₫</span>',
+        re.DOTALL,
+    )
+    seen: set[str] = set()
+    products = []
+    base = "https://giakedehangpro.com"
+    for rel_url, name, price_text in pattern.findall(html):
+        if rel_url in seen:
+            continue
+        seen.add(rel_url)
+        products.append(RawProduct(name=name.strip(), url=base + rel_url, price=int(price_text.replace(".", ""))))
+    return products
+
+
 # ---------------------------------------------------------------------------
 # Cau hinh 4 nguon: url fetch, parser, TenNCC, KhuVuc gan san (co ly do).
 # ---------------------------------------------------------------------------
@@ -190,6 +209,12 @@ SOURCES = [
                                             # "Chi Nhanh Ha Noi: 89 D6 Dai Kim, Hoang Mai"
         "urls": ["https://kesatngoctin.com/danh-muc/ke-ho-so"],
         "parser": parse_kesatngoctin,
+    },
+    {
+        "label": "Gia Ke De Hang Pro",
+        "khu_vuc": "Ha Noi",  # "444 phuc Dien, Nam Tu Liem, Ha Noi"; "mien phi noi thanh Ha Noi"
+        "urls": ["https://giakedehangpro.com/"],
+        "parser": parse_giakedehangpro,
     },
 ]
 
