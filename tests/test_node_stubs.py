@@ -30,7 +30,7 @@ class NodeContractTests(unittest.TestCase):
         done = {
             "plan", "filter_hard", "score_rank", "verify_output", "diagnose", "replan",
             "respond_limits", "graceful_fail", "tool_search", "tool_compare", "tool_detail",
-            "confirm_gate", "respond",
+            "confirm_gate", "respond", "perceive",
         }
         for node in ALL_NODES:
             if node.__name__ in done:
@@ -40,10 +40,18 @@ class NodeContractTests(unittest.TestCase):
 
 
 class StubShapeTests(unittest.TestCase):
-    def test_perceive_stub_sets_intent_and_req(self) -> None:
-        patch = perceive(new_state("x"))
-        self.assertEqual(patch["intent"], "search_new")
+    def test_perceive_returns_correct_shape(self) -> None:
+        """perceive (node that) phai tra ve dung cac khoa hop dong.
+
+        Khong kiem tra gia tri cu the vi node goi LLM that voi input bat ky;
+        chi dam bao shape dung de graph.py va cac node sau doc duoc.
+        """
+        patch = perceive(new_state("Can 50 ghe van phong, ngan sach 200 trieu, giao 14 ngay"))
+        self.assertIn("intent", patch)
+        self.assertIn("req", patch)
+        self.assertIn("llm_calls", patch)
         self.assertIn("hard_constraints", patch["req"])
+        self.assertIn("soft_constraints", patch["req"])
 
     def test_verify_output_stub_returns_structured_verdict_not_boolean(self) -> None:
         patch = verify_output(new_state("x"))
