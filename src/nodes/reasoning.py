@@ -1,33 +1,112 @@
-"""Cac node suy luan - Owner: Nguoi B. Toan bo dang la NODE GIA.
-
-B thay ruot tung ham o Dot 2 (goi vao src/reasoning/planner.py va
-src/reasoning/scoring.py da co san), giu nguyen chu ky va cac khoa tra ve,
-va xoa dong `<ten_ham>.__stub__` tuong ung.
-"""
+"""Cac node suy luan tat dinh - Owner: Nguoi B."""
 
 from src.graph_state import AgentState
+from src.reasoning.planner import PlanningError, ReplanLimitReached, make_plan, make_replan
+from src.reasoning.scoring import (
+    ScoringError,
+    diagnose as diagnose_rejections,
+    filter_hard_constraints,
+    rank_suppliers,
+    verify_output as verify_recommendation,
+)
+
+
+_FULL_HARD_FIELDS = (
+    "product_type",
+    "quantity",
+    "budget_max",
+    "delivery_deadline_days",
+)
+
+
+def _req_with_session(state: AgentState) -> dict:
+    req = dict(state.get("req") or {})
+    req.setdefault("session_id", state.get("session_id") or "")
+    return req
+
+
+def _partial_compare_filter(candidates: list[dict], quantity) -> dict:
+    """Filter only constraints known in a standalone compare request."""
+
+    eligible, rejected = [], []
+    for supplier in candidates:
+        violations = []
+        if supplier.get("error"):
+            violations.append({
+                "code": "tool_result_error",
+                "field": "error_type",
+                "actual": supplier.get("error_type"),
+                "required": "successful evidence",
+            })
+        moq = supplier.get("MOQ")
+        if isinstance(quantity, int) and not isinstance(quantity, bool):
+            if not isinstance(moq, (int, float)) or isinstance(moq, bool):
+                violations.append({
+                    "code": "missing_moq_evidence", "field": "MOQ",
+                    "actual": moq, "required": "numeric value",
+                })
+            elif quantity < moq:
+                violations.append({
+                    "code": "quantity_below_moq", "field": "MOQ",
+                    "actual": quantity, "required": f">= {moq}",
+                })
+            stock = supplier.get("TonKho")
+            if not isinstance(stock, (int, float)) or isinstance(stock, bool):
+                violations.append({
+                    "code": "missing_stock_evidence", "field": "TonKho",
+                    "actual": stock, "required": f">= {quantity}",
+                })
+            elif stock < quantity:
+                violations.append({
+                    "code": "stock_below_quantity", "field": "TonKho",
+                    "actual": stock, "required": f">= {quantity}",
+                })
+        if violations:
+            rejected.append({
+                "supplier_id": supplier.get("MaNCC"),
+                "violations": violations,
+                "evidence": supplier,
+            })
+        else:
+            eligible.append(dict(supplier))
+    return {"eligible": eligible, "rejected": rejected}
+
+
+def _diagnosis_for(state: AgentState) -> dict:
+    rejected = list(state.get("rejected") or [])
+    verdict_violations = (state.get("verdict") or {}).get("violations") or []
+    if verdict_violations:
+        supplier_id = ((state.get("ranked") or [{}])[0]).get("MaNCC")
+        rejected.append({"supplier_id": supplier_id, "violations": verdict_violations})
+
+    for entry in state.get("tool_results") or []:
+        if entry.get("status") != "error":
+            continue
+        result = entry.get("result") or {}
+        rejected.append({
+            "supplier_id": None,
+            "violations": [{
+                "code": "tool_result_error",
+                "field": "error_type",
+                "actual": entry.get("error_type") or result.get("error_type"),
+                "required": "successful evidence",
+            }],
+        })
+    return diagnose_rejections(rejected)
 
 
 def plan(state: AgentState) -> dict:
     """Tra ve: {"plan": dict}. Goi make_plan/make_replan cua planner.py."""
-    return {
-        "plan": {
-            "plan_id": "plan_stub",
-            "session_id": state.get("session_id", ""),
-            "status": "executing",
-            "replan_count": state.get("replan_count", 0),
-            "replan_reason": None,
-            "steps": [
-                {
-                    "step_id": 1,
-                    "action": "search_suppliers",
-                    "params": {"product_type": "ghế văn phòng"},
-                    "reason": "stub",
-                    "depends_on": [],
-                }
-            ],
+    req = _req_with_session(state)
+    intent = state.get("intent") or req.get("intent") or "search_new"
+    try:
+        return {"plan": make_plan(req, intent=intent)}
+    except PlanningError as exc:
+        return {
+            "plan": {},
+            "status": "needs_input",
+            "answer": f"Chưa thể lập kế hoạch: {exc}",
         }
-    }
 
 
 def filter_hard(state: AgentState) -> dict:
@@ -45,13 +124,54 @@ def filter_hard(state: AgentState) -> dict:
     candidates = list(state.get("candidates") or [])
     if state.get("intent") == "supplier_detail":
         return {"candidates": candidates, "rejected": []}
-    # Stub chua loc gi; B thay dong duoi day bang filter_hard_constraints()
-    return {"candidates": candidates, "rejected": []}
+
+    hard = (state.get("req") or {}).get("hard_constraints") or {}
+    if state.get("intent") == "compare_specific" and not all(
+        hard.get(field) is not None for field in _FULL_HARD_FIELDS
+    ):
+        filtered = _partial_compare_filter(candidates, hard.get("quantity"))
+    else:
+        try:
+            filtered = filter_hard_constraints(candidates, hard)
+        except (KeyError, TypeError, ValueError) as exc:
+            rejected = [{
+                "supplier_id": item.get("MaNCC"),
+                "violations": [{
+                    "code": "invalid_constraint_state",
+                    "field": "hard_constraints",
+                    "actual": hard,
+                    "required": str(exc),
+                }],
+                "evidence": item,
+            } for item in candidates]
+            filtered = {"eligible": [], "rejected": rejected}
+    return {"candidates": filtered["eligible"], "rejected": filtered["rejected"]}
 
 
 def score_rank(state: AgentState) -> dict:
     """Tra ve: {"ranked": [...]}. Goi rank_suppliers() cua scoring.py."""
-    return {"ranked": list(state.get("candidates") or [])}
+    candidates = list(state.get("candidates") or [])
+    intent = state.get("intent")
+    hard = (state.get("req") or {}).get("hard_constraints") or {}
+
+    if intent == "supplier_detail":
+        return {"ranked": candidates}
+    if intent == "compare_specific" and not all(
+        hard.get(field) is not None for field in _FULL_HARD_FIELDS
+    ):
+        ranked = sorted(
+            candidates,
+            key=lambda item: (
+                not isinstance(item.get("total_price"), (int, float)),
+                item.get("total_price", float("inf")),
+                str(item.get("MaNCC", "")),
+            ),
+        )
+        return {"ranked": ranked}
+    try:
+        return {"ranked": rank_suppliers(candidates, state.get("req") or {})}
+    except (KeyError, TypeError, ScoringError):
+        return {"ranked": []}
 
 
 def verify_output(state: AgentState) -> dict:
@@ -61,13 +181,18 @@ def verify_output(state: AgentState) -> dict:
                  "evidence": {"MaNCC": str, "field": str, "nguon_url": str}}
     AutoEval tinh Citation/Evidence Correctness tu claims -> KHONG duoc tra boolean.
     """
-    return {"verdict": {"passed": True, "violations": [], "claims": []}}
+    verdict = verify_recommendation(
+        state.get("ranked") or [],
+        state.get("req") or {},
+        state.get("tool_results") or [],
+    )
+    return {"verdict": verdict}
 
 
 def diagnose(state: AgentState) -> dict:
     """Tra ve: {"replan_reason": str} - ma nguyen nhan lay tu
     hard_constraint_violations() va tu loi trong tool_results."""
-    return {"replan_reason": "stub_no_candidate"}
+    return {"replan_reason": _diagnosis_for(state)["replan_reason"]}
 
 
 def replan(state: AgentState) -> dict:
@@ -75,10 +200,19 @@ def replan(state: AgentState) -> dict:
 
     replan_count KHONG co reducer -> tra ve gia tri moi, khong tra ve so cong them.
     """
-    return {
-        "plan": dict(state.get("plan") or {}, plan_id="plan_stub_replan"),
-        "replan_count": state.get("replan_count", 0) + 1,
-    }
+    previous_plan = state.get("plan") or {}
+    reason = _diagnosis_for(state)["replan_reason"]
+    req = _req_with_session(state)
+    try:
+        new_plan = make_replan(req, previous_plan, reason)
+    except (PlanningError, ReplanLimitReached) as exc:
+        return {
+            "plan": previous_plan,
+            "replan_count": state.get("replan_count", 0) + 1,
+            "status": "needs_input",
+            "answer": f"Không thể lập lại kế hoạch: {exc}",
+        }
+    return {"plan": new_plan, "replan_count": new_plan["replan_count"]}
 
 
 def respond_limits(state: AgentState) -> dict:
@@ -101,8 +235,3 @@ def graceful_fail(state: AgentState) -> dict:
         "answer": "Khong tim duoc nha cung cap thoa man rang buoc sau 3 lan lap ke hoach lai.",
         "status": "graceful_fail",
     }
-
-
-for _node in (plan, filter_hard, score_rank, verify_output, diagnose, replan,
-              respond_limits, graceful_fail):
-    _node.__stub__ = True

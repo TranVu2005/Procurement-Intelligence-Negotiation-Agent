@@ -64,7 +64,11 @@ class VerificationTests(unittest.TestCase):
                 "nguon_url": "https://example.test/ncc001",
                 "nguon_type": "public_listing",
             },
-            {"comparisons": [{"MaNCC": "NCC001", "total_price": 32_000_000}]},
+            {"comparisons": [{
+                "MaNCC": "NCC001",
+                "unit_price": 1_600_000,
+                "total_price": 32_000_000,
+            }]},
         ]
 
         verdict = verify_output(ranked, REQ, tool_results)

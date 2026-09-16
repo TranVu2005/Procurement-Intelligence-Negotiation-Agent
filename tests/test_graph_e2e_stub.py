@@ -24,6 +24,40 @@ def pass_through(state):
 BASE_OVERRIDES = {"respond": fake_respond, "confirm_gate": pass_through}
 
 
+def fake_plan(state):
+    count = state.get("replan_count", 0)
+    return {"plan": {
+        "plan_id": f"plan_fake_{count}",
+        "session_id": state.get("session_id", ""),
+        "replan_count": count,
+        "steps": [{"step_id": 1, "action": "search_suppliers", "params": {},
+                   "reason": "wiring test", "depends_on": []}],
+    }}
+
+
+def fake_filter(state):
+    return {"candidates": list(state.get("candidates") or []), "rejected": []}
+
+
+def fake_replan(state):
+    count = state.get("replan_count", 0) + 1
+    return {"plan": {"plan_id": f"plan_fake_{count}", "replan_count": count,
+                     "steps": []}, "replan_count": count}
+
+
+# Day la test WIRING, nen cac node noi dung cua B cung duoc thay bang ham toi thieu.
+BASE_OVERRIDES.update({
+    "plan": fake_plan,
+    "filter_hard": fake_filter,
+    "score_rank": lambda s: {"ranked": list(s.get("candidates") or [])},
+    "verify_output": lambda s: {
+        "verdict": {"passed": True, "violations": [], "claims": []}
+    },
+    "diagnose": lambda s: {"replan_reason": "wiring_test"},
+    "replan": fake_replan,
+})
+
+
 class HappyPathTests(unittest.TestCase):
     def test_search_new_reaches_respond_with_exactly_two_llm_calls(self) -> None:
         final = run_request(

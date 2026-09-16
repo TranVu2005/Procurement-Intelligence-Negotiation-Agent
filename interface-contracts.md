@@ -71,8 +71,8 @@ mới nhất từ `updated_at`.
     {
       "step_id": 1,
       "action": "search_suppliers",
-      "params": {"product_type": "ghế văn phòng", "material": "gỗ tự nhiên"},
-      "reason": "lọc NCC theo ràng buộc cứng loại sản phẩm và ràng buộc mềm chất liệu",
+      "params": {"product_type": "ghế văn phòng"},
+      "reason": "tìm rộng theo loại sản phẩm; chất liệu và khu vực được chấm như ưu tiên mềm ở bước sau",
       "depends_on": []
     },
     {
@@ -167,7 +167,7 @@ Mỗi người đọc kỹ phần mình sẽ dùng nhiều nhất (A đọc kỹ
 | Người | Đã đọc | Đồng ý | Đề xuất sửa (nếu có) | Ngày ký |
 |---|---|---|---|---|
 | A | ☑ | ☑ | Đồng ý quyết định §8.1: bỏ material/region khỏi plan.steps[0].params | 15/9/2026 |
-| B | ☐ | ☐ | | |
+| B | ☑ | ☑ | Đồng ý §8.1; đã nối node reasoning thật và cập nhật ví dụ plan/test theo contract | 16/9/2026 |
 | C | ☐ | ☐ | | |
 
 > Sau khi cả 3 tick xong, coi đây là bản khóa (frozen) cho buổi họp 2 (10/9). Muốn đổi field sau mốc này phải báo cả nhóm trước khi sửa code.

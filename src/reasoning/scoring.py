@@ -460,13 +460,28 @@ def verify_output(
         }
 
     hard = req.get("hard_constraints", req)
+    intent = req.get("intent", "search_new")
     recommended = ranked_list[0]
     supplier_id = recommended.get("MaNCC")
-    for item in hard_constraint_violations(recommended, hard):
-        violations.append({
-            "code": item["code"],
-            "detail": f"{item['field']}: actual={item['actual']}, required={item['required']}",
-        })
+    full_hard = all(
+        hard.get(field) is not None
+        for field in ("product_type", "quantity", "budget_max", "delivery_deadline_days")
+    )
+    if intent == "search_new" or full_hard:
+        try:
+            constraint_violations = hard_constraint_violations(recommended, hard)
+        except (KeyError, TypeError, ValueError) as exc:
+            constraint_violations = [{
+                "code": "invalid_constraint_state",
+                "field": "hard_constraints",
+                "actual": hard,
+                "required": str(exc),
+            }]
+        for item in constraint_violations:
+            violations.append({
+                "code": item["code"],
+                "detail": f"{item['field']}: actual={item['actual']}, required={item['required']}",
+            })
 
     unit_price = recommended.get("unit_price")
     total_price = recommended.get("total_price")
@@ -485,7 +500,10 @@ def verify_output(
         evidence_by_id.setdefault(sid, {}).update(record)
     source = evidence_by_id.get(supplier_id, {})
 
-    for field in ("total_price", "MOQ", "TonKho", "ThoiGianGiao", "BaoHanh", "DiemUyTin"):
+    for field in (
+        "unit_price", "total_price", "Gia", "MOQ", "TonKho",
+        "ThoiGianGiao", "BaoHanh", "DiemUyTin",
+    ):
         if field not in recommended:
             continue
         supported = field in source and source[field] == recommended[field]
