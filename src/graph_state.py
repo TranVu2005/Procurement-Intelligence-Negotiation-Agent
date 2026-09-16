@@ -34,6 +34,7 @@ class AgentState(TypedDict, total=False):
     ranked: list[dict]
     verdict: dict
     replan_count: int
+    replan_reason: str | None            # tra ve tu diagnose(), doc boi replan()
     answer: str
     pending_confirmation: dict | None
     status: Status
@@ -63,6 +64,7 @@ def new_state(
         "ranked": [],
         "verdict": {},
         "replan_count": 0,
+        "replan_reason": None,
         "answer": "",
         "pending_confirmation": None,
         "inject": inject or {},

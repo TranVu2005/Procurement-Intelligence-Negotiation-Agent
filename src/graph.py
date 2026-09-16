@@ -19,9 +19,13 @@ from src.nodes.reasoning import (
 from src.nodes.respond import respond
 from src.nodes.tools import confirm_gate, tool_compare, tool_detail, tool_search
 
-# Vong lap tool_search -> filter_hard -> diagnose -> replan -> tool_search chay
-# toi da MAX_REPLAN lan; 25 du rong cho ca truong hop xau nhat.
-RECURSION_LIMIT = 25
+# Duong dai nhat: tool_search -> filter_hard -> score_rank -> verify_output ->
+# diagnose -> replan (6 node) lap (MAX_REPLAN + 1) lan (1 lan dau + MAX_REPLAN lan
+# replan) truoc khi cham tran va di graceful_fail, cong perceive/plan/graceful_fail/
+# confirm_gate o hai dau. Smoke test thuc te (ngan sach bat kha thi) cham
+# GraphRecursionError o muc cu (25) vi duong nay dai dung 25-26 buoc; de bien do cho
+# cac nhanh khac (confirm_gate, respond), dat cao hon han muc toi thieu do duoc.
+RECURSION_LIMIT = 6 * (MAX_REPLAN + 1) + 16
 
 _INTENT_ENTRY = {
     "search_new": "plan",
