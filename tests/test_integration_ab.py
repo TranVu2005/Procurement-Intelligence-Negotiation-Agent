@@ -87,12 +87,16 @@ class TestAStateFeedsIntoMakePlan(unittest.TestCase):
         self.assertIsNone(plan["replan_reason"])
         self.assertTrue(plan["plan_id"].startswith("plan_"))
 
-        # Step đầu tiên phải là search_suppliers với params từ A's state
+        # Step đầu tiên phải là search_suppliers
         step = plan["steps"][0]
         self.assertEqual(step["action"], "search_suppliers")
         self.assertEqual(step["params"]["product_type"], "ghế văn phòng")
-        self.assertEqual(step["params"]["material"], "gỗ tự nhiên")
-        self.assertEqual(step["params"]["region"], "Hà Nội")
+
+        # Decision §8.1: material/region are omitted entirely from the tool params
+        # to avoid incorrectly turning soft constraints into hard filters.
+        # Soft constraints (material, region, min_trust) are applied downstream
+        # by evaluate_candidates() after raw results are fetched.
+        self.assertEqual(step["params"], {"product_type": "ghế văn phòng"})
 
     def test_state_without_soft_constraints_still_makes_plan(self):
         """State không có soft constraints vẫn tạo được plan."""
@@ -100,8 +104,7 @@ class TestAStateFeedsIntoMakePlan(unittest.TestCase):
         plan = make_plan(state)
 
         step = plan["steps"][0]
-        self.assertIsNone(step["params"]["material"])
-        self.assertIsNone(step["params"]["region"])
+        self.assertEqual(step["params"], {"product_type": "ghế văn phòng"})
 
     def test_all_furniture_product_types_are_plannable(self):
         """Mọi product_type trong catalog của A đều tạo được plan."""

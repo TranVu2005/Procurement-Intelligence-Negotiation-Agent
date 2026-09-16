@@ -39,11 +39,7 @@ class PlannerTests(unittest.TestCase):
         self.assertTrue(plan["plan_id"].startswith("plan_"))
         self.assertEqual(
             plan["steps"][0]["params"],
-            {
-                "product_type": "ghế văn phòng",
-                "material": None,
-                "region": None,
-            },
+            {"product_type": "ghế văn phòng"},
         )
         self.assertEqual(plan["steps"][0]["action"], "search_suppliers")
 
@@ -124,6 +120,46 @@ class PlannerTests(unittest.TestCase):
         self.assertEqual(proposal["status"], "needs_replan")
         self.assertEqual(proposal["tool_error"]["error_type"], "timeout")
         self.assertTrue(any("Retry" in option for option in proposal["alternatives"]))
+
+    def test_compare_specific_plan_calls_compare_price(self) -> None:
+        state = {
+            "session_id": "sess_compare",
+            "hard_constraints": {"quantity": 12},
+        }
+
+        plan = make_plan(
+            state,
+            intent="compare_specific",
+            supplier_ids=["NCC001", "NCC006"],
+        )
+
+        self.assertEqual(plan["intent"], "compare_specific")
+        self.assertEqual(plan["steps"][0]["action"], "compare_price")
+        self.assertEqual(plan["steps"][0]["params"]["quantity"], 12)
+
+    def test_supplier_detail_plan_does_not_require_procurement_constraints(self) -> None:
+        plan = make_plan(
+            {"session_id": "sess_detail"},
+            intent="supplier_detail",
+            supplier_id="NCC001",
+        )
+
+        self.assertEqual(plan["steps"][0]["action"], "get_supplier_detail")
+        self.assertEqual(plan["steps"][0]["params"], {"supplier_id": "NCC001"})
+
+    def test_out_of_scope_plan_has_no_tool_call(self) -> None:
+        plan = make_plan({"session_id": "sess_oos"}, intent="out_of_scope")
+
+        self.assertEqual(plan["intent"], "out_of_scope")
+        self.assertEqual(plan["steps"], [])
+        self.assertEqual(plan["workflow"][0]["name"], "respond_limits")
+
+    def test_compare_specific_requires_supplier_ids(self) -> None:
+        with self.assertRaisesRegex(PlanningError, "supplier_ids"):
+            make_plan(
+                {"session_id": "sess_compare", "hard_constraints": {"quantity": 10}},
+                intent="compare_specific",
+            )
 
 
 if __name__ == "__main__":

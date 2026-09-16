@@ -7,6 +7,7 @@ Every score and rejection produced here is traceable to state and tool output.
 from __future__ import annotations
 
 import unicodedata
+from collections import Counter
 from collections.abc import Iterable
 from typing import Any
 
@@ -369,6 +370,169 @@ def detect_evidence_conflicts(suppliers: Iterable[dict[str, Any]]) -> list[dict[
                 "resolution": "Cần xác minh nguồn/bản ghi trước khi khuyến nghị.",
             })
     return conflicts
+
+
+_DIAGNOSIS_MESSAGES = {
+    "stock_below_quantity": "Tồn kho không đủ số lượng yêu cầu.",
+    "quantity_below_moq": "Số lượng yêu cầu thấp hơn MOQ.",
+    "delivery_deadline_unmet": "Thời gian giao vượt deadline.",
+    "budget_exceeded": "Tổng giá vượt ngân sách.",
+    "product_type_mismatch": "Loại sản phẩm không khớp yêu cầu.",
+    "missing_price_evidence": "Thiếu bằng chứng tổng giá.",
+    "missing_stock_evidence": "Thiếu bằng chứng tồn kho.",
+    "missing_delivery_evidence": "Thiếu bằng chứng thời gian giao.",
+    "tool_result_error": "Tool trả lỗi nên chưa đủ bằng chứng.",
+}
+
+
+def diagnose(rejected_suppliers: Iterable[dict[str, Any]]) -> dict[str, Any]:
+    """Aggregate rejection evidence into an auditable re-plan reason."""
+
+    rejected_list = list(rejected_suppliers)
+    codes = Counter(
+        violation.get("code")
+        for rejected in rejected_list
+        for violation in rejected.get("violations", [])
+        if violation.get("code")
+    )
+    causes = []
+    for code, count in codes.most_common():
+        supplier_ids = [
+            rejected.get("supplier_id")
+            for rejected in rejected_list
+            if any(item.get("code") == code for item in rejected.get("violations", []))
+        ]
+        causes.append({
+            "code": code,
+            "message": _DIAGNOSIS_MESSAGES.get(code, "Ứng viên không đủ điều kiện hoặc bằng chứng."),
+            "affected_suppliers": count,
+            "supplier_ids": supplier_ids,
+        })
+
+    primary = causes[0] if causes else {
+        "code": "no_candidate_evidence",
+        "message": "Không có dữ liệu ứng viên để đánh giá.",
+        "affected_suppliers": 0,
+        "supplier_ids": [],
+    }
+    return {
+        "primary_code": primary["code"],
+        "replan_reason": f"{primary['code']}: {primary['message']}",
+        "causes": causes,
+    }
+
+
+def _tool_records(value: Any) -> Iterable[dict[str, Any]]:
+    """Yield supplier-shaped records from nested structured tool results."""
+
+    if isinstance(value, list):
+        for item in value:
+            yield from _tool_records(item)
+    elif isinstance(value, dict):
+        if value.get("MaNCC"):
+            yield value
+        for key in ("result", "output", "data", "suppliers", "comparisons"):
+            if key in value:
+                yield from _tool_records(value[key])
+
+
+def verify_output(
+    ranked: Iterable[dict[str, Any]],
+    req: dict[str, Any],
+    tool_results: Iterable[dict[str, Any]],
+    *,
+    require_citations: bool = True,
+) -> dict[str, Any]:
+    """Verify recommendation constraints, arithmetic and evidence provenance.
+
+    The verdict is intentionally structured so AutoEval can compute constraint
+    satisfaction and citation/evidence correctness without parsing prose.
+    """
+
+    ranked_list = list(ranked)
+    violations: list[dict[str, Any]] = []
+    claims: list[dict[str, Any]] = []
+    if not ranked_list:
+        return {
+            "passed": False,
+            "violations": [{"code": "no_ranked_candidate", "detail": "Không có ứng viên để xác minh."}],
+            "claims": [],
+        }
+
+    hard = req.get("hard_constraints", req)
+    intent = req.get("intent", "search_new")
+    recommended = ranked_list[0]
+    supplier_id = recommended.get("MaNCC")
+    full_hard = all(
+        hard.get(field) is not None
+        for field in ("product_type", "quantity", "budget_max", "delivery_deadline_days")
+    )
+    if intent == "search_new" or full_hard:
+        try:
+            constraint_violations = hard_constraint_violations(recommended, hard)
+        except (KeyError, TypeError, ValueError) as exc:
+            constraint_violations = [{
+                "code": "invalid_constraint_state",
+                "field": "hard_constraints",
+                "actual": hard,
+                "required": str(exc),
+            }]
+        for item in constraint_violations:
+            violations.append({
+                "code": item["code"],
+                "detail": f"{item['field']}: actual={item['actual']}, required={item['required']}",
+            })
+
+    unit_price = recommended.get("unit_price")
+    total_price = recommended.get("total_price")
+    quantity = hard.get("quantity")
+    if all(isinstance(value, (int, float)) and not isinstance(value, bool) for value in (unit_price, total_price, quantity)):
+        expected_total = unit_price * quantity
+        if total_price != expected_total:
+            violations.append({
+                "code": "total_price_inconsistent",
+                "detail": f"total_price={total_price}, nhưng unit_price*quantity={expected_total}",
+            })
+
+    evidence_by_id: dict[str, dict[str, Any]] = {}
+    for record in _tool_records(list(tool_results)):
+        sid = record.get("MaNCC")
+        evidence_by_id.setdefault(sid, {}).update(record)
+    source = evidence_by_id.get(supplier_id, {})
+
+    for field in (
+        "unit_price", "total_price", "Gia", "MOQ", "TonKho",
+        "ThoiGianGiao", "BaoHanh", "DiemUyTin",
+    ):
+        if field not in recommended:
+            continue
+        supported = field in source and source[field] == recommended[field]
+        evidence = None
+        if supported:
+            evidence = {
+                "MaNCC": supplier_id,
+                "field": field,
+                "nguon_url": source.get("nguon_url"),
+                "nguon_type": source.get("nguon_type"),
+            }
+        claims.append({
+            "claim": f"{supplier_id}.{field}",
+            "value": recommended[field],
+            "supported": supported,
+            "evidence": evidence,
+        })
+        if not supported:
+            violations.append({
+                "code": "unsupported_claim",
+                "detail": f"Không truy được {supplier_id}.{field} về tool_results.",
+            })
+        elif require_citations and not source.get("nguon_url"):
+            violations.append({
+                "code": "missing_citation",
+                "detail": f"{supplier_id}.{field} chưa có nguon_url.",
+            })
+
+    return {"passed": not violations, "violations": violations, "claims": claims}
 
 
 def evaluate_candidates(

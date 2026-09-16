@@ -13,6 +13,7 @@ from uuid import uuid4
 
 
 MAX_REPLAN_COUNT = 3
+SUPPORTED_INTENTS = {"search_new", "compare_specific", "supplier_detail", "out_of_scope"}
 
 # Only stages marked ``tool`` become plan steps because SYSTEM-RULES requires
 # each step action to exactly match a tool owned by C.
@@ -26,6 +27,24 @@ WORKFLOW_STAGES: tuple[dict[str, str], ...] = (
     {"name": "generate_recommendation", "kind": "reasoning"},
     {"name": "verify_output", "kind": "reasoning"},
 )
+
+_INTENT_WORKFLOWS: dict[str, tuple[dict[str, str], ...]] = {
+    "search_new": WORKFLOW_STAGES,
+    "compare_specific": (
+        {"name": "validate_state", "kind": "reasoning"},
+        {"name": "compare_price", "kind": "tool"},
+        {"name": "rank_candidates", "kind": "reasoning"},
+        {"name": "verify_output", "kind": "reasoning"},
+    ),
+    "supplier_detail": (
+        {"name": "validate_state", "kind": "reasoning"},
+        {"name": "get_supplier_detail", "kind": "tool"},
+        {"name": "verify_output", "kind": "reasoning"},
+    ),
+    "out_of_scope": (
+        {"name": "respond_limits", "kind": "reasoning"},
+    ),
+}
 
 _REQUIRED_HARD_CONSTRAINTS = (
     "product_type",
@@ -43,7 +62,7 @@ class ReplanLimitReached(PlanningError):
     """Raised when another re-plan would exceed the agreed safety limit."""
 
 
-def validate_state(state: dict[str, Any]) -> None:
+def validate_state(state: dict[str, Any], intent: str = "search_new") -> None:
     """Validate the subset of A's state that planning depends on.
 
     Missing important information is reported instead of silently inferred.
@@ -52,30 +71,40 @@ def validate_state(state: dict[str, Any]) -> None:
     if not isinstance(state, dict):
         raise PlanningError("state must be a dictionary")
 
+    if intent not in SUPPORTED_INTENTS:
+        raise PlanningError(f"unsupported intent: {intent}")
+
     session_id = state.get("session_id")
     if not isinstance(session_id, str) or not session_id.strip():
         raise PlanningError("missing or invalid session_id")
+
+    if intent in {"supplier_detail", "out_of_scope"}:
+        return
 
     hard = state.get("hard_constraints")
     if not isinstance(hard, dict):
         raise PlanningError("hard_constraints must be a dictionary")
 
-    missing = [name for name in _REQUIRED_HARD_CONSTRAINTS if hard.get(name) is None]
+    required = _REQUIRED_HARD_CONSTRAINTS if intent == "search_new" else ("quantity",)
+    missing = [name for name in required if hard.get(name) is None]
     if missing:
         raise PlanningError(f"missing hard constraints: {', '.join(missing)}")
 
-    if not isinstance(hard["product_type"], str) or not hard["product_type"].strip():
+    if intent == "search_new" and (
+        not isinstance(hard["product_type"], str) or not hard["product_type"].strip()
+    ):
         raise PlanningError("product_type must be a non-empty string")
     if not isinstance(hard["quantity"], int) or isinstance(hard["quantity"], bool) or hard["quantity"] <= 0:
         raise PlanningError("quantity must be a positive integer")
-    if not isinstance(hard["budget_max"], (int, float)) or isinstance(hard["budget_max"], bool) or hard["budget_max"] <= 0:
-        raise PlanningError("budget_max must be a positive number")
-    if (
-        not isinstance(hard["delivery_deadline_days"], int)
-        or isinstance(hard["delivery_deadline_days"], bool)
-        or hard["delivery_deadline_days"] <= 0
-    ):
-        raise PlanningError("delivery_deadline_days must be a positive integer")
+    if intent == "search_new":
+        if not isinstance(hard["budget_max"], (int, float)) or isinstance(hard["budget_max"], bool) or hard["budget_max"] <= 0:
+            raise PlanningError("budget_max must be a positive number")
+        if (
+            not isinstance(hard["delivery_deadline_days"], int)
+            or isinstance(hard["delivery_deadline_days"], bool)
+            or hard["delivery_deadline_days"] <= 0
+        ):
+            raise PlanningError("delivery_deadline_days must be a positive integer")
 
     soft = state.get("soft_constraints", {})
     if soft is not None and not isinstance(soft, dict):
@@ -85,17 +114,16 @@ def validate_state(state: dict[str, Any]) -> None:
 def make_plan(
     state: dict[str, Any],
     *,
+    intent: str | None = None,
+    supplier_ids: list[str] | None = None,
+    supplier_id: str | None = None,
     replan_count: int = 0,
     replan_reason: str | None = None,
 ) -> dict[str, Any]:
-    """Create the first executable plan for a validated procurement state.
+    """Create executable steps for one of the four documented intents."""
 
-    Search is the only immediately executable tool call. Supplier IDs required
-    by ``compare_price`` do not exist until search finishes, so later tool calls
-    must be appended by the orchestrator from real tool output.
-    """
-
-    validate_state(state)
+    selected_intent = intent or state.get("intent", "search_new")
+    validate_state(state, selected_intent)
     if not isinstance(replan_count, int) or isinstance(replan_count, bool) or replan_count < 0:
         raise PlanningError("replan_count must be a non-negative integer")
     if replan_count > MAX_REPLAN_COUNT:
@@ -105,34 +133,51 @@ def make_plan(
     if replan_count > 0 and not replan_reason:
         raise PlanningError("replan_reason is required when replan_count is greater than 0")
 
-    hard = state["hard_constraints"]
-    search_params = {
-        "product_type": hard["product_type"],
-        # Material and region are soft preferences. Filtering by them here would
-        # incorrectly turn them into hard constraints and hide valid trade-offs.
-        "material": None,
-        "region": None,
-    }
+    hard = state.get("hard_constraints") or {}
+    if selected_intent == "search_new":
+        # Soft preferences deliberately remain in state for ranking/trade-off.
+        # Omitting them here prevents search from treating them as hard filters.
+        steps = [{
+            "step_id": 1,
+            "action": "search_suppliers",
+            "params": {"product_type": hard["product_type"]},
+            "reason": "Tìm rộng theo loại sản phẩm trước khi lọc ràng buộc cứng và chấm ưu tiên mềm.",
+            "depends_on": [],
+        }]
+    elif selected_intent == "compare_specific":
+        ids = supplier_ids if supplier_ids is not None else state.get("supplier_ids")
+        if not isinstance(ids, list) or not ids or not all(isinstance(item, str) and item for item in ids):
+            raise PlanningError("compare_specific requires a non-empty supplier_ids list")
+        steps = [{
+            "step_id": 1,
+            "action": "compare_price",
+            "params": {"supplier_ids": list(ids), "quantity": hard["quantity"]},
+            "reason": "So sánh giá các nhà cung cấp người dùng chỉ định với số lượng đã xác nhận.",
+            "depends_on": [],
+        }]
+    elif selected_intent == "supplier_detail":
+        selected_supplier_id = supplier_id or state.get("supplier_id")
+        if not isinstance(selected_supplier_id, str) or not selected_supplier_id.strip():
+            raise PlanningError("supplier_detail requires supplier_id")
+        steps = [{
+            "step_id": 1,
+            "action": "get_supplier_detail",
+            "params": {"supplier_id": selected_supplier_id.strip()},
+            "reason": "Lấy bằng chứng chi tiết cho đúng nhà cung cấp được hỏi.",
+            "depends_on": [],
+        }]
+    else:
+        steps = []
 
     return {
         "plan_id": f"plan_{uuid4().hex[:12]}",
         "session_id": state["session_id"],
+        "intent": selected_intent,
         "status": "draft",
         "replan_count": replan_count,
         "replan_reason": replan_reason,
-        "workflow": deepcopy(WORKFLOW_STAGES),
-        "steps": [
-            {
-                "step_id": 1,
-                "action": "search_suppliers",
-                "params": search_params,
-                "reason": (
-                    "Find candidates using product type and optional material/region "
-                    "preferences before enforcing budget, quantity and delivery constraints."
-                ),
-                "depends_on": [],
-            }
-        ],
+        "workflow": deepcopy(_INTENT_WORKFLOWS[selected_intent]),
+        "steps": steps,
     }
 
 
@@ -160,8 +205,13 @@ def make_replan(
             f"cannot re-plan more than {MAX_REPLAN_COUNT} times; graceful failure is required"
         )
 
+    intent = previous_plan.get("intent", "search_new")
+    step_params = previous_plan.get("steps", [{}])[0].get("params", {}) if previous_plan.get("steps") else {}
     return make_plan(
         state,
+        intent=intent,
+        supplier_ids=step_params.get("supplier_ids"),
+        supplier_id=step_params.get("supplier_id"),
         replan_count=previous_count + 1,
         replan_reason=reason.strip(),
     )

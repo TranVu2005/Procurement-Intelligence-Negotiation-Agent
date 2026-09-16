@@ -13,10 +13,18 @@ Cung cấp:
 - load_conversation()  : đọc lịch sử hội thoại
 - save_decision()      : ghi nhận NCC đã được chốt
 - load_decisions()     : lấy danh sách NCC đã chốt trong phiên
+
+Metrics (architecture.md §3.2, §5.5):
+- start_run()          : tạo bản ghi run mới, trả về run_id
+- finish_run()         : cập nhật status, latency, LLM/tool call counts
+- save_artifact()      : lưu plan / tool_results / verdict theo session + run
+- load_artifacts()     : đọc lại artifacts của 1 phiên
+- load_runs()          : đọc metrics của các runs theo session
 """
 
 import json
 import sqlite3
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
@@ -129,6 +137,8 @@ def delete_session(session_id: str) -> bool:
     """
     with get_connection() as conn:
         # Xóa theo thứ tự để không vi phạm foreign key constraint
+        conn.execute("DELETE FROM session_artifacts WHERE session_id = ?", (session_id,))
+        conn.execute("DELETE FROM runs WHERE session_id = ?", (session_id,))
         conn.execute("DELETE FROM decisions_made WHERE session_id = ?", (session_id,))
         conn.execute("DELETE FROM conversation_history WHERE session_id = ?", (session_id,))
         result = conn.execute(
@@ -225,3 +235,181 @@ def load_decisions(session_id: str) -> list[dict]:
             (session_id,),
         ).fetchall()
     return [{"supplier_id": r["supplier_id"], "confirmed_at": r["confirmed_at"]} for r in rows]
+
+
+# ---------------------------------------------------------------------------
+# Runs — metrics mỗi request (architecture.md §3.2, §5.5)
+# ---------------------------------------------------------------------------
+
+
+def start_run(
+    session_id: str,
+    intent: Optional[str] = None,
+    trace_id: Optional[str] = None,
+) -> str:
+    """Tạo bản ghi run mới với status='running', trả về run_id.
+
+    Gọi ngay khi bắt đầu xử lý 1 request để đảm bảo audit trail hoàn chỉnh
+    kể cả khi request thất bại giữa chừng.
+
+    Args:
+        session_id: ID phiên làm việc.
+        intent:     Intent đã phân loại (search_new / compare_specific / ...).
+        trace_id:   Trace ID từ tracer.py (nếu có).
+
+    Returns:
+        run_id (str): UUID hex dùng để gọi finish_run() sau.
+    """
+    run_id = uuid.uuid4().hex
+    now = _now_iso()
+    with get_connection() as conn:
+        conn.execute(
+            """INSERT INTO runs
+               (run_id, session_id, trace_id, intent, status, started_at)
+               VALUES (?, ?, ?, ?, 'running', ?)""",
+            (run_id, session_id, trace_id, intent, now),
+        )
+    return run_id
+
+
+def finish_run(
+    run_id: str,
+    *,
+    status: str = "success",
+    llm_calls: int = 0,
+    tool_calls: int = 0,
+    tokens_in: int = 0,
+    tokens_out: int = 0,
+    latency_ms: Optional[float] = None,
+    ttft_ms: Optional[float] = None,
+    error_msg: Optional[str] = None,
+) -> None:
+    """Cập nhật kết quả và metrics khi request hoàn thành hoặc thất bại.
+
+    Args:
+        run_id:     run_id nhận được từ start_run().
+        status:     'success' | 'graceful_fail' | 'error'.
+        llm_calls:  Số lần gọi LLM (kỳ vọng = 2 cho happy path).
+        tool_calls: Số lần gọi tool.
+        tokens_in:  Tổng token input (sum qua tất cả LLM calls).
+        tokens_out: Tổng token output.
+        latency_ms: End-to-end latency (ms).
+        ttft_ms:    Time to first token (ms), None nếu không stream.
+        error_msg:  Mô tả lỗi nếu status='error'.
+    """
+    valid_statuses = {"success", "graceful_fail", "error"}
+    if status not in valid_statuses:
+        raise ValueError(f"status phải là một trong {valid_statuses}, nhận được: {status!r}")
+
+    now = _now_iso()
+    with get_connection() as conn:
+        conn.execute(
+            """UPDATE runs SET
+               status=?, llm_calls=?, tool_calls=?, tokens_in=?, tokens_out=?,
+               latency_ms=?, ttft_ms=?, finished_at=?, error_msg=?
+               WHERE run_id=?""",
+            (status, llm_calls, tool_calls, tokens_in, tokens_out,
+             latency_ms, ttft_ms, now, error_msg, run_id),
+        )
+
+
+def load_runs(session_id: str, *, limit: int = 50) -> list[dict]:
+    """Đọc danh sách runs (metrics) của 1 phiên, mới nhất trước.
+
+    Args:
+        session_id: ID phiên cần xem.
+        limit:      Số bản ghi tối đa trả về (default 50).
+
+    Returns:
+        List[dict] với các key: run_id, trace_id, intent, status, llm_calls,
+        tool_calls, tokens_in, tokens_out, latency_ms, ttft_ms, started_at,
+        finished_at, error_msg.
+    """
+    with get_connection() as conn:
+        rows = conn.execute(
+            """SELECT run_id, trace_id, intent, status, llm_calls, tool_calls,
+                      tokens_in, tokens_out, latency_ms, ttft_ms,
+                      started_at, finished_at, error_msg
+               FROM runs WHERE session_id = ?
+               ORDER BY id DESC LIMIT ?""",
+            (session_id, limit),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+# ---------------------------------------------------------------------------
+# Session artifacts — plan, tool_results, verdict (architecture.md §3.2)
+# ---------------------------------------------------------------------------
+
+
+def save_artifact(
+    session_id: str,
+    artifact_type: str,
+    artifact: dict,
+    run_id: Optional[str] = None,
+) -> None:
+    """Lưu 1 artifact (plan/tool_results/verdict) theo session và run.
+
+    Mỗi lần re-plan hoặc tool trả kết quả mới tạo 1 bản ghi riêng để giữ
+    đầy đủ audit trail như rubric yêu cầu.
+
+    Args:
+        session_id:    ID phiên.
+        artifact_type: 'plan' | 'tool_results' | 'verdict'.
+        artifact:      Dict cần lưu.
+        run_id:        Liên kết với bảng runs (có thể None).
+    """
+    valid_types = {"plan", "tool_results", "verdict"}
+    if artifact_type not in valid_types:
+        raise ValueError(f"artifact_type phải là một trong {valid_types}")
+
+    now = _now_iso()
+    with get_connection() as conn:
+        conn.execute(
+            """INSERT INTO session_artifacts
+               (session_id, run_id, artifact_type, artifact_json, created_at)
+               VALUES (?, ?, ?, ?, ?)""",
+            (session_id, run_id, artifact_type, json.dumps(artifact, ensure_ascii=False), now),
+        )
+
+
+def load_artifacts(
+    session_id: str,
+    artifact_type: Optional[str] = None,
+    run_id: Optional[str] = None,
+) -> list[dict]:
+    """Đọc artifacts của 1 phiên, tùy chọn lọc theo loại hoặc run.
+
+    Args:
+        session_id:    ID phiên.
+        artifact_type: Lọc theo loại ('plan'/'tool_results'/'verdict'). None = tất cả.
+        run_id:        Lọc theo run cụ thể. None = tất cả.
+
+    Returns:
+        List[dict] với keys: id, run_id, artifact_type, artifact (dict), created_at.
+    """
+    query = "SELECT id, run_id, artifact_type, artifact_json, created_at FROM session_artifacts WHERE session_id = ?"
+    params: list = [session_id]
+
+    if artifact_type is not None:
+        query += " AND artifact_type = ?"
+        params.append(artifact_type)
+    if run_id is not None:
+        query += " AND run_id = ?"
+        params.append(run_id)
+
+    query += " ORDER BY id ASC"
+
+    with get_connection() as conn:
+        rows = conn.execute(query, params).fetchall()
+
+    return [
+        {
+            "id":            r["id"],
+            "run_id":        r["run_id"],
+            "artifact_type": r["artifact_type"],
+            "artifact":      json.loads(r["artifact_json"]),
+            "created_at":    r["created_at"],
+        }
+        for r in rows
+    ]

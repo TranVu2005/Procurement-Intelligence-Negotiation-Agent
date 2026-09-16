@@ -71,8 +71,8 @@ mới nhất từ `updated_at`.
     {
       "step_id": 1,
       "action": "search_suppliers",
-      "params": {"product_type": "ghế văn phòng", "material": "gỗ tự nhiên"},
-      "reason": "lọc NCC theo ràng buộc cứng loại sản phẩm và ràng buộc mềm chất liệu",
+      "params": {"product_type": "ghế văn phòng"},
+      "reason": "tìm rộng theo loại sản phẩm; chất liệu và khu vực được chấm như ưu tiên mềm ở bước sau",
       "depends_on": []
     },
     {
@@ -133,7 +133,13 @@ làm crash response (Quyết định 2, architecture.md §8.2).
 `simulated_fields` để mọi claim về `total_price` truy được về nguồn. Phần tử lỗi giữ nguyên shape
 lỗi chuẩn, không có hai trường này.
 
-### `confirm_order` — ĐỀ XUẤT MỚI (buổi họp 4, 15/9) — CẦN A/B XÁC NHẬN LẠI
+### `confirm_order` — đã cập nhật vai trò (buổi họp 4, 15/9)
+- **Vai trò mới**: node `confirm_gate` (pipeline, không phải LLM-callable tool) — chặn lại chờ người dùng xác nhận tường minh (architecture.md §3.5).
+- **Input/Output giữ nguyên** như cũ.
+
+### Quyết định §8.1 (tất cả đã đồng ý)
+`material` và `region` bị bỏ hoàn toàn khỏi `plan.steps[0].params` (không truyền `None`, không truyền gì). Soft preferences được đọc từ `soft_constraints` bởi `evaluate_candidates()` sau khi search xong. A đã cập nhật `tests/test_integration_ab.py` theo.
+
 - **Input:** `{"supplier_id": "string (required)", "quantity": "int (required)", "confirmed": "bool (required)"}`
 - **Output nếu `confirmed=true` và hợp lệ:**
 ```json
@@ -160,8 +166,8 @@ Mỗi người đọc kỹ phần mình sẽ dùng nhiều nhất (A đọc kỹ
 
 | Người | Đã đọc | Đồng ý | Đề xuất sửa (nếu có) | Ngày ký |
 |---|---|---|---|---|
-| A | ☐ | ☐ | | |
-| B | ☐ | ☐ | | |
+| A | ☑ | ☑ | Đồng ý quyết định §8.1: bỏ material/region khỏi plan.steps[0].params | 15/9/2026 |
+| B | ☑ | ☑ | Đồng ý §8.1; đã nối node reasoning thật và cập nhật ví dụ plan/test theo contract | 16/9/2026 |
 | C | ☐ | ☐ | | |
 
 > Sau khi cả 3 tick xong, coi đây là bản khóa (frozen) cho buổi họp 2 (10/9). Muốn đổi field sau mốc này phải báo cả nhóm trước khi sửa code.
