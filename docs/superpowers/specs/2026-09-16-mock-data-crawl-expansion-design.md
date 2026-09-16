@@ -64,7 +64,7 @@ hạn nguồn đã biết, thay vì chỉ đủ ngưỡng tối thiểu.
 | xuanhoa.vn | Đà Nẵng + Hà Nội | bàn làm việc, tủ hồ sơ, ghế văn phòng | Đã có (`parse_xuanhoa`), cần sửa để tách 2 vùng |
 | tekkashop.com.vn | Đà Nẵng + Hà Nội | ghế văn phòng | Đã có (`parse_tekkashop`), cần sửa để tách 2 vùng |
 | kesatngoctin.com | TP.HCM + Hà Nội (2 chi nhánh ghi rõ địa chỉ) | kệ | Đã khảo sát — static, 2 bước (trang danh mục lấy tên/link, trang sản phẩm mới có giá `woocommerce-Price-amount`); parser chưa viết |
-| giakedehangpro.com | Hà Nội (444 Phúc Diễn, Nam Từ Liêm) | kệ | Đã khảo sát — static, 1 bước, **không có giá công khai** (toàn "Liên hệ"); parser chưa viết |
+| giakedehangpro.com | Hà Nội (444 Phúc Diễn, Nam Từ Liêm) | kệ | Đã crawl (`parse_giakedehangpro`) — static, 1 bước; **có giá công khai** (nhận định "không có giá" lúc khảo sát là sai, do đọc nhầm link menu "Liên hệ" với giá sản phẩm — đã sửa khi viết implementation plan) |
 | noithatlinco.com | TP.HCM (112A Lê Thúc Hoạch, Tân Phú) | sofa | Đã khảo sát — static, JSON nhúng sẵn trong HTML (`name`/`price`/`urlPart`), dễ viết parser nhất trong tất cả các site; parser chưa viết |
 
 **Loại khỏi danh sách: tongkhogiake.com.** Hai lý do: (1) lỗi
