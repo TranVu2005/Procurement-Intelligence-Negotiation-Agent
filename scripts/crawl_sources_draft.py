@@ -1,9 +1,9 @@
 """Crawl-assist cho sources.csv (Task 10, architecture.md muc 4.2).
 
-Fetch 4 trang ban noi that that da khao sat co gia cong khai / danh muc
-ro rang, tu dong doan LoaiSanPham tu ten san pham, roi xuat ra MOT DONG
-DAI DIEN cho moi cap (cong ty, khu vuc, danh muc) kem link san pham cu the
-lam bang chung gia.
+Fetch 7 trang ban noi that that da khao sat (co gia cong khai hoac danh muc
+ro rang), tu dong doan LoaiSanPham tu ten san pham, roi xuat toi da 5 dong
+moi to hop (cong ty, khu vuc, danh muc) - uu tien gia thap, tran 6 dong/cong
+ty - kem link san pham cu the lam bang chung gia.
 
 KHONG ghi thang vao src/tools/mock_data/sources.csv. Day chi la NHAP -
 nguoi phai mo file draft, kiem tra tung dong (dung khu vuc? dung danh muc?
@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import csv
 import re
+from collections import Counter
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -317,6 +318,14 @@ def build_rows() -> list[dict]:
     return rows
 
 
+def print_distribution(rows: list[dict]) -> None:
+    by_category = Counter(r["LoaiSanPham"] for r in rows)
+    by_region = Counter(r["KhuVuc"] for r in rows)
+    print("\nPhan bo cua rieng draft nay (CHUA cong sources.csv that neu da co san):")
+    print(f"  Theo LoaiSanPham: {dict(by_category)}")
+    print(f"  Theo KhuVuc: {dict(by_region)}")
+
+
 def main() -> None:
     rows = build_rows()
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -325,7 +334,8 @@ def main() -> None:
         writer.writeheader()
         writer.writerows(rows)
     print(f"\n{len(rows)} dong nhap -> {OUT_PATH}")
-    print("Day la NHAP: mo file, kiem tra tung dong (KhuVuc/LoaiSanPham/gia) "
+    print_distribution(rows)
+    print("\nDay la NHAP: mo file, kiem tra tung dong (KhuVuc/LoaiSanPham/gia) "
           "truoc khi copy vao src/tools/mock_data/sources.csv that.")
 
 
