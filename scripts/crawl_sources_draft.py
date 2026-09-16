@@ -139,6 +139,20 @@ def parse_tekkashop(html: str) -> list[RawProduct]:
     return products
 
 
+def parse_kesatngoctin(html: str) -> list[RawProduct]:
+    """kesatngoctin.com - trang danh muc da co gia san (khong can fetch
+    tung trang san pham). Gia dang '1.090.000' (dau cham = phan cach nghin)."""
+    pattern = re.compile(
+        r'<a href="(https://kesatngoctin\.com/san-pham/[^"]+)">([^<]+)</a>'
+        r'.*?woocommerce-Price-amount amount">([\d.]+)&nbsp;',
+        re.DOTALL,
+    )
+    products = []
+    for url, name, price_text in pattern.findall(html):
+        products.append(RawProduct(name=name.strip(), url=url, price=int(price_text.replace(".", ""))))
+    return products
+
+
 # ---------------------------------------------------------------------------
 # Cau hinh 4 nguon: url fetch, parser, TenNCC, KhuVuc gan san (co ly do).
 # ---------------------------------------------------------------------------
@@ -169,6 +183,13 @@ SOURCES = [
                                              # "Ha Noi: Lo B2-2-4, KCN Thang Long, Bac Tu Liem"
         "urls": ["https://tekkashop.com.vn/collections/ghe-van-phong"],
         "parser": parse_tekkashop,
+    },
+    {
+        "label": "Ngoc Tin",
+        "khu_vuc": ["TP.HCM", "Ha Noi"],  # "Chi nhanh TPHCM: 45 duong A8, Binh Tan";
+                                            # "Chi Nhanh Ha Noi: 89 D6 Dai Kim, Hoang Mai"
+        "urls": ["https://kesatngoctin.com/danh-muc/ke-ho-so"],
+        "parser": parse_kesatngoctin,
     },
 ]
 
