@@ -172,6 +172,17 @@ def parse_giakedehangpro(html: str) -> list[RawProduct]:
     return products
 
 
+def parse_noithatlinco(html: str) -> list[RawProduct]:
+    """noithatlinco.com - JSON san co nhung trong HTML (khong phai regex
+    theo class CSS). Gia la so nguyen thuan, khong co dau phan cach."""
+    pattern = re.compile(r'"price":(\d+),.*?"urlPart":"([^"]+)".*?"name":"([^"]+)"')
+    base = "https://www.noithatlinco.com"
+    products = []
+    for price_text, url_part, name in pattern.findall(html):
+        products.append(RawProduct(name=name.strip(), url=f"{base}/{url_part}", price=int(price_text)))
+    return products
+
+
 # ---------------------------------------------------------------------------
 # Cau hinh 4 nguon: url fetch, parser, TenNCC, KhuVuc gan san (co ly do).
 # ---------------------------------------------------------------------------
@@ -215,6 +226,12 @@ SOURCES = [
         "khu_vuc": "Ha Noi",  # "444 phuc Dien, Nam Tu Liem, Ha Noi"; "mien phi noi thanh Ha Noi"
         "urls": ["https://giakedehangpro.com/"],
         "parser": parse_giakedehangpro,
+    },
+    {
+        "label": "Noi That Linco",
+        "khu_vuc": "TP.HCM",  # "112A Le Thuc Hoach, Tan Quy, Tan Phu, HCM"
+        "urls": ["https://www.noithatlinco.com/sofa-v%C4%83n-ph%C3%B2ng"],
+        "parser": parse_noithatlinco,
     },
 ]
 
