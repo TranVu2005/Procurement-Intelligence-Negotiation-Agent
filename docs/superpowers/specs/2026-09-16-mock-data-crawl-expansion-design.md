@@ -14,7 +14,7 @@ mới có 32 record thường (không tính EDGE), thiếu nặng ở Đà Nẵn
 bàn làm việc (5/8).
 
 Phiên làm việc trước đã:
-- Khảo sát khả năng crawl 8 site bán nội thất thật (có giá công khai, danh
+- Khảo sát khả năng crawl các site bán nội thất thật (có giá công khai, danh
   mục sản phẩm rõ), thay vì chỉ đọc blog liệt kê không có giá/danh mục.
 - Viết bản nháp `scripts/crawl_sources_draft.py`, crawl thành công 4 site
   (noithathunter.com, hoaphathcm.vn, xuanhoa.vn, tekkashop.com.vn), sinh
@@ -22,6 +22,9 @@ Phiên làm việc trước đã:
 - Phát hiện và sửa 1 bug phân loại danh mục (sản phẩm ghép như "Bàn làm việc
   ... có tủ" bị bắt nhầm thành tủ hồ sơ) — chuyển từ luật ưu tiên cố định
   sang chọn theo từ khóa xuất hiện sớm nhất trong tên sản phẩm.
+- Dùng Playwright MCP khảo sát nhanh 4 site ứng viên còn lại (tìm link danh
+  mục, đọc địa chỉ chi nhánh), rồi verify từng site bằng `requests` tĩnh để
+  xác nhận có crawl được bằng code không (xem §3) — 3/4 dùng được, 1 loại.
 
 Thiết kế này mở rộng script đó để thu thập **nhiều nhất có thể** trong giới
 hạn nguồn đã biết, thay vì chỉ đủ ngưỡng tối thiểu.
@@ -29,11 +32,13 @@ hạn nguồn đã biết, thay vì chỉ đủ ngưỡng tối thiểu.
 ## 2. Mục tiêu và phi mục tiêu
 
 **Mục tiêu:**
-- Mở rộng `scripts/crawl_sources_draft.py` để crawl 8 site (4 đã có parser +
-  4 ứng viên mới), tối đa hóa số dòng thu được trong giới hạn lấy mẫu ở §4.
+- Mở rộng `scripts/crawl_sources_draft.py` để crawl 7 site (4 đã có parser +
+  3 ứng viên mới đã khảo sát xong ở §3), tối đa hóa số dòng thu được trong
+  giới hạn lấy mẫu ở §4.
 - Bù cụ thể 2 lỗ hổng vùng/danh mục hiện tại: Đà Nẵng (0 → nhiều hơn), kệ
   (3/8 → gần/đủ 8), đồng thời không bỏ sót Hà Nội (dùng lại nhánh Hà Nội có
-  sẵn của 2 công ty đã crawl thay vì tìm site mới).
+  sẵn của các công ty đa chi nhánh — Xuân Hòa, Tekkashop, kesatngoctin.com —
+  thay vì tìm site mới).
 - Giữ nguyên vòng duyệt tay: script chỉ ghi `sources_draft.csv`, không ghi
   thẳng `sources.csv` thật.
 
@@ -42,10 +47,11 @@ hạn nguồn đã biết, thay vì chỉ đủ ngưỡng tối thiểu.
   người, theo đúng Task 10 bước 1.
 - Không chỉnh sửa `generate_mock_data.py` — đó là việc riêng của Task 10 sau
   khi `sources.csv` thật đã có, không thuộc thiết kế này.
-- Không tìm kiếm site mới ngoài 4 ứng viên đã xác định (kesatngoctin.com,
-  giakedehangpro.com, tongkhogiake.com, noithatlinco.com) — nếu sau khi crawl
-  hết 8 site vẫn thiếu ngưỡng, việc tìm thêm site là một vòng lặp riêng, không
-  nằm trong thiết kế này.
+- Không tìm kiếm site mới ngoài 3 ứng viên đã xác định dùng được
+  (kesatngoctin.com, giakedehangpro.com, noithatlinco.com — tongkhogiake.com
+  đã khảo sát và loại, xem §3) — nếu sau khi crawl hết 7 site vẫn thiếu
+  ngưỡng, việc tìm thêm site là một vòng lặp riêng, không nằm trong thiết kế
+  này.
 - Không đặt số dòng tổng cố định trước — kết quả phụ thuộc site nào crawl
   được, site nào không (xem §6 rủi ro).
 
@@ -57,16 +63,24 @@ hạn nguồn đã biết, thay vì chỉ đủ ngưỡng tối thiểu.
 | hoaphathcm.vn | TP.HCM | kệ | Đã có (`parse_hoaphathcm`) |
 | xuanhoa.vn | Đà Nẵng + Hà Nội | bàn làm việc, tủ hồ sơ, ghế văn phòng | Đã có (`parse_xuanhoa`), cần sửa để tách 2 vùng |
 | tekkashop.com.vn | Đà Nẵng + Hà Nội | ghế văn phòng | Đã có (`parse_tekkashop`), cần sửa để tách 2 vùng |
-| kesatngoctin.com | Xác định khi crawl (footer/địa chỉ) | kệ | Chưa viết — cần fetch + soi cấu trúc trước |
-| giakedehangpro.com | Xác định khi crawl | kệ | Chưa viết |
-| tongkhogiake.com | Xác định khi crawl | kệ | Chưa viết |
-| noithatlinco.com | TP.HCM (cần xác nhận địa chỉ khi crawl) | sofa | Chưa viết |
+| kesatngoctin.com | TP.HCM + Hà Nội (2 chi nhánh ghi rõ địa chỉ) | kệ | Đã khảo sát — static, 2 bước (trang danh mục lấy tên/link, trang sản phẩm mới có giá `woocommerce-Price-amount`); parser chưa viết |
+| giakedehangpro.com | Hà Nội (444 Phúc Diễn, Nam Từ Liêm) | kệ | Đã khảo sát — static, 1 bước, **không có giá công khai** (toàn "Liên hệ"); parser chưa viết |
+| noithatlinco.com | TP.HCM (112A Lê Thúc Hoạch, Tân Phú) | sofa | Đã khảo sát — static, JSON nhúng sẵn trong HTML (`name`/`price`/`urlPart`), dễ viết parser nhất trong tất cả các site; parser chưa viết |
 
-Với 4 site chưa viết parser: nếu fetch xong không tìm được địa chỉ/chi nhánh
-vùng cụ thể trong trang (bán toàn quốc, không có địa chỉ vùng rõ), **bỏ qua
-site đó hoàn toàn**, không gán `KhuVuc` phỏng đoán. Lý do: `SYSTEM-RULES.md`
-cấm agent tự điền thông tin còn thiếu; một dòng dữ liệu "thật" mà tự đoán
-vùng thì không còn là dữ liệu thật.
+**Loại khỏi danh sách: tongkhogiake.com.** Hai lý do: (1) lỗi
+`SSL: CERTIFICATE_VERIFY_FAILED` khi fetch bằng `requests` mặc định, phải
+tắt xác thực chứng chỉ (`verify=False`) mới qua được; (2) địa chỉ công ty
+thật nằm ở Lâm Đồng (ngoài 3 vùng mục tiêu) — các cụm từ "Hà Nội"/"Hồ Chí
+Minh"/"Nha Trang" xuất hiện trong trang chỉ là landing page SEO theo tỉnh,
+không phải chi nhánh thật, nên không dùng làm `KhuVuc` được theo nguyên tắc
+dưới đây.
+
+Với 3 site còn lại (chưa viết parser, nhưng đã xác nhận vùng thật + xác nhận
+crawl được bằng `requests` tĩnh, không cần render JS): nếu lúc viết parser
+phát sinh thêm chỗ không xác định được `KhuVuc`, **bỏ qua phần đó**, không
+gán phỏng đoán. Lý do: `SYSTEM-RULES.md` cấm agent tự điền thông tin còn
+thiếu; một dòng dữ liệu "thật" mà tự đoán vùng thì không còn là dữ liệu
+thật.
 
 ## 4. Chính sách lấy mẫu
 
@@ -98,10 +112,11 @@ ghi CSV) được giữ nguyên, chỉ mở rộng các phần sau:
   tên đã đúng, đã kiểm chứng qua bug ở phiên trước.
 - **`SOURCES`**: field `khu_vuc` đổi kiểu từ `str` sang `str | list[str]`.
   Khi là `list`, hàm gom nhóm biết phải chia round-robin trước (xem §4).
-- **4 parser mới**: `parse_kesatngoctin`, `parse_giakedehangpro`,
-  `parse_tongkhogiake`, `parse_noithatlinco` — viết sau khi fetch HTML thật
-  và soi cấu trúc (không đoán trước theme, các site trước đó mỗi site một
-  kiểu markup khác nhau: WooCommerce, theme riêng, Shopify).
+- **3 parser mới**: `parse_kesatngoctin` (2 bước: trang danh mục lấy
+  tên/link, trang sản phẩm lấy giá — WooCommerce), `parse_giakedehangpro`
+  (1 bước, không giá), `parse_noithatlinco` (1 bước, trích JSON nhúng sẵn
+  trong HTML thay vì regex theo class CSS — cấu trúc đã xác nhận ở §3, không
+  cần dò lại).
 - **`build_rows()`**: thêm bộ đếm `rows_per_company: dict[str, int]` để áp
   trần 6 dòng/công ty; thêm logic chia vùng round-robin khi `khu_vuc` là
   list; đổi từ lấy 1 đại diện/tổ hợp sang lấy tối đa N=5, sắp theo giá tăng
@@ -137,9 +152,9 @@ fetch(url) -> html
 
 | Rủi ro | Ảnh hưởng | Giảm thiểu |
 |---|---|---|
-| 4 site mới có cấu trúc HTML khác hẳn 4 site cũ (SPA, cần JS render, chặn bot) | Không viết được parser, script không crawl được site đó | Try/except cô lập theo site (§5); nếu 1-2 site thất bại, các site còn lại vẫn chạy và ghi được phần của mình |
-| Site không có địa chỉ vùng rõ ràng | Không có `KhuVuc` đáng tin | Bỏ qua site đó hoàn toàn (§3), không đoán |
-| Sau khi crawl hết 8 site vẫn chưa đạt ngưỡng kệ/Đà Nẵng | `sources.csv` thật (sau khi người duyệt) có thể vẫn thiếu, cần thêm site hoặc nhập tay bù | Bảng tổng hợp cuối script (§5) cho thấy ngay chỗ còn thiếu để quyết định vòng tiếp theo — không nằm trong scope thiết kế này |
+| Site đã khảo sát cấu trúc HTML thay đổi giữa lúc khảo sát và lúc viết parser (trang thương mại cập nhật theme) | Parser viết theo cấu trúc cũ không khớp nữa | Try/except cô lập theo site (§5); nếu 1-2 site thất bại, các site còn lại vẫn chạy và ghi được phần của mình |
+| Site không có địa chỉ vùng rõ ràng, hoặc lỗi SSL cert khi fetch (đã gặp ở tongkhogiake.com) | Không có `KhuVuc` đáng tin, hoặc không fetch được | Bỏ qua site đó hoàn toàn (§3), không đoán vùng và không tắt xác thực SSL để cố lấy bằng được |
+| Sau khi crawl hết 7 site vẫn chưa đạt ngưỡng kệ/Đà Nẵng | `sources.csv` thật (sau khi người duyệt) có thể vẫn thiếu, cần thêm site hoặc nhập tay bù | Bảng tổng hợp cuối script (§5) cho thấy ngay chỗ còn thiếu để quyết định vòng tiếp theo — không nằm trong scope thiết kế này |
 | Trần 6 dòng/công ty cắt bớt đúng lúc công ty đó đang bù đúng danh mục thiếu | Dataset không tối ưu bù lỗ hổng dù có đủ sản phẩm | Chấp nhận trade-off đã chọn ở Phần A (ưu tiên đa dạng công ty hơn tối đa hoá theo lỗ hổng); log rõ số bị cắt để người tự quyết định nới trần nếu cần |
 
 ## 7. Xác minh sau khi implement
