@@ -1,42 +1,136 @@
 # Procurement Intelligence & Negotiation Agent — Nội thất
 
-Dự án cuối khóa AI Guru AEF1. Xem chi tiết kiến trúc, hợp đồng interface giữa 3
-module tại [interface-contracts.md](interface-contracts.md), rule chung hệ
-thống tại [SYSTEM-RULES.md](SYSTEM-RULES.md).
+Dự án cuối khóa AI Guru AEF1. Agent nhận yêu cầu mua sắm nội thất bằng tiếng
+Việt tự nhiên, tìm/so sánh nhà cung cấp mock, và đề xuất chiến lược đàm phán
+kèm leverage score.
+
+Ba tài liệu chi phối, theo thứ tự ưu tiên:
+
+- [interface-contracts.md](interface-contracts.md) — nguồn sự thật cho mọi
+  field/action trao đổi giữa 3 module.
+- [SYSTEM-RULES.md](SYSTEM-RULES.md) — rule hành vi chung.
+- [architecture.md](architecture.md) — thiết kế pipeline đã thống nhất.
+
+## Kiến trúc
+
+Pipeline là **LangGraph `StateGraph`** xác định (không còn ReAct
+`AgentExecutor`), LLM chỉ được gọi ở 2 node `perceive` và `respond` — mọi node
+khác là Python thuần. Entrypoint: `src/graph.py::run_request()`; `src/agent.py`
+chỉ là REPL mỏng gọi hàm này.
+
+3 nhánh intent dùng chung scoring/verification: `search_new`
+(`plan → tool_search → filter_hard → score_rank → verify_output`),
+`compare_specific` (`tool_compare`), `supplier_detail` (`tool_detail`),
+`out_of_scope` (`respond_limits`). Khi `verify_output` fail, `diagnose` +
+`replan` chạy tối đa 3 lần trước khi `graceful_fail`.
+
+| Module | Owner |
+|---|---|
+| `src/perception/`, `src/memory/`, node `perceive` | Người A |
+| `src/reasoning/`, node `plan`/`filter_hard`/`score_rank`/`verify_output`/`diagnose`/`replan` | Người B |
+| `src/tools/`, `src/logging_utils/`, node `tool_*`/`confirm_gate`, wiring `respond` | Người C |
+| `src/agent.py`, `src/graph.py`, `src/graph_state.py`, `src/llm.py` | Người C |
 
 ## Quick start
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+python -m venv .venv
+.venv\Scripts\activate           # Windows; POSIX: source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env             # điền ANTHROPIC_API_KEY và GOOGLE_API_KEY
+cp .env.example .env             # điền GOOGLE_API_KEY
 ```
 
-`src/agent.py` (entrypoint AgentExecutor) vẫn đang stub, chưa ráp xong 3
-module. Dùng các lệnh dưới đây để chạy/test từng phần đã có tới hôm nay.
+Không có `GOOGLE_API_KEY` thật vẫn chạy được: set `AGENT_LLM=stub` để dùng
+`StubLLM` (không gọi mạng, trả JSON/text cố định) cho cả perceive lẫn respond.
+
+```bash
+# PowerShell
+$env:AGENT_LLM="stub"
+# POSIX
+export AGENT_LLM=stub
+```
+
+## Chạy agent (REPL)
+
+```bash
+python -m src.agent
+```
 
 ## Chạy test
 
 ```bash
-python -m unittest tests.test_planner -v      # Reasoning (B)
-python tests/test_parse_and_memory.py         # Perception + Memory (A) — chạy trực
-                                               # tiếp, không qua unittest discover (script
-                                               # tự sys.exit(), gọi Gemini API thật nên có
-                                               # thể dao động nếu bị rate-limit)
+# Toàn bộ test suite — PHẢI chạy -s tests -t . (tests/ không có __init__.py,
+# "-s tests -t ." khác sẽ lỗi ImportError: Start directory is not importable)
+python -m unittest discover tests "test_*.py"
+
+# Một module test riêng
+python -m unittest tests.test_tools -v
 ```
 
-## Demo 3 tool (Action/Tool Use — search_suppliers, get_supplier_detail, compare_price)
+Test dùng `unittest` chuẩn (không phải pytest — pytest không có trong
+`requirements.txt`). Không có linter wired sẵn.
+
+## Dữ liệu mock
 
 ```bash
-python -m src.tools.supplier_tools
+python generate_mock_data.py
 ```
 
-## Demo end-to-end 1 câu hỏi mẫu (Perception → Reasoning → Tool)
+Sinh lại `src/tools/mock_data/suppliers.json` (38 bản ghi: 32 từ 14 công ty
+nội thất văn phòng thật tại Việt Nam + 6 edge case thủ công `EDGE00x`). Tên
+công ty, khu vực và `nguon_url` là thật (website chính thức từng công ty,
+verify qua WebSearch); mọi field số (`Gia`, `MOQ`, `TonKho`, `ThoiGianGiao`,
+`BaoHanh`, `ChietKhauTheoSoLuong`, `DiemUyTin`) là dữ liệu mô phỏng, được khai
+báo rõ trong `simulated_fields` của từng record — agent phải trích dẫn
+`simulated_fields` khi trả lời, không được trình bày như số liệu thật. 6 record
+`EDGE00x` là công ty hư cấu dùng để test hành vi cụ thể (ngân sách mâu thuẫn
+MOQ, thiếu `DiemUyTin`, hết hàng, dữ liệu mâu thuẫn…) — `nguon_url` của chúng
+trỏ về chính `generate_mock_data.py` trong repo, không phải domain thật.
+
+## Memory / State
 
 ```bash
-python -m scripts.demo_e2e
+sqlite3 src/memory/state.db < src/memory/schema.sql   # (re)init SQLite state DB
 ```
 
-Nếu chưa có `GOOGLE_API_KEY` thật trong `.env`, script tự fallback sang state
-mẫu (`session_states_sample.json`) để vẫn demo được phần Reasoning + Tool.
+`src/memory/db.py` lưu state theo `session_id`; `src/graph.py` gọi `init_db()`
+1 lần khi import module (idempotent, `CREATE TABLE IF NOT EXISTS`).
+
+## AutoEval
+
+```bash
+python scripts/run_autoeval.py --eval-set tests/eval_set/cases_c.jsonl --llm stub
+```
+
+Xuất `reports/autoeval_<timestamp>.json` và `.md`, báo 5 chỉ số: Task Success
+Rate, Constraint Satisfaction Rate, Tool Call Success Rate,
+Citation/Evidence Correctness, Failure Recovery Rate.
+
+Lưu ý: `--llm stub` không làm NLP thật (`perceive` luôn trả về đúng 1 JSON cố
+định bất kể câu hỏi), nên các case adversarial cần phân loại intent đúng
+(hỏi ngoài phạm vi, ngân sách bất khả thi, hỏi thông tin agent không biết) sẽ
+luôn trượt ở chế độ stub — chỉ đo được chính xác bằng `--llm real` (cần
+`GOOGLE_API_KEY` thật). `tests/eval_set/cases.jsonl` là file case cũ chưa có
+`oracle`, script tự bỏ qua; dùng `cases_c.jsonl` hoặc thư mục `tests/eval_set/`
+để chạy toàn bộ case có oracle.
+
+`tests/run_autoeval.py` (khác file, dispatch bằng `if cid == "case_001"`)
+thuộc tier unit-test cũ, không phải AutoEval báo cáo chính thức.
+
+## Load test
+
+```bash
+python scripts/run_loadtest.py --levels 1 --requests-per-level 5 --llm stub
+```
+
+## Trạng thái hiện tại (2026-09-17)
+
+- 243/243 unit test pass (`AGENT_LLM=stub python -m unittest discover tests
+  "test_*.py"`).
+- Pipeline LangGraph chạy thông cả 4 intent; `mock_data/suppliers.json` đã có
+  `nguon_url`/`nguon_type`/`simulated_fields` đầy đủ nên `verify_output`
+  không còn chặn vì thiếu trích dẫn (`citation_correctness = 1.0` trong
+  AutoEval gần nhất).
+- AutoEval (`cases_c.jsonl`, stub): task_success_rate 0.7 (7/10) — 3 case
+  trượt đều là adversarial, do giới hạn của `StubLLM` (không NLP thật), cần
+  `--llm real` để đo đúng.
