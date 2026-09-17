@@ -1,8 +1,42 @@
+import json
 import os
 import unittest
 from unittest.mock import patch
 
 from src.llm import MODEL_NAME, StubLLM, get_llm, usage_of
+
+
+class StubLLMBindTests(unittest.TestCase):
+    """parser.py (Perception) goi _get_llm().bind(response_format=...).invoke(...)
+    roi json.loads(response.content) - StubLLM phai chiu duoc chuoi goi nay."""
+
+    def test_bind_returns_object_with_invoke(self) -> None:
+        bound = StubLLM(latency_s=0.0).bind(response_format={"type": "json_object"})
+        message = bound.invoke([("human", "a")])
+        self.assertTrue(message.content)
+
+    def test_bound_content_is_valid_json_matching_extraction_schema(self) -> None:
+        bound = StubLLM(latency_s=0.0).bind(response_format={"type": "json_object"})
+        parsed = json.loads(bound.invoke([("human", "a")]).content)
+        self.assertEqual(
+            set(parsed),
+            {"intent", "product_type", "quantity", "budget_max",
+             "delivery_deadline_days", "material_preference", "region_preference",
+             "min_trust_score", "supplier_ids", "supplier_id"},
+        )
+        self.assertIn(parsed["intent"],
+                      {"search_new", "compare_specific", "supplier_detail", "out_of_scope"})
+
+    def test_bind_ignores_kwargs_and_keeps_deterministic_latency(self) -> None:
+        bound = StubLLM(latency_s=0.0).bind(response_format={"type": "json_object"},
+                                             anything_else=123)
+        self.assertIsInstance(bound, StubLLM)
+
+    def test_unbound_stub_still_returns_prose_not_json(self) -> None:
+        # bind() phai tra ve BIEN THE moi, khong doi hanh vi cua respond's stub
+        plain = StubLLM(latency_s=0.0).invoke([("human", "a")]).content
+        with self.assertRaises(json.JSONDecodeError):
+            json.loads(plain)
 
 
 class StubLLMTests(unittest.TestCase):

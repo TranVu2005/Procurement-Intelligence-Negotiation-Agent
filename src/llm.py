@@ -8,6 +8,7 @@ Bat stub bang bien moi truong AGENT_LLM=stub -> khong goi mang, dung cho
 load test muc 10-50 CCU (architecture.md muc 5.6).
 """
 
+import json
 import os
 import random
 import time
@@ -15,6 +16,25 @@ import time
 from langchain_core.messages import AIMessage
 
 MODEL_NAME = "gemini-3.6-flash"
+
+# JSON co dinh cho StubLLM sau .bind(response_format=...) - dung cho Perception
+# (src/perception/parser.py::_call_llm, json.loads(response.content)). Gia tri
+# khop voi bo 4 hard constraint stub cu (Task 3) de khong doi baseline AutoEval
+# --llm stub hien co. Stub khong lam NLP that: moi request deu ra cung 1 JSON,
+# bat ke user_input la gi - dung de do chi phi/latency pipeline, khong do chat
+# luong Perception (do bang --llm real).
+_STUB_PERCEPTION_JSON = json.dumps({
+    "intent": "search_new",
+    "product_type": "ghế văn phòng",
+    "quantity": 50,
+    "budget_max": 200_000_000,
+    "delivery_deadline_days": 14,
+    "material_preference": None,
+    "region_preference": None,
+    "min_trust_score": None,
+    "supplier_ids": [],
+    "supplier_id": None,
+}, ensure_ascii=False)
 
 # Do tre gia lap cua stub. Do thuc te bang scripts/run_loadtest.py --levels 1
 # --requests-per-level 5 --llm real (Task 16 buoc 6): p50=17542ms, p95=20966ms
@@ -66,6 +86,27 @@ class StubLLM:
             yield AIMessage(content=word + suffix)
         yield AIMessage(
             content="",
+            usage_metadata={"input_tokens": 100, "output_tokens": 50, "total_tokens": 150},
+        )
+
+    def bind(self, **_kwargs) -> "StubLLM":
+        """Nhai .bind(response_format=...) cua ChatGoogleGenerativeAI (LangChain
+        Runnable). parser.py goi _get_llm().bind(response_format={"type":
+        "json_object"}) roi .invoke() - khong co bind() se AttributeError khi
+        A doi sang dung get_llm() chung. Tra ve bien the JSON, khong phai self,
+        vi noi dung tra ve khac (JSON thay vi cau van cho respond)."""
+        return _StubPerceptionLLM(latency_s=self._latency_s)
+
+
+class _StubPerceptionLLM(StubLLM):
+    """StubLLM sau .bind() - danh cho Perception (parser.py). Tra JSON hop le
+    theo dung schema _EXTRACT_SYSTEM_PROMPT/_UPDATE_SYSTEM_PROMPT mong doi, de
+    json.loads() khong crash. Xem _STUB_PERCEPTION_JSON o dau file."""
+
+    @staticmethod
+    def _message() -> AIMessage:
+        return AIMessage(
+            content=_STUB_PERCEPTION_JSON,
             usage_metadata={"input_tokens": 100, "output_tokens": 50, "total_tokens": 150},
         )
 
