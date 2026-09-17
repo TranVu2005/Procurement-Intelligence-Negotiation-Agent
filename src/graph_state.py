@@ -34,7 +34,7 @@ class AgentState(TypedDict, total=False):
     ranked: list[dict]
     verdict: dict
     replan_count: int
-    replan_reason: str | None            # tra ve tu diagnose(), doc boi replan()
+    replan_reason: str | None                          # tra ve tu diagnose(), doc boi replan()
     answer: str
     pending_confirmation: dict | None
     status: Status
@@ -50,13 +50,23 @@ def new_state(
     session_id: str | None = None,
     trace_id: str | None = None,
     inject: dict | None = None,
+    req: dict | None = None,
 ) -> AgentState:
-    """State khoi tao cho 1 request. Moi khoa co reducer deu bat dau tu 0/[]."""
+    """State khoi tao cho 1 request. Moi khoa co reducer deu bat dau tu 0/[].
+
+    Args:
+        user_input: Cau yeu cau nguoi dung.
+        session_id: ID phien. None = tao UUID moi o perceive.
+        trace_id:   Trace ID. None = tao moi.
+        inject:     Failure injection cho AutoEval.
+        req:        Existing req dict (load tu DB cho multi-turn session).
+                    None hoac {} = turn dau, perceive se goi parse_request().
+    """
     return {
         "session_id": session_id or "",
         "trace_id": trace_id or new_trace_id(),
         "user_input": user_input,
-        "req": {},
+        "req": req or {},
         "plan": {},
         "tool_results": [],
         "candidates": [],

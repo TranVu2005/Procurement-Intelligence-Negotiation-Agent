@@ -47,7 +47,6 @@ _STUB_TEXT = (
     "load test, khong goi mo hinh that."
 )
 
-
 class StubLLM:
     """Thay the ChatGoogleGenerativeAI trong load test.
 

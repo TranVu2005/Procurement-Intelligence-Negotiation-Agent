@@ -12,12 +12,26 @@ from langgraph.graph import END, START, StateGraph
 
 from src.graph_state import MAX_REPLAN, AgentState, new_state
 from src.logging_utils.tracer import log_event, write_run_record
+from src.memory.db import (
+    append_conversation,
+    init_db,
+    load_session,
+    save_session,
+    session_exists,
+)
 from src.nodes.perceive import perceive
 from src.nodes.reasoning import (
     diagnose, filter_hard, graceful_fail, plan, replan, respond_limits, score_rank, verify_output,
 )
 from src.nodes.respond import respond
 from src.nodes.tools import confirm_gate, tool_compare, tool_detail, tool_search
+
+# Khoi tao DB 1 lan khi module nap — CREATE TABLE IF NOT EXISTS, idempotent.
+# Loi DB khong duoc lam gay import hay pipeline.
+try:
+    init_db()
+except Exception:  # noqa: BLE001
+    pass
 
 # Duong dai nhat: tool_search -> filter_hard -> score_rank -> verify_output ->
 # diagnose -> replan (6 node) lap (MAX_REPLAN + 1) lan (1 lan dau + MAX_REPLAN lan
@@ -136,9 +150,24 @@ def run_request(
     (architecture.md muc 5.4), khong dung o duong chay that.
     Ham nay khong bao gio raise: moi exception duoc bat thanh graceful_fail
     de mot case hong khong lam gay ca luot AutoEval hoac load test.
+
+    Memory semantics (A chot, 2026-09-17):
+    - Neu session_id da ton tai trong DB: load req cu -> perceive goi update_state()
+    - Neu session moi / None: perceive goi parse_request() tao state moi
+    - Sau moi luot: save req va ghi agent answer vao DB
     """
     graph = build_graph(overrides) if overrides else get_graph()
-    state = new_state(user_input, session_id=session_id, inject=_inject)
+
+    # Load session cu neu co
+    existing_req: dict = {}
+    if session_id:
+        try:
+            if session_exists(session_id):
+                existing_req = load_session(session_id) or {}
+        except Exception:  # noqa: BLE001
+            existing_req = {}  # DB loi thi coi nhu turn dau, khong gay crash
+
+    state = new_state(user_input, session_id=session_id, inject=_inject, req=existing_req)
     log_event(state["trace_id"], "request_start", session_id=state["session_id"],
               user_input=user_input)
 
@@ -160,4 +189,18 @@ def run_request(
               llm_calls=final.get("llm_calls", 0), tool_calls=len(final.get("tool_results", [])),
               latency_ms=final["latency_ms"])
     write_run_record(final)
+
+    # Luu state va agent answer vao DB (best-effort — khong duoc lam gay response)
+    sid = final.get("session_id") or session_id or ""
+    if sid:
+        try:
+            req_to_save = final.get("req")
+            if req_to_save:
+                save_session(sid, req_to_save)
+            agent_answer = final.get("answer", "")
+            if agent_answer:
+                append_conversation(sid, "agent", agent_answer)
+        except Exception:  # noqa: BLE001
+            pass  # DB loi khong duoc lam gay response tra ve nguoi dung
+
     return final

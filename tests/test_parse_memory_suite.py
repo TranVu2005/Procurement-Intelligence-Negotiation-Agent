@@ -20,7 +20,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from src.perception.parser import (
     VALID_PRODUCT_TYPES,
     VALID_INTENTS,
-    LLM_MODEL_NAME,
     MissingFieldError,
     InvalidProductTypeError,
     _parse_product_type,
@@ -95,13 +94,15 @@ class TestParserConstants(unittest.TestCase):
         self.assertEqual(VALID_INTENTS, expected)
 
     def test_llm_model_name_is_string(self):
-        self.assertIsInstance(LLM_MODEL_NAME, str)
-        self.assertGreater(len(LLM_MODEL_NAME), 0)
+        from src.llm import MODEL_NAME
+        self.assertIsInstance(MODEL_NAME, str)
+        self.assertGreater(len(MODEL_NAME), 0)
 
-    def test_llm_model_name_is_not_old_value(self):
-        """Phai dung gemini-2.5-flash (hoac env override), khong phai gemini-3.6-flash cu."""
-        self.assertNotEqual(LLM_MODEL_NAME, "gemini-3.6-flash",
-                            "Ten model cu bi lech - phai dung gemini-2.5-flash (architecture.md §3.1)")
+    def test_llm_model_name_is_current_value(self):
+        """Phai dung gemini-3.6-flash tu src.llm (canonical), khong phai gia tri cu cua parser."""
+        from src.llm import MODEL_NAME
+        self.assertEqual(MODEL_NAME, "gemini-3.6-flash",
+                         "Ten model phai la gemini-3.6-flash theo src/llm.py (architecture.md §3.1)")
 
     def test_missing_field_error_has_fields(self):
         err = MissingFieldError(["so luong", "ngan sach"])

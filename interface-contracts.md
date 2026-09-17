@@ -15,6 +15,10 @@ Lưu trong SQLite, expose ra dạng dict/JSON khi A truyền cho B/C dùng.
   "created_at": "2026-09-08T10:00:00",
   "updated_at": "2026-09-08T10:05:00",
 
+  "intent": "search_new",
+  "supplier_ids": ["NCC001", "NCC002"],
+  "supplier_id": null,
+
   "hard_constraints": {
     "product_type": "ghế văn phòng",
     "quantity": 50,
@@ -43,10 +47,13 @@ Lưu trong SQLite, expose ra dạng dict/JSON khi A truyền cho B/C dùng.
 
 | Field | Kiểu | Bắt buộc | Ghi chú |
 |---|---|---|---|
-| `product_type` | string | có | enum gợi ý: ghế văn phòng, bàn làm việc, tủ hồ sơ, kệ, sofa... |
-| `quantity` | int | có | > 0, nếu ≤0 → lỗi validate ở Perception |
-| `budget_max` | float (VND) | có | tổng ngân sách, không phải đơn giá |
-| `delivery_deadline_days` | int | có | số ngày kể từ hôm nay |
+| `intent` | string | có | `search_new` \| `compare_specific` \| `supplier_detail` \| `out_of_scope` — do Perception ghi, B/C đọc để định tuyến |
+| `supplier_ids` | list[string] | không | danh sách MaNCC khi intent=`compare_specific`; `[]` nếu không có |
+| `supplier_id` | string \| null | không | MaNCC cụ thể khi intent=`supplier_detail`; `null` nếu không có |
+| `product_type` | string | có\* | enum gợi ý: ghế văn phòng, bàn làm việc, tủ hồ sơ, kệ, sofa... (\*bắt buộc khi `search_new`) |
+| `quantity` | int | có\* | > 0, nếu ≤0 → lỗi validate ở Perception (\*bắt buộc khi `search_new` hoặc `compare_specific`) |
+| `budget_max` | float (VND) | có\* | tổng ngân sách, không phải đơn giá (\*bắt buộc khi `search_new`) |
+| `delivery_deadline_days` | int | có\* | số ngày kể từ hôm nay (\*bắt buộc khi `search_new`) |
 | `material_preference` | string \| null | không | ràng buộc mềm |
 | `region_preference` | string \| null | không | ràng buộc mềm |
 | `min_trust_score` | float \| null | không | ràng buộc mềm, 1–5 |
@@ -166,7 +173,7 @@ Mỗi người đọc kỹ phần mình sẽ dùng nhiều nhất (A đọc kỹ
 
 | Người | Đã đọc | Đồng ý | Đề xuất sửa (nếu có) | Ngày ký |
 |---|---|---|---|---|
-| A | ☑ | ☑ | Đồng ý quyết định §8.1: bỏ material/region khỏi plan.steps[0].params | 15/9/2026 |
+| A | ☑ | ☑ | Đồng ý quyết định §8.1: bỏ material/region khỏi plan.steps[0].params; bổ sung `intent`, `supplier_ids`, `supplier_id` vào §1 (17/9/2026) | 15/9/2026 |
 | B | ☑ | ☑ | Đồng ý §8.1; đã nối node reasoning thật và cập nhật ví dụ plan/test theo contract | 16/9/2026 |
 | C | ☐ | ☐ | | |
 
