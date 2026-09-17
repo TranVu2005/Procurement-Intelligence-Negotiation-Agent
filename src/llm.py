@@ -30,7 +30,7 @@ _STUB_TEXT = (
 # JSON stub cho Perception parser (10 field theo _EXTRACT_SYSTEM_PROMPT va
 # _UPDATE_SYSTEM_PROMPT cua src/perception/parser.py).
 _STUB_PERCEPTION_JSON = (
-    '{"intent": "search_new", "product_type": "gh\u1ebf v\u0103n ph\u00f2ng", "quantity": 50,'
+    '{"intent": "search_new", "product_type": "ghế văn phòng", "quantity": 50,'
     ' "budget_max": 200000000, "delivery_deadline_days": 14,'
     ' "material_preference": null, "region_preference": null,'
     ' "min_trust_score": null, "supplier_ids": [], "supplier_id": null}'

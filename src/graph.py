@@ -26,11 +26,12 @@ from src.nodes.reasoning import (
 from src.nodes.respond import respond
 from src.nodes.tools import confirm_gate, tool_compare, tool_detail, tool_search
 
-# Khoi tao DB 1 lan khi module nap — CREATE TABLE IF NOT EXISTS, idempotent
+# Khoi tao DB 1 lan khi module nap — CREATE TABLE IF NOT EXISTS, idempotent.
+# Loi DB khong duoc lam gay import hay pipeline.
 try:
     init_db()
 except Exception:  # noqa: BLE001
-    pass  # DB hong khong duoc lam gay import
+    pass
 
 # Duong dai nhat: tool_search -> filter_hard -> score_rank -> verify_output ->
 # diagnose -> replan (6 node) lap (MAX_REPLAN + 1) lan (1 lan dau + MAX_REPLAN lan
