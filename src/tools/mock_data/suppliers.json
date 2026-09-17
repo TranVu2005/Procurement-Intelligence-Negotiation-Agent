@@ -17,7 +17,19 @@
       }
     ],
     "DiemUyTin": 4.3,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC002",
@@ -45,7 +57,19 @@
       }
     ],
     "DiemUyTin": 4.6,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC003",
@@ -69,7 +93,19 @@
       }
     ],
     "DiemUyTin": 4.9,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC004",
@@ -97,7 +133,19 @@
       }
     ],
     "DiemUyTin": 4.5,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://xuanhoa.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC005",
@@ -121,7 +169,19 @@
       }
     ],
     "DiemUyTin": 4.3,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://xuanhoa.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC006",
@@ -145,7 +205,19 @@
       }
     ],
     "DiemUyTin": 4.6,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithat190.com.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC007",
@@ -169,7 +241,19 @@
       }
     ],
     "DiemUyTin": 4.0,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://fami.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC008",
@@ -189,7 +273,19 @@
       }
     ],
     "DiemUyTin": 4.2,
-    "KhuVuc": "TP.HCM"
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://govi.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC009",
@@ -209,7 +305,19 @@
       }
     ],
     "DiemUyTin": 4.0,
-    "KhuVuc": "TP.HCM"
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://govi.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC010",
@@ -229,7 +337,19 @@
       }
     ],
     "DiemUyTin": 3.5,
-    "KhuVuc": "TP.HCM"
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://levindecor.com/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC011",
@@ -253,7 +373,19 @@
       }
     ],
     "DiemUyTin": 3.6,
-    "KhuVuc": "TP.HCM"
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://levindecor.com/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC012",
@@ -273,7 +405,19 @@
       }
     ],
     "DiemUyTin": 3.7,
-    "KhuVuc": "TP.HCM"
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://levindecor.com/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC013",
@@ -297,7 +441,19 @@
       }
     ],
     "DiemUyTin": 3.8,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://proce.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC014",
@@ -317,7 +473,19 @@
       }
     ],
     "DiemUyTin": 4.1,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://proce.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC015",
@@ -337,7 +505,19 @@
       }
     ],
     "DiemUyTin": 3.5,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://proce.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC016",
@@ -365,7 +545,19 @@
       }
     ],
     "DiemUyTin": 4.3,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://mychair.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC017",
@@ -389,7 +581,19 @@
       }
     ],
     "DiemUyTin": 3.8,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://mychair.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC018",
@@ -413,7 +617,19 @@
       }
     ],
     "DiemUyTin": 3.8,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://mychair.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC019",
@@ -433,7 +649,19 @@
       }
     ],
     "DiemUyTin": 4.5,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://ngocdiep.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC020",
@@ -457,7 +685,19 @@
       }
     ],
     "DiemUyTin": 4.2,
-    "KhuVuc": "TP.HCM"
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://tekkashop.com.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC021",
@@ -481,7 +721,19 @@
       }
     ],
     "DiemUyTin": 3.8,
-    "KhuVuc": "TP.HCM"
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://tekkashop.com.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC022",
@@ -509,7 +761,19 @@
       }
     ],
     "DiemUyTin": 3.7,
-    "KhuVuc": "TP.HCM"
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://tekkashop.com.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC023",
@@ -533,7 +797,19 @@
       }
     ],
     "DiemUyTin": 3.8,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithatamia.com/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC024",
@@ -561,7 +837,19 @@
       }
     ],
     "DiemUyTin": 3.5,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithatamia.com/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC025",
@@ -585,7 +873,19 @@
       }
     ],
     "DiemUyTin": 3.7,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithatamia.com/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC026",
@@ -609,7 +909,19 @@
       }
     ],
     "DiemUyTin": 4.1,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithatmelinh.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC027",
@@ -629,7 +941,19 @@
       }
     ],
     "DiemUyTin": 4.0,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://erado.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC028",
@@ -649,7 +973,19 @@
       }
     ],
     "DiemUyTin": 4.0,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://erado.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC029",
@@ -673,7 +1009,19 @@
       }
     ],
     "DiemUyTin": 3.7,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://erado.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC030",
@@ -697,7 +1045,19 @@
       }
     ],
     "DiemUyTin": 4.4,
-    "KhuVuc": "TP.HCM"
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://interoffice.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC031",
@@ -721,7 +1081,19 @@
       }
     ],
     "DiemUyTin": 4.3,
-    "KhuVuc": "TP.HCM"
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://interoffice.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "NCC032",
@@ -749,7 +1121,19 @@
       }
     ],
     "DiemUyTin": 4.3,
-    "KhuVuc": "TP.HCM"
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://interoffice.vn/",
+    "nguon_type": "website_chinh_thuc",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "EDGE001",
@@ -769,7 +1153,20 @@
       }
     ],
     "DiemUyTin": 4.2,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://github.com/TranVu2005/Procurement-Intelligence-Negotiation-Agent/blob/main/generate_mock_data.py",
+    "nguon_type": "du_lieu_test_gia_lap",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "TenNCC",
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "EDGE002",
@@ -789,7 +1186,20 @@
       }
     ],
     "DiemUyTin": null,
-    "KhuVuc": "Da Nang"
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://github.com/TranVu2005/Procurement-Intelligence-Negotiation-Agent/blob/main/generate_mock_data.py",
+    "nguon_type": "du_lieu_test_gia_lap",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "TenNCC",
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "EDGE003",
@@ -809,7 +1219,20 @@
       }
     ],
     "DiemUyTin": 3.8,
-    "KhuVuc": "TP.HCM"
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://github.com/TranVu2005/Procurement-Intelligence-Negotiation-Agent/blob/main/generate_mock_data.py",
+    "nguon_type": "du_lieu_test_gia_lap",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "TenNCC",
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "EDGE004A",
@@ -829,7 +1252,20 @@
       }
     ],
     "DiemUyTin": 4.0,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://github.com/TranVu2005/Procurement-Intelligence-Negotiation-Agent/blob/main/generate_mock_data.py",
+    "nguon_type": "du_lieu_test_gia_lap",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "TenNCC",
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "EDGE004B",
@@ -849,7 +1285,20 @@
       }
     ],
     "DiemUyTin": 4.0,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://github.com/TranVu2005/Procurement-Intelligence-Negotiation-Agent/blob/main/generate_mock_data.py",
+    "nguon_type": "du_lieu_test_gia_lap",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "TenNCC",
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   },
   {
     "MaNCC": "EDGE005",
@@ -869,6 +1318,19 @@
       }
     ],
     "DiemUyTin": 3.5,
-    "KhuVuc": "Ha Noi"
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://github.com/TranVu2005/Procurement-Intelligence-Negotiation-Agent/blob/main/generate_mock_data.py",
+    "nguon_type": "du_lieu_test_gia_lap",
+    "fetched_at": "2026-09-17",
+    "simulated_fields": [
+      "TenNCC",
+      "Gia",
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "BaoHanh",
+      "ChietKhauTheoSoLuong",
+      "DiemUyTin"
+    ]
   }
 ]

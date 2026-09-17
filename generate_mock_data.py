@@ -25,24 +25,37 @@ random.seed(42)
 
 OUT_PATH = "src/tools/mock_data/suppliers.json"
 
-# Ten cong ty that (nguon: cac bai tong hop noi that van phong VN, xem cuoi file)
-# + khu vuc gan voi thong tin cong khai (tru mot so suy doan hop ly khi khong ro)
+# Ten cong ty that (nguon: website chinh thuc cua tung cong ty, kiem tra qua
+# WebSearch ngay 2026-09-17, xem source_url tung dong) + khu vuc gan voi
+# thong tin cong khai (tru mot so suy doan hop ly khi khong ro)
 COMPANIES = [
-    {"name": "Noi That Hoa Phat",        "region": "Ha Noi",   "base_trust": 4.6},
-    {"name": "Noi That Xuan Hoa",        "region": "Ha Noi",   "base_trust": 4.5},
-    {"name": "Noi That 190",             "region": "Ha Noi",   "base_trust": 4.4},
-    {"name": "Noi That Fami",            "region": "Ha Noi",   "base_trust": 4.0},
-    {"name": "Sieu Thi Noi That GOVI",   "region": "TP.HCM",   "base_trust": 3.9},
-    {"name": "Noi That Le Vin Decor",    "region": "TP.HCM",   "base_trust": 3.7},
-    {"name": "Noi That Van Phong Proce", "region": "Ha Noi",   "base_trust": 3.8},
-    {"name": "MyChair",                  "region": "Ha Noi",   "base_trust": 4.1},
-    {"name": "Noi That Ngoc Diep",       "region": "Ha Noi",   "base_trust": 4.2},
-    {"name": "Tekkashop",                "region": "TP.HCM",   "base_trust": 4.0},
-    {"name": "AmiA",                     "region": "Ha Noi",   "base_trust": 3.6},
-    {"name": "Melinh Plaza",             "region": "Ha Noi",   "base_trust": 4.3},
-    {"name": "Noi That ERADO",           "region": "Ha Noi",   "base_trust": 3.9},
-    {"name": "Inter Office",             "region": "TP.HCM",   "base_trust": 4.5},
+    {"name": "Noi That Hoa Phat",        "region": "Ha Noi",   "base_trust": 4.6, "source_url": "https://noithathoaphat.com.vn/"},
+    {"name": "Noi That Xuan Hoa",        "region": "Ha Noi",   "base_trust": 4.5, "source_url": "https://xuanhoa.vn/"},
+    {"name": "Noi That 190",             "region": "Ha Noi",   "base_trust": 4.4, "source_url": "https://noithat190.com.vn/"},
+    {"name": "Noi That Fami",            "region": "Ha Noi",   "base_trust": 4.0, "source_url": "https://fami.vn/"},
+    {"name": "Sieu Thi Noi That GOVI",   "region": "TP.HCM",   "base_trust": 3.9, "source_url": "https://govi.vn/"},
+    {"name": "Noi That Le Vin Decor",    "region": "TP.HCM",   "base_trust": 3.7, "source_url": "https://levindecor.com/"},
+    {"name": "Noi That Van Phong Proce", "region": "Ha Noi",   "base_trust": 3.8, "source_url": "https://proce.vn/"},
+    {"name": "MyChair",                  "region": "Ha Noi",   "base_trust": 4.1, "source_url": "https://mychair.vn/"},
+    {"name": "Noi That Ngoc Diep",       "region": "Ha Noi",   "base_trust": 4.2, "source_url": "https://ngocdiep.vn/"},
+    {"name": "Tekkashop",                "region": "TP.HCM",   "base_trust": 4.0, "source_url": "https://tekkashop.com.vn/"},
+    {"name": "AmiA",                     "region": "Ha Noi",   "base_trust": 3.6, "source_url": "https://noithatamia.com/"},
+    {"name": "Melinh Plaza",             "region": "Ha Noi",   "base_trust": 4.3, "source_url": "https://noithatmelinh.vn/"},
+    {"name": "Noi That ERADO",           "region": "Ha Noi",   "base_trust": 3.9, "source_url": "https://erado.vn/"},
+    {"name": "Inter Office",             "region": "TP.HCM",   "base_trust": 4.5, "source_url": "https://interoffice.vn/"},
 ]
+
+# Field nao la SO LIEU MO PHONG (khong phai lay tu website that ben tren) -
+# phai co mat trong "simulated_fields" cua moi record de respond()/verify_output()
+# noi ro voi nguoi dung day la du lieu gia lap cho bai tap, khong phai gia/ton
+# kho that cua cong ty (SYSTEM-RULES.md, architecture.md muc 4.1).
+SIMULATED_NUMERIC_FIELDS = [
+    "Gia", "MOQ", "TonKho", "ThoiGianGiao", "BaoHanh",
+    "ChietKhauTheoSoLuong", "DiemUyTin",
+]
+
+# Ngay kiem tra source_url con hop le (WebSearch xac nhan ngay lap ke hoach nay)
+FETCHED_AT = "2026-09-17"
 
 CATEGORY_TO_MATERIALS = {
     "ghế văn phòng": ["vai_boc", "da_that", "luoi_nhua"],
@@ -87,6 +100,10 @@ def gen_record(idx, company, category):
         "ChietKhauTheoSoLuong": gen_discount_tiers(),
         "DiemUyTin": round(min(5.0, max(1.0, company["base_trust"] + random.uniform(-0.3, 0.3))), 1),
         "KhuVuc": company["region"],
+        "nguon_url": company["source_url"],
+        "nguon_type": "website_chinh_thuc",
+        "fetched_at": FETCHED_AT,
+        "simulated_fields": list(SIMULATED_NUMERIC_FIELDS),
     }
 
 
@@ -102,12 +119,26 @@ def gen_bulk(start_idx=1):
     return records, idx
 
 
+# Cong ty trong add_edge_cases() la HU CAU (dung de kich hoat 1 hanh vi cu the),
+# khong ton tai ngoai doi nhu COMPANIES o tren. nguon_url tro ve chinh file sinh
+# du lieu nay trong repo - minh bach rang toan bo record (ke ca TenNCC) la du
+# lieu gia lap cho bai tap, khong phai nha cung cap that.
+_EDGE_SOURCE_URL = "https://github.com/TranVu2005/Procurement-Intelligence-Negotiation-Agent/blob/main/generate_mock_data.py"
+_EDGE_SIMULATED_FIELDS = ["TenNCC", *SIMULATED_NUMERIC_FIELDS]
+
+
 def add_edge_cases(next_idx):
     """
     5 ban ghi thu cong, moi ban ghi ton tai de kich hoat 1 hanh vi cu the
     ma SYSTEM-RULES.md yeu cau kiem tra. MaNCC co prefix EDGE de de loc rieng
     trong eval_cases.json.
     """
+    edge_source = {
+        "nguon_url": _EDGE_SOURCE_URL,
+        "nguon_type": "du_lieu_test_gia_lap",
+        "fetched_at": FETCHED_AT,
+        "simulated_fields": list(_EDGE_SIMULATED_FIELDS),
+    }
     records = []
 
     # EDGE 1 - ngan sach khong du cho MOQ (dung cho case "rang buoc mau thuan")
@@ -118,7 +149,7 @@ def add_edge_cases(next_idx):
         "Gia": 4_500_000, "DonViTinh": "cai", "MOQ": 100, "TonKho": 150,
         "ThoiGianGiao": 20, "BaoHanh": 24,
         "ChietKhauTheoSoLuong": [{"tu_so_luong": 100, "phan_tram_giam": 5}],
-        "DiemUyTin": 4.2, "KhuVuc": "Ha Noi",
+        "DiemUyTin": 4.2, "KhuVuc": "Ha Noi", **edge_source,
     })
 
     # EDGE 2 - thieu DiemUyTin (null) trong khi de bai co the yeu cau
@@ -129,7 +160,7 @@ def add_edge_cases(next_idx):
         "Gia": 1_450_000, "DonViTinh": "cai", "MOQ": 10, "TonKho": 80,
         "ThoiGianGiao": 7, "BaoHanh": 12,
         "ChietKhauTheoSoLuong": [{"tu_so_luong": 10, "phan_tram_giam": 4}],
-        "DiemUyTin": None, "KhuVuc": "Da Nang",
+        "DiemUyTin": None, "KhuVuc": "Da Nang", **edge_source,
     })
 
     # EDGE 3 - MaNCC nay CO TON TAI nhung se duoc dung ket hop voi 1 ma
@@ -141,7 +172,7 @@ def add_edge_cases(next_idx):
         "Gia": 2_300_000, "DonViTinh": "cai", "MOQ": 5, "TonKho": 40,
         "ThoiGianGiao": 10, "BaoHanh": 12,
         "ChietKhauTheoSoLuong": [{"tu_so_luong": 5, "phan_tram_giam": 2}],
-        "DiemUyTin": 3.8, "KhuVuc": "TP.HCM",
+        "DiemUyTin": 3.8, "KhuVuc": "TP.HCM", **edge_source,
     })
 
     # EDGE 4 - 2 ban ghi CUNG TenNCC nhung DU LIEU MAU THUAN (gia khac nhau
@@ -152,7 +183,7 @@ def add_edge_cases(next_idx):
         "Gia": 15_000_000, "DonViTinh": "bo", "MOQ": 1, "TonKho": 10,
         "ThoiGianGiao": 15, "BaoHanh": 24,
         "ChietKhauTheoSoLuong": [{"tu_so_luong": 5, "phan_tram_giam": 5}],
-        "DiemUyTin": 4.0, "KhuVuc": "Ha Noi",
+        "DiemUyTin": 4.0, "KhuVuc": "Ha Noi", **edge_source,
     })
     records.append({
         "MaNCC": "EDGE004B", "TenNCC": "Noi That Viet Tin",
@@ -160,7 +191,7 @@ def add_edge_cases(next_idx):
         "Gia": 19_800_000, "DonViTinh": "bo", "MOQ": 1, "TonKho": 10,
         "ThoiGianGiao": 15, "BaoHanh": 24,
         "ChietKhauTheoSoLuong": [{"tu_so_luong": 5, "phan_tram_giam": 5}],
-        "DiemUyTin": 4.0, "KhuVuc": "Ha Noi",
+        "DiemUyTin": 4.0, "KhuVuc": "Ha Noi", **edge_source,
     })
 
     # EDGE 5 - TonKho=0 (het hang / NCC tam ngung cung cap dong san pham nay).
@@ -173,7 +204,7 @@ def add_edge_cases(next_idx):
         "Gia": 1_200_000, "DonViTinh": "cai", "MOQ": 10, "TonKho": 0,
         "ThoiGianGiao": 14, "BaoHanh": 12,
         "ChietKhauTheoSoLuong": [{"tu_so_luong": 10, "phan_tram_giam": 3}],
-        "DiemUyTin": 3.5, "KhuVuc": "Ha Noi",
+        "DiemUyTin": 3.5, "KhuVuc": "Ha Noi", **edge_source,
     })
 
     # EDGE 6 - khong phai du lieu san pham, ma la 2 session state mau dung
