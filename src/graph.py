@@ -33,8 +33,8 @@ except Exception:  # noqa: BLE001
     pass  # DB hong khong duoc lam gay import
 
 # Vong lap tool_search -> filter_hard -> diagnose -> replan -> tool_search chay
-# toi da MAX_REPLAN lan; 25 du rong cho ca truong hop xau nhat.
-RECURSION_LIMIT = 25
+# toi da MAX_REPLAN lan; 40 du rong cho duong lap ba lan re-plan (B §1 xac nhan).
+RECURSION_LIMIT = 40
 
 _INTENT_ENTRY = {
     "search_new": "plan",
