@@ -28,7 +28,7 @@ Quy tắc:
 - Nếu field bắt buộc còn thiếu → raise MissingFieldError để agent hỏi lại người dùng.
   Ngoại lệ: intent=compare_specific hoặc supplier_detail chỉ cần MaNCC, không cần hard constraints đầy đủ.
 - Nếu product_type không nằm trong enum → raise InvalidProductTypeError.
-- Dùng LangChain ChatGoogleGenerativeAI (JSON mode) — không regex, không keyword matching cứng.
+- Dùng src.llm.get_llm() (JSON mode) — không regex, không keyword matching cứng.
 """
 
 import json
@@ -38,33 +38,10 @@ from datetime import datetime, timezone
 from typing import Optional, Literal
 
 from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, SystemMessage
+from src.llm import get_llm
 
 load_dotenv()
-
-# ---------------------------------------------------------------------------
-# Cấu hình model — một điểm duy nhất cho cả project (architecture.md §3.1)
-# ---------------------------------------------------------------------------
-
-# Gom về đây để graph.py, agent.py không mỗi nơi một giá trị khác nhau
-LLM_MODEL_NAME: str = os.getenv("LLM_MODEL", "gemini-2.5-flash")
-
-
-def _get_llm() -> ChatGoogleGenerativeAI:
-    """Trả về ChatGoogleGenerativeAI đã cấu hình — JSON mode, temperature 0."""
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        raise EnvironmentError(
-            "GOOGLE_API_KEY chưa được set. "
-            "Tạo file .env với GOOGLE_API_KEY=your_key hoặc export biến môi trường."
-        )
-    return ChatGoogleGenerativeAI(
-        model=LLM_MODEL_NAME,
-        google_api_key=api_key,
-        temperature=0,
-    )
-
 
 # ---------------------------------------------------------------------------
 # Hằng số
@@ -178,10 +155,10 @@ Quy tắc:
 def _call_llm(system_prompt: str, user_text: str) -> dict:
     """Gọi LLM với JSON output, trả về dict đã parse.
 
-    Dùng ChatGoogleGenerativeAI với response_mime_type JSON để tránh
-    FutureWarning từ google.generativeai đã deprecated (architecture.md §3.1).
+    Dùng factory chung src.llm.get_llm() để AGENT_LLM=stub được tôn trọng
+    và tên model không bị khai báo riêng ở parser (architecture.md §3.1).
     """
-    llm = _get_llm().bind(
+    llm = get_llm().bind(
         response_format={"type": "json_object"}
     )
     messages = [

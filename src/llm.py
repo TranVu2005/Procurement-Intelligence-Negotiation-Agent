@@ -27,6 +27,15 @@ _STUB_TEXT = (
     "load test, khong goi mo hinh that."
 )
 
+# JSON stub cho Perception parser (10 field theo _EXTRACT_SYSTEM_PROMPT va
+# _UPDATE_SYSTEM_PROMPT cua src/perception/parser.py).
+_STUB_PERCEPTION_JSON = (
+    '{"intent": "search_new", "product_type": "gh\u1ebf v\u0103n ph\u00f2ng", "quantity": 50,'
+    ' "budget_max": 200000000, "delivery_deadline_days": 14,'
+    ' "material_preference": null, "region_preference": null,'
+    ' "min_trust_score": null, "supplier_ids": [], "supplier_id": null}'
+)
+
 
 class StubLLM:
     """Thay the ChatGoogleGenerativeAI trong load test.
@@ -66,6 +75,29 @@ class StubLLM:
             yield AIMessage(content=word + suffix)
         yield AIMessage(
             content="",
+            usage_metadata={"input_tokens": 100, "output_tokens": 50, "total_tokens": 150},
+        )
+
+    def bind(self, **_kwargs) -> "_BoundStubLLM":
+        """Ho tro parser.py goi _get_llm().bind(response_format=...).invoke(...).
+
+        Tra ve _BoundStubLLM: invoke() cho ra JSON dung 10 field cua parser,
+        stream() giu nguyen hanh vi text stub goc.
+        """
+        return _BoundStubLLM(latency_s=self._latency_s)
+
+
+class _BoundStubLLM(StubLLM):
+    """Bien the stub cho nhanh JSON (dung sau StubLLM.bind()).
+
+    invoke() tra JSON dung 10 field de parser.py goi json.loads() khong crash.
+    stream() ke thua StubLLM.stream() (prose).
+    """
+
+    def invoke(self, messages, **_kwargs) -> AIMessage:  # type: ignore[override]
+        self._sleep()
+        return AIMessage(
+            content=_STUB_PERCEPTION_JSON,
             usage_metadata={"input_tokens": 100, "output_tokens": 50, "total_tokens": 150},
         )
 
