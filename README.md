@@ -50,6 +50,37 @@ $env:AGENT_LLM="stub"
 export AGENT_LLM=stub
 ```
 
+## Dùng OpenRouter (free) thay vì Gemini
+
+Không muốn xin `GOOGLE_API_KEY` mà vẫn muốn LLM thật (không phải stub): set
+`LLM_PROVIDER=openrouter` + `OPENROUTER_API_KEY` (lấy miễn phí tại
+[openrouter.ai/keys](https://openrouter.ai/keys), không cần thẻ). `AGENT_LLM=stub`
+vẫn thắng tuyệt đối nếu set — bỏ biến đó đi để dùng OpenRouter thật.
+
+```bash
+# PowerShell
+$env:LLM_PROVIDER="openrouter"
+$env:OPENROUTER_API_KEY="sk-or-..."
+# POSIX
+export LLM_PROVIDER=openrouter
+export OPENROUTER_API_KEY=sk-or-...
+```
+
+Model mặc định: `google/gemma-4-31b-it:free`. Đổi bằng `OPENROUTER_MODEL`.
+Model free khác đáng cân nhắc (data live từ `openrouter.ai/api/v1/models`,
+kiểm tra 2026-09-17 — danh sách free của OpenRouter đổi liên tục, kiểm tra
+lại trước khi dùng lâu dài):
+
+| Model | Context | Ghi chú |
+|---|---|---|
+| `google/gemma-4-31b-it:free` (default) | 262K | Đa ngôn ngữ mạnh, cùng họ Google với Gemini đang dùng nên hành vi dễ so sánh |
+| `z-ai/glm-5.2:free` | 32K | JSON/tool-use tốt nhưng context ngắn — rủi ro với prompt dài của project |
+| `nvidia/nemotron-3-super-120b-a12b:free` | 262K | Model lớn hơn, lý luận mạnh hơn, chậm hơn |
+| `openrouter/free` | 200K | Auto-router giữa các model free — fallback khi 1 model bị rate-limit |
+
+Free tier OpenRouter giới hạn 20 request/phút, 50 request/ngày (không nạp
+credit) hoặc 1000 request/ngày (đã nạp tối thiểu $10).
+
 ## Chạy agent (REPL)
 
 ```bash

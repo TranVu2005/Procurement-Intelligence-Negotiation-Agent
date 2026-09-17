@@ -11,6 +11,7 @@ langchain==1.4.0
 langchain-core==1.6.2
 langgraph==1.2.11
 langchain-google-genai==4.4.0
+langchain-openai==1.6.2
 
 # --- Con dung tam boi src/perception/parser.py ---
 # Package nay da ngung ho tro (phat FutureWarning). Go bo sau khi A chuyen

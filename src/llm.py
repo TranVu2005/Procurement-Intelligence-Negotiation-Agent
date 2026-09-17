@@ -102,10 +102,39 @@ class _BoundStubLLM(StubLLM):
         )
 
 
+DEFAULT_OPENROUTER_MODEL = "google/gemma-4-31b-it:free"
+
+
 def get_llm(streaming: bool = False, temperature: float = 0.0):
-    """Tra ve client LLM. AGENT_LLM=stub -> StubLLM, khong can API key."""
+    """Tra ve client LLM.
+
+    AGENT_LLM=stub -> StubLLM, khong can API key, LLM_PROVIDER bi bo qua.
+    Neu khong stub, LLM_PROVIDER chon nha cung cap ("gemini" mac dinh,
+    hoac "openrouter" - model free, xem README muc OpenRouter).
+    """
     if os.getenv("AGENT_LLM", "").lower() == "stub":
         return StubLLM()
+
+    provider = os.getenv("LLM_PROVIDER", "gemini").lower()
+
+    if provider == "openrouter":
+        api_key = os.getenv("OPENROUTER_API_KEY")
+        if not api_key:
+            raise EnvironmentError(
+                "OPENROUTER_API_KEY chua duoc set. Tao file .env voi "
+                "OPENROUTER_API_KEY=your_key (lay tai openrouter.ai/keys), "
+                "hoac dat AGENT_LLM=stub de chay khong can mang."
+            )
+
+        from langchain_openai import ChatOpenAI
+
+        return ChatOpenAI(
+            model=os.getenv("OPENROUTER_MODEL", DEFAULT_OPENROUTER_MODEL),
+            api_key=api_key,
+            base_url="https://openrouter.ai/api/v1",
+            temperature=temperature,
+            streaming=streaming,
+        )
 
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
