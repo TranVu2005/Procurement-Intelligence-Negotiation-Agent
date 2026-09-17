@@ -102,7 +102,7 @@ class _BoundStubLLM(StubLLM):
         )
 
 
-DEFAULT_OPENROUTER_MODEL = "google/gemma-4-31b-it:free"
+DEFAULT_OPENROUTER_MODEL = "openrouter/free"
 
 
 def get_llm(streaming: bool = False, temperature: float = 0.0):

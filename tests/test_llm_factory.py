@@ -92,7 +92,7 @@ class GetLLMTests(unittest.TestCase):
         from langchain_openai import ChatOpenAI
         self.assertIsInstance(llm, ChatOpenAI)
         self.assertEqual(str(llm.openai_api_base), "https://openrouter.ai/api/v1")
-        self.assertEqual(llm.model_name, "google/gemma-4-31b-it:free")
+        self.assertEqual(llm.model_name, "openrouter/free")
 
     def test_openrouter_model_is_overridable_via_env(self) -> None:
         env = {"LLM_PROVIDER": "openrouter", "OPENROUTER_API_KEY": "sk-test",
