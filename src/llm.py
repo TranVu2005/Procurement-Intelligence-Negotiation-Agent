@@ -8,7 +8,6 @@ Bat stub bang bien moi truong AGENT_LLM=stub -> khong goi mang, dung cho
 load test muc 10-50 CCU (architecture.md muc 5.6).
 """
 
-import json
 import os
 import random
 import time
@@ -16,25 +15,6 @@ import time
 from langchain_core.messages import AIMessage
 
 MODEL_NAME = "gemini-3.6-flash"
-
-# JSON co dinh cho StubLLM sau .bind(response_format=...) - dung cho Perception
-# (src/perception/parser.py::_call_llm, json.loads(response.content)). Gia tri
-# khop voi bo 4 hard constraint stub cu (Task 3) de khong doi baseline AutoEval
-# --llm stub hien co. Stub khong lam NLP that: moi request deu ra cung 1 JSON,
-# bat ke user_input la gi - dung de do chi phi/latency pipeline, khong do chat
-# luong Perception (do bang --llm real).
-_STUB_PERCEPTION_JSON = json.dumps({
-    "intent": "search_new",
-    "product_type": "ghế văn phòng",
-    "quantity": 50,
-    "budget_max": 200_000_000,
-    "delivery_deadline_days": 14,
-    "material_preference": None,
-    "region_preference": None,
-    "min_trust_score": None,
-    "supplier_ids": [],
-    "supplier_id": None,
-}, ensure_ascii=False)
 
 # Do tre gia lap cua stub. Do thuc te bang scripts/run_loadtest.py --levels 1
 # --requests-per-level 5 --llm real (Task 16 buoc 6): p50=17542ms, p95=20966ms
@@ -45,6 +25,15 @@ STUB_LATENCY_STDDEV_S = 1.7
 _STUB_TEXT = (
     "[STUB] Da tim duoc nha cung cap phu hop. Day la phan hoi co dinh dung cho "
     "load test, khong goi mo hinh that."
+)
+
+# JSON stub cho Perception parser (10 field theo _EXTRACT_SYSTEM_PROMPT va
+# _UPDATE_SYSTEM_PROMPT cua src/perception/parser.py).
+_STUB_PERCEPTION_JSON = (
+    '{"intent": "search_new", "product_type": "gh\u1ebf v\u0103n ph\u00f2ng", "quantity": 50,'
+    ' "budget_max": 200000000, "delivery_deadline_days": 14,'
+    ' "material_preference": null, "region_preference": null,'
+    ' "min_trust_score": null, "supplier_ids": [], "supplier_id": null}'
 )
 
 
@@ -89,22 +78,24 @@ class StubLLM:
             usage_metadata={"input_tokens": 100, "output_tokens": 50, "total_tokens": 150},
         )
 
-    def bind(self, **_kwargs) -> "StubLLM":
-        """Nhai .bind(response_format=...) cua ChatGoogleGenerativeAI (LangChain
-        Runnable). parser.py goi _get_llm().bind(response_format={"type":
-        "json_object"}) roi .invoke() - khong co bind() se AttributeError khi
-        A doi sang dung get_llm() chung. Tra ve bien the JSON, khong phai self,
-        vi noi dung tra ve khac (JSON thay vi cau van cho respond)."""
-        return _StubPerceptionLLM(latency_s=self._latency_s)
+    def bind(self, **_kwargs) -> "_BoundStubLLM":
+        """Ho tro parser.py goi _get_llm().bind(response_format=...).invoke(...).
+
+        Tra ve _BoundStubLLM: invoke() cho ra JSON dung 10 field cua parser,
+        stream() giu nguyen hanh vi text stub goc.
+        """
+        return _BoundStubLLM(latency_s=self._latency_s)
 
 
-class _StubPerceptionLLM(StubLLM):
-    """StubLLM sau .bind() - danh cho Perception (parser.py). Tra JSON hop le
-    theo dung schema _EXTRACT_SYSTEM_PROMPT/_UPDATE_SYSTEM_PROMPT mong doi, de
-    json.loads() khong crash. Xem _STUB_PERCEPTION_JSON o dau file."""
+class _BoundStubLLM(StubLLM):
+    """Bien the stub cho nhanh JSON (dung sau StubLLM.bind()).
 
-    @staticmethod
-    def _message() -> AIMessage:
+    invoke() tra JSON dung 10 field de parser.py goi json.loads() khong crash.
+    stream() ke thua StubLLM.stream() (prose).
+    """
+
+    def invoke(self, messages, **_kwargs) -> AIMessage:  # type: ignore[override]
+        self._sleep()
         return AIMessage(
             content=_STUB_PERCEPTION_JSON,
             usage_metadata={"input_tokens": 100, "output_tokens": 50, "total_tokens": 150},
