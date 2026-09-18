@@ -17,6 +17,7 @@ from src.memory.db import (
     append_conversation,
     init_db,
     load_session,
+    save_decision,
     save_session,
     session_exists,
 )
@@ -196,6 +197,26 @@ def get_graph():
     return build_graph()
 
 
+def _confirmed_orders(final: dict) -> list[dict]:
+    """Ket qua confirm_order da thuc thi thanh cong trong request nay."""
+    return [
+        entry["result"] for entry in final.get("tool_results") or []
+        if entry.get("tool") == "confirm_order" and entry.get("status") == "ok"
+        and isinstance(entry.get("result"), dict) and entry["result"].get("order_confirmed")
+    ]
+
+
+def _with_decisions(req: dict | None, final: dict) -> dict | None:
+    """Them don vua chot vao req["decisions_made"] (schema cua A, muc 1 contract)."""
+    orders = _confirmed_orders(final)
+    if not req or not orders:
+        return req
+    decisions = list(req.get("decisions_made") or [])
+    decisions.extend({"supplier_id": order["supplier_id"],
+                      "confirmed_at": order["confirmed_at"]} for order in orders)
+    return {**req, "decisions_made": decisions}
+
+
 def run_request(
     user_input: str,
     session_id: str | None = None,
@@ -252,9 +273,12 @@ def run_request(
     sid = final.get("session_id") or session_id or ""
     if sid:
         try:
-            req_to_save = final.get("req")
+            req_to_save = _with_decisions(final.get("req"), final)
             if req_to_save:
+                final["req"] = req_to_save
                 save_session(sid, req_to_save)
+            for order in _confirmed_orders(final):
+                save_decision(sid, order["supplier_id"])
             agent_answer = final.get("answer", "")
             if agent_answer:
                 append_conversation(sid, "agent", agent_answer)

@@ -171,6 +171,20 @@ def tool_detail(state: AgentState) -> dict:
 CONFIRM_WORDS = ("chot don", "dong y", "ok chot", "xac nhan dat", "dat hang di", "chot luon")
 _REFUSAL_WORDS = ("khong dong y", "khong chot", "chua chot", "khoan da", "de sau")
 
+_FIRST_TURN_NOTE = (
+    "Ban chua xem de xuat nao o luot truoc, nen toi chua chot don o luot nay. "
+)
+
+
+def _has_previous_turn(state: AgentState) -> bool:
+    """Chi chot khi nguoi dung da thay de xuat o 1 luot truoc.
+
+    conversation_history cua A chi chua luot user: >= 2 nghia la day la luot
+    thu hai tro di cua phien.
+    """
+    history = (state.get("req") or {}).get("conversation_history") or []
+    return len(history) >= 2
+
 
 def _fold(text: str) -> str:
     """Bo dau tieng Viet, ha thuong - chi de so khop, khong doi du lieu goc."""
@@ -192,16 +206,25 @@ def _is_confirmed(user_input: str) -> bool:
 
 
 def confirm_gate(state: AgentState) -> dict:
-    """Chan buoc chot don lai, cho den khi nguoi dung xac nhan tuong minh."""
+    """Chan buoc chot don lai, cho den khi nguoi dung xac nhan tuong minh.
+
+    Chi thuc thi khi (1) cau cua CHINH luot nay la xac nhan va (2) nguoi dung
+    da thay de xuat o luot truoc. Xac nhan ngay luot dau khong duoc tinh:
+    nguoi dung chua biet se chot voi ai (SYSTEM-RULES.md muc 3).
+    """
     ranked = state.get("ranked") or []
-    if not ranked:
+    quantity = ((state.get("req") or {}).get("hard_constraints") or {}).get("quantity")
+    if not ranked or state.get("intent") == "supplier_detail" or not quantity:
+        # Khong co gi de chot: hoi chi tiet 1 NCC, hoac chua biet so luong
         return {"pending_confirmation": None, "status": state.get("status") or "success"}
 
     top = ranked[0]
     supplier_id = top.get("MaNCC")
-    quantity = ((state.get("req") or {}).get("hard_constraints") or {}).get("quantity")
+    confirmed_now = _is_confirmed(state.get("user_input", ""))
+    earlier_turn = _has_previous_turn(state)
 
-    if not _is_confirmed(state.get("user_input", "")) or not supplier_id or not quantity:
+    if not (confirmed_now and earlier_turn) or not supplier_id:
+        note = _FIRST_TURN_NOTE if confirmed_now and not earlier_turn else ""
         return {
             "pending_confirmation": {
                 "supplier_id": supplier_id,
@@ -212,7 +235,7 @@ def confirm_gate(state: AgentState) -> dict:
             "status": "needs_confirmation",
             "answer": (
                 f"{state.get('answer', '')}\n\n"
-                f"Ban co muon chot don voi {top.get('TenNCC')} ({supplier_id}), "
+                f"{note}Ban co muon chot don voi {top.get('TenNCC')} ({supplier_id}), "
                 f"so luong {quantity}? Toi chi thuc hien khi ban xac nhan ro rang "
                 f"(vi du: 'chot don di')."
             ).strip(),

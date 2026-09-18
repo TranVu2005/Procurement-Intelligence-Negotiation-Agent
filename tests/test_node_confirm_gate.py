@@ -18,14 +18,18 @@ def patch_data():
     return patch("src.tools.supplier_tools._load_data", return_value=FAKE_DATA)
 
 
-def state_with(user_input, ranked=True):
-    return {
+def state_with(user_input, ranked=True, turns=2, intent=None, quantity=20):
+    history = [{"role": "user", "content": f"luot {i}"} for i in range(turns)]
+    state = {
         **new_state(user_input),
-        "req": {"hard_constraints": {"quantity": 20}},
+        "req": {"hard_constraints": {"quantity": quantity}, "conversation_history": history},
         "ranked": [{"MaNCC": "T001", "TenNCC": "NCC Mot", "total_price": 20_000_000}] if ranked else [],
         "answer": "Toi de xuat NCC Mot.",
         "status": "success",
     }
+    if intent:
+        state["intent"] = intent
+    return state
 
 
 class GateBlocksTests(unittest.TestCase):
@@ -71,6 +75,26 @@ class GateConfirmsTests(unittest.TestCase):
         with patch_data():
             out = confirm_gate(state_with("khong dong y, tim cho khac"))
         self.assertEqual(out["status"], "needs_confirmation")
+        self.assertEqual(out.get("tool_results", []), [])
+
+
+class GateTimingTests(unittest.TestCase):
+    def test_confirm_words_on_the_first_turn_do_not_execute(self) -> None:
+        with patch_data():
+            out = confirm_gate(state_with("Can 20 ghe, chot don luon", turns=1))
+        self.assertEqual(out["status"], "needs_confirmation")
+        self.assertEqual(out.get("tool_results", []), [])
+        self.assertIn("chua xem de xuat", out["answer"])
+
+    def test_supplier_detail_never_asks_to_place_an_order(self) -> None:
+        out = confirm_gate(state_with("Cho xem NCC T001", intent="supplier_detail",
+                                      quantity=None))
+        self.assertIsNone(out["pending_confirmation"])
+        self.assertEqual(out["status"], "success")
+
+    def test_unknown_quantity_means_nothing_to_confirm(self) -> None:
+        out = confirm_gate(state_with("ok chot don di", quantity=None))
+        self.assertIsNone(out["pending_confirmation"])
         self.assertEqual(out.get("tool_results", []), [])
 
 
