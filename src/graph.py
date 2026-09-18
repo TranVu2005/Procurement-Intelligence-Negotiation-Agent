@@ -6,6 +6,7 @@ co dinh dem duoc.
 """
 
 import time
+import json
 from functools import lru_cache
 
 from langgraph.graph import END, START, StateGraph
@@ -20,6 +21,7 @@ from src.memory.db import (
     session_exists,
 )
 from src.nodes.perceive import perceive
+from src.perception.parser import InvalidProductTypeError, MissingFieldError
 from src.nodes.reasoning import (
     diagnose, filter_hard, graceful_fail, plan, replan, respond_limits, score_rank, verify_output,
 )
@@ -67,8 +69,43 @@ _NODES = {
 
 
 def route_intent(state: AgentState) -> str:
-    """Intent la gi cung phai ra mot node hop le. Intent la -> neu gioi han."""
+    """Intent la gi cung phai ra mot node hop le. Intent la -> neu gioi han.
+
+    Perception bao thieu/sai thong tin (status=needs_input) -> dung lai hoi
+    nguoi dung, khong goi tool nao.
+    """
+    if state.get("status") == "needs_input":
+        return "graceful_fail"
     return _INTENT_ENTRY.get(state.get("intent"), "respond_limits")
+
+
+def guard_perceive(func):
+    """Boc node perceive cua A ma khong sua file cua A.
+
+    1. Loi do NGUOI DUNG (thieu field, san pham ngoai catalog, so <= 0) -> hoi
+       lai (status=needs_input), khong bien thanh loi he thong. SYSTEM-RULES
+       muc 3: khong tu dien thong tin con thieu.
+    2. Chep req["session_id"] (parser tu sinh o luot dau) len state, de
+       run_request luu dung phien va tra session_id cho luot sau.
+    JSONDecodeError (LLM tra JSON hong) la loi he thong -> nem tiep cho
+    run_request bien thanh graceful_fail.
+    """
+    def node(state: AgentState) -> dict:
+        try:
+            out = dict(func(state) or {})
+        except (MissingFieldError, InvalidProductTypeError) as exc:
+            return {"status": "needs_input", "answer": str(exc), "llm_calls": 1}
+        except json.JSONDecodeError:
+            raise
+        except ValueError as exc:
+            return {"status": "needs_input",
+                    "answer": f"Thong tin chua hop le: {exc}. Vui long nhap lai.",
+                    "llm_calls": 1}
+        req = out.get("req") or {}
+        if not state.get("session_id") and req.get("session_id"):
+            out["session_id"] = req["session_id"]
+        return out
+    return node
 
 
 def route_after_filter(state: AgentState) -> str:
@@ -96,7 +133,7 @@ def build_graph(overrides: dict | None = None):
 
     graph = StateGraph(AgentState)
     for name, func in nodes.items():
-        graph.add_node(name, func)
+        graph.add_node(name, guard_perceive(func) if name == "perceive" else func)
 
     graph.add_edge(START, "perceive")
     graph.add_conditional_edges("perceive", route_intent, {
@@ -104,6 +141,7 @@ def build_graph(overrides: dict | None = None):
         "tool_compare": "tool_compare",
         "tool_detail": "tool_detail",
         "respond_limits": "respond_limits",
+        "graceful_fail": "graceful_fail",
     })
 
     graph.add_edge("plan", "tool_search")
