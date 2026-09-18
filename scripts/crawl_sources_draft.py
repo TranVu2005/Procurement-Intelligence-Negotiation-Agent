@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import csv
 import re
+import sys
 from collections import Counter
 from dataclasses import dataclass
 from datetime import date
@@ -27,15 +28,24 @@ from pathlib import Path
 
 import requests
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from src.tools.dataset_builder import SOURCE_COLUMNS  # noqa: E402
+
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 TIMEOUT_S = 15
 FETCHED_AT = date.today().isoformat()
 
 OUT_PATH = Path(__file__).parent.parent / "src" / "tools" / "mock_data" / "sources_draft.csv"
-CSV_HEADER = ["TenNCC", "KhuVuc", "LoaiSanPham", "Gia_niem_yet", "nguon_url", "fetched_at", "nguoi_thu"]
 
-# San pham ngoai pham vi B2B van phong (truong hoc, ky tuc xa,...) - loai truoc khi phan loai
-_EXCLUDE_KEYWORDS = ("học sinh", "ký túc xá", "mầm non", "giường")
+# San pham ngoai pham vi B2B van phong (truong hoc, gia dinh, kho, dich vu) - loai truoc khi phan loai
+_EXCLUDE_KEYWORDS = (
+    "học sinh", "ký túc xá", "mầm non", "giường",
+    "lắp đặt", "nhà bếp", "siêu thị", "gia dụng", "bàn bệt",
+)
+
+# Gia duoi muc nay la dich vu/phu kien/gia hien thi loi, khong phai 1 san pham noi that
+MIN_PRICE_VND = 50_000
 
 # Ten san pham VN dat danh tu chinh o dau ("Ban lam viec co tu...", "Tu tai
 # lieu..."). Uu tien co dinh sai vi hang lam-viec-co-tu se bi bat nham thanh
@@ -53,6 +63,9 @@ def classify(name: str) -> str | None:
     lowered = name.lower()
     if any(bad in lowered for bad in _EXCLUDE_KEYWORDS):
         return None
+    # "Bo ghe sofa ..." la sofa: "ghe" dung truoc nhung sofa moi la danh muc that
+    if "sofa" in lowered:
+        return "sofa"
     best_category, best_pos = None, len(lowered) + 1
     for category, keywords in _CATEGORY_KEYWORDS.items():
         for kw in keywords:
@@ -67,6 +80,29 @@ class RawProduct:
     name: str
     url: str
     price: int | None  # None = khong cong bo gia tren trang
+
+
+def is_usable(product: RawProduct) -> bool:
+    """Khong co gia van giu (nguoi duyet quyet); gia qua thap thi loai."""
+    return product.price is None or product.price >= MIN_PRICE_VND
+
+
+def to_source_row(label: str, region: str, category: str, product: RawProduct) -> dict:
+    """1 dong draft theo dung schema src/tools/mock_data/sources/*.csv."""
+    row = {column: "" for column in SOURCE_COLUMNS}
+    row.update({
+        "supplier_name": label,
+        "product_type": category,
+        "product_name": product.name,
+        "price": product.price if product.price is not None else "",
+        "unit": "bo" if "bộ" in product.name.lower() else "cai",
+        "region": region,
+        "source_url": product.url,
+        "collected_at": FETCHED_AT,
+        "collected_by": "C(script)",
+        "note": "chua duyet tay",
+    })
+    return row
 
 
 def fetch(url: str) -> str:
@@ -279,7 +315,7 @@ def build_rows() -> list[dict]:
         by_category: dict[str, list[RawProduct]] = {}
         for product in products:
             category = classify(product.name)
-            if category is None:
+            if category is None or not is_usable(product):
                 continue
             by_category.setdefault(category, []).append(product)
 
@@ -295,15 +331,7 @@ def build_rows() -> list[dict]:
                     if rows_per_company.get(label, 0) >= MAX_ROWS_PER_COMPANY:
                         capped_companies.add(label)
                         break
-                    rows.append({
-                        "TenNCC": label,
-                        "KhuVuc": region,
-                        "LoaiSanPham": category,
-                        "Gia_niem_yet": product.price if product.price is not None else "",
-                        "nguon_url": product.url,
-                        "fetched_at": FETCHED_AT,
-                        "nguoi_thu": "C(script)",
-                    })
+                    rows.append(to_source_row(label, region, category, product))
                     rows_per_company[label] = rows_per_company.get(label, 0) + 1
                     rows_added_for_source += 1
 
@@ -319,8 +347,8 @@ def build_rows() -> list[dict]:
 
 
 def print_distribution(rows: list[dict]) -> None:
-    by_category = Counter(r["LoaiSanPham"] for r in rows)
-    by_region = Counter(r["KhuVuc"] for r in rows)
+    by_category = Counter(r["product_type"] for r in rows)
+    by_region = Counter(r["region"] for r in rows)
     print("\nPhan bo cua rieng draft nay (CHUA cong sources.csv that neu da co san):")
     print(f"  Theo LoaiSanPham: {dict(by_category)}")
     print(f"  Theo KhuVuc: {dict(by_region)}")
@@ -330,13 +358,14 @@ def main() -> None:
     rows = build_rows()
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     with OUT_PATH.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=CSV_HEADER)
+        writer = csv.DictWriter(handle, fieldnames=list(SOURCE_COLUMNS))
         writer.writeheader()
         writer.writerows(rows)
     print(f"\n{len(rows)} dong nhap -> {OUT_PATH}")
     print_distribution(rows)
-    print("\nDay la NHAP: mo file, kiem tra tung dong (KhuVuc/LoaiSanPham/gia) "
-          "truoc khi copy vao src/tools/mock_data/sources.csv that.")
+    print("\nDay la NHAP: kiem tra tung dong (region/product_type/gia) tren trang that, "
+          "doi collected_by thanh nguoi da duyet, xoa note, roi chep vao "
+          "src/tools/mock_data/sources/<nhom>.csv.")
 
 
 if __name__ == "__main__":
