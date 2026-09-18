@@ -12,9 +12,6 @@ goi thang run_request ma khong vuong vong lap input() chan luong
 import io
 import sys
 
-if hasattr(sys.stdout, "buffer"):
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -40,6 +37,9 @@ def render(final: dict) -> str:
 
 
 def main() -> None:
+    if hasattr(sys.stdout, "buffer"):
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+
     print("\n" + "=" * 60)
     print("  Procurement Intelligence & Negotiation Agent")
     print("  Nhan 'quit' hoac 'exit' de thoat")

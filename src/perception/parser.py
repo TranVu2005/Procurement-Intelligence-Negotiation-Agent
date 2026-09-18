@@ -39,7 +39,7 @@ from typing import Optional, Literal
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
-from src.llm import get_llm
+from src.llm import get_llm, usage_of
 
 load_dotenv()
 
@@ -71,8 +71,9 @@ class MissingFieldError(ValueError):
     Agent nên bắt lỗi này và hỏi lại người dùng thay vì tự điền ngầm.
     """
 
-    def __init__(self, missing_fields: list[str]):
+    def __init__(self, missing_fields: list[str], partial_state: dict | None = None):
         self.missing_fields = missing_fields
+        self.partial_state = partial_state
         super().__init__(
             f"Thiếu thông tin bắt buộc: {', '.join(missing_fields)}. "
             "Vui lòng cung cấp thêm để tiếp tục."
@@ -117,10 +118,10 @@ Quy tắc bắt buộc:
 5. delivery_deadline_days: chuyển về số ngày (VD: "2 tuần" → 14, "1 tháng" → 30).
 6. product_type: normalize về đúng 1 trong {ghế văn phòng, bàn làm việc, tủ hồ sơ, kệ, sofa} nếu nhận ra.
 7. intent:
-   - "search_new": khách muốn TÌM nhà cung cấp mới theo yêu cầu (cần đầy đủ hard constraints).
+   - "search_new": khách muốn TÌM nhà cung cấp mới theo yêu cầu (cần đầy đủ hard constraints). Nếu câu có kèm hỏi ngoài lề nhưng VẪN CÓ nhu cầu mua sắm, chọn search_new thay vì out_of_scope.
    - "compare_specific": khách nêu tên/mã NCC cụ thể muốn so sánh (chỉ cần supplier_ids + quantity).
    - "supplier_detail": khách hỏi chi tiết về một NCC cụ thể (chỉ cần supplier_id).
-   - "out_of_scope": câu hỏi nằm ngoài phạm vi mua sắm nội thất.
+   - "out_of_scope": câu hỏi HOÀN TOÀN nằm ngoài phạm vi mua sắm nội thất.
 8. Chỉ trả JSON thuần, không giải thích thêm.
 """
 
@@ -128,7 +129,7 @@ _UPDATE_SYSTEM_PROMPT = """Bạn là trợ lý cập nhật yêu cầu mua sắm
 
 Nhiệm vụ: Đọc tin nhắn và trích xuất CÁC THÔNG TIN ĐƯỢC ĐỀ CẬP vào JSON:
 {
-  "intent": "search_new | compare_specific | supplier_detail | out_of_scope",
+  "intent": "search_new | compare_specific | supplier_detail | out_of_scope | null",
   "product_type": "loại sản phẩm hoặc null",
   "quantity": số_nguyên_hoặc_null,
   "budget_max": số_VND_hoặc_null,
@@ -141,7 +142,7 @@ Nhiệm vụ: Đọc tin nhắn và trích xuất CÁC THÔNG TIN ĐƯỢC ĐỀ
 }
 
 Quy tắc:
-1. Trả null cho field KHÔNG được đề cập (sẽ được giữ nguyên từ yêu cầu trước).
+1. Trả null cho field KHÔNG được đề cập (sẽ được giữ nguyên từ yêu cầu trước). Việc trả lời "chốt đơn", "chưa chốt", hay xác nhận đồng ý/từ chối đều tính là không thay đổi intent (trả null).
 2. Chuyển đổi đơn vị: triệu→VND, tuần→ngày.
 3. Chỉ trả JSON thuần.
 """
@@ -152,8 +153,8 @@ Quy tắc:
 # ---------------------------------------------------------------------------
 
 
-def _call_llm(system_prompt: str, user_text: str) -> dict:
-    """Gọi LLM với JSON output, trả về dict đã parse.
+def _call_llm(system_prompt: str, user_text: str) -> tuple[dict, int, int]:
+    """Gọi LLM với JSON output, trả về (dict đã parse, tokens_in, tokens_out).
 
     Dùng factory chung src.llm.get_llm() để AGENT_LLM=stub được tôn trọng
     và tên model không bị khai báo riêng ở parser (architecture.md §3.1).
@@ -166,11 +167,12 @@ def _call_llm(system_prompt: str, user_text: str) -> dict:
         HumanMessage(content=user_text),
     ]
     response = llm.invoke(messages)
+    tokens_in, tokens_out = usage_of(response)
     raw = response.content
     if isinstance(raw, list):
         # Một số provider trả list[block]
         raw = "".join(block.get("text", "") if isinstance(block, dict) else str(block) for block in raw)
-    return json.loads(raw.strip())
+    return json.loads(raw.strip()), tokens_in, tokens_out
 
 
 # ---------------------------------------------------------------------------
@@ -228,7 +230,7 @@ def _parse_intent(raw: str | None) -> str:
 # ---------------------------------------------------------------------------
 
 
-def parse_request(text: str, session_id: Optional[str] = None) -> dict:
+def parse_request(text: str, session_id: Optional[str] = None) -> tuple[dict, int, int]:
     """Parse câu yêu cầu tự nhiên của khách thành structured state.
 
     Dùng LangChain ChatGoogleGenerativeAI với JSON mode để trích xuất thông tin —
@@ -245,7 +247,7 @@ def parse_request(text: str, session_id: Optional[str] = None) -> dict:
         session_id: UUID phiên làm việc. Nếu None → tự sinh UUID mới.
 
     Returns:
-        Dict đúng schema SYSTEM-RULES §2.1 (thêm trường intent).
+        tuple(Dict đúng schema SYSTEM-RULES §2.1, tokens_in, tokens_out).
 
     Raises:
         MissingFieldError:       Nếu thiếu ≥1 hard constraint bắt buộc (search_new).
@@ -258,12 +260,12 @@ def parse_request(text: str, session_id: Optional[str] = None) -> dict:
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
 
     # --- Gọi LLM để trích xuất (bao gồm intent) ---
-    extracted = _call_llm(_EXTRACT_SYSTEM_PROMPT, text)
+    extracted, tokens_in, tokens_out = _call_llm(_EXTRACT_SYSTEM_PROMPT, text)
     intent = _parse_intent(extracted.get("intent"))
 
     # --- Kiểm tra field bắt buộc theo intent ---
+    missing = []
     if intent == "search_new":
-        missing = []
         if not extracted.get("product_type"):
             missing.append("loại sản phẩm (ghế văn phòng, bàn làm việc, tủ hồ sơ, kệ, sofa)")
         if extracted.get("quantity") is None:
@@ -272,15 +274,13 @@ def parse_request(text: str, session_id: Optional[str] = None) -> dict:
             missing.append("ngân sách tối đa")
         if extracted.get("delivery_deadline_days") is None:
             missing.append("thời hạn giao hàng (số ngày)")
-        if missing:
-            raise MissingFieldError(missing)
 
         # Validate & build hard constraints
         hard = {
-            "product_type":           _parse_product_type(extracted["product_type"]),
-            "quantity":               _parse_quantity(extracted["quantity"]),
-            "budget_max":             _parse_budget(extracted["budget_max"]),
-            "delivery_deadline_days": _parse_deadline(extracted["delivery_deadline_days"]),
+            "product_type":           _parse_product_type(extracted["product_type"]) if extracted.get("product_type") else None,
+            "quantity":               _parse_quantity(extracted["quantity"]) if extracted.get("quantity") is not None else None,
+            "budget_max":             _parse_budget(extracted["budget_max"]) if extracted.get("budget_max") is not None else None,
+            "delivery_deadline_days": _parse_deadline(extracted["delivery_deadline_days"]) if extracted.get("delivery_deadline_days") is not None else None,
         }
 
     elif intent == "compare_specific":
@@ -317,7 +317,7 @@ def parse_request(text: str, session_id: Optional[str] = None) -> dict:
         "min_trust_score":     _parse_trust_score(raw_trust) if raw_trust is not None else None,
     }
 
-    return {
+    state_dict = {
         "session_id":           session_id,
         "created_at":           now,
         "updated_at":           now,
@@ -330,13 +330,18 @@ def parse_request(text: str, session_id: Optional[str] = None) -> dict:
         "decisions_made":       [],
     }
 
+    if missing:
+        raise MissingFieldError(missing, partial_state=state_dict)
+
+    return state_dict, tokens_in, tokens_out
+
 
 # ---------------------------------------------------------------------------
 # Update state khi khách thay đổi yêu cầu
 # ---------------------------------------------------------------------------
 
 
-def update_state(existing_state: dict, new_text: str) -> dict:
+def update_state(existing_state: dict, new_text: str) -> tuple[dict, int, int]:
     """Cập nhật state hiện có khi khách đổi yêu cầu trong cùng phiên.
 
     Theo SYSTEM-RULES §2.1: ghi đè field liên quan, không giữ song song bản cũ.
@@ -347,7 +352,7 @@ def update_state(existing_state: dict, new_text: str) -> dict:
         new_text:       Câu yêu cầu mới của khách.
 
     Returns:
-        State dict đã được cập nhật (không mutate existing_state).
+        tuple(State dict đã được cập nhật, tokens_in, tokens_out)
 
     Raises:
         InvalidProductTypeError: Nếu product_type mới không thuộc enum hợp lệ.
@@ -356,10 +361,14 @@ def update_state(existing_state: dict, new_text: str) -> dict:
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
 
     # Trích xuất thông tin thay đổi từ LLM (bao gồm intent mới nếu đổi ngữ cảnh)
-    extracted = _call_llm(_UPDATE_SYSTEM_PROMPT, new_text)
+    extracted, tokens_in, tokens_out = _call_llm(_UPDATE_SYSTEM_PROMPT, new_text)
 
     # Cập nhật intent nếu LLM phát hiện ngữ cảnh mới
-    new_intent = _parse_intent(extracted.get("intent"))
+    new_intent_raw = extracted.get("intent")
+    if new_intent_raw is None or new_intent_raw == "null":
+        new_intent = existing_state.get("intent", "search_new")
+    else:
+        new_intent = _parse_intent(new_intent_raw)
 
     # Ghi đè chỉ những field được đề cập (không None) — dùng helper để validate
     updated_hard = dict(existing_state.get("hard_constraints", {}))
@@ -394,7 +403,7 @@ def update_state(existing_state: dict, new_text: str) -> dict:
     history = list(existing_state.get("conversation_history", []))
     history.append({"role": "user", "content": new_text, "timestamp": now})
 
-    return {
+    updated_state = {
         **existing_state,
         "updated_at":           now,
         "intent":               new_intent,
@@ -404,3 +413,5 @@ def update_state(existing_state: dict, new_text: str) -> dict:
         "soft_constraints":     updated_soft,
         "conversation_history": history,
     }
+    
+    return updated_state, tokens_in, tokens_out

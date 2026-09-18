@@ -175,6 +175,6 @@ Mỗi người đọc kỹ phần mình sẽ dùng nhiều nhất (A đọc kỹ
 |---|---|---|---|---|
 | A | ☑ | ☑ | Đồng ý quyết định §8.1: bỏ material/region khỏi plan.steps[0].params; bổ sung `intent`, `supplier_ids`, `supplier_id` vào §1 (17/9/2026) | 15/9/2026 |
 | B | ☑ | ☑ | Đồng ý §8.1; đã nối node reasoning thật và cập nhật ví dụ plan/test theo contract | 16/9/2026 |
-| C | ☐ | ☐ | | |
+| C | ☑ | ☑ | | 18/9/2026 |
 
 > Sau khi cả 3 tick xong, coi đây là bản khóa (frozen) cho buổi họp 2 (10/9). Muốn đổi field sau mốc này phải báo cả nhóm trước khi sửa code.
