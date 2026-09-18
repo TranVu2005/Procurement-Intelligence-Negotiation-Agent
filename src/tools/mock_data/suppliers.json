@@ -1332,5 +1332,254 @@
       "ChietKhauTheoSoLuong",
       "DiemUyTin"
     ]
+  },
+  {
+    "MaNCC": "SRC001",
+    "TenNCC": "Noi That Linco",
+    "LoaiSanPham": "sofa",
+    "TenSanPham": "Bộ ghế sofa phòng khách giá rẻ KL4 GBL2 màu xanh dương",
+    "ChatLieu": "vai_boc",
+    "Gia": 5800000,
+    "DonViTinh": "bo",
+    "MOQ": 1,
+    "TonKho": 82,
+    "ThoiGianGiao": 16,
+    "BaoHanh": 36,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://www.noithatlinco.com/product-page/bộ-ghế-sofa-phòng-khách-giá-rẻ-kl4-gbl2-màu-xanh-dương",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC002",
+    "TenNCC": "Noi That Linco",
+    "LoaiSanPham": "sofa",
+    "TenSanPham": "Bộ ghế sofa phòng khách giá rẻ KL1 Presa vải xám trắng",
+    "ChatLieu": "vai_boc",
+    "Gia": 7200000,
+    "DonViTinh": "bo",
+    "MOQ": 5,
+    "TonKho": 42,
+    "ThoiGianGiao": 12,
+    "BaoHanh": 36,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://www.noithatlinco.com/product-page/bộ-ghế-sofa-phòng-khách-giá-rẻ-kl1-presa-vải-xám-trắng",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC003",
+    "TenNCC": "Noi That Linco",
+    "LoaiSanPham": "sofa",
+    "TenSanPham": "Bộ ghế sofa giá rẻ KT93 Supai cho phòng làm việc nhỏ",
+    "ChatLieu": "vai_boc",
+    "Gia": 7300000,
+    "DonViTinh": "bo",
+    "MOQ": 5,
+    "TonKho": 214,
+    "ThoiGianGiao": 13,
+    "BaoHanh": 60,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://www.noithatlinco.com/product-page/bộ-ghế-sofa-giá-rẻ-kt93-supai-cho-phòng-làm-việc-nhỏ",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC004",
+    "TenNCC": "Noi That Linco",
+    "LoaiSanPham": "sofa",
+    "TenSanPham": "Bộ ghế sofa màu be đẹp KT191 Beiro phòng khách nhỏ",
+    "ChatLieu": "vai_boc",
+    "Gia": 7500000,
+    "DonViTinh": "bo",
+    "MOQ": 5,
+    "TonKho": 139,
+    "ThoiGianGiao": 8,
+    "BaoHanh": 60,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://www.noithatlinco.com/product-page/bộ-ghế-sofa-màu-be-đẹp-kt191-beiro-phòng-khách-nhỏ",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC005",
+    "TenNCC": "Noi That Linco",
+    "LoaiSanPham": "sofa",
+    "TenSanPham": "Bộ ghế sofa phòng khách nhỏ KT96 Uixe vải nỉ bố giá rẻ",
+    "ChatLieu": "vai_boc",
+    "Gia": 7700000,
+    "DonViTinh": "bo",
+    "MOQ": 20,
+    "TonKho": 197,
+    "ThoiGianGiao": 16,
+    "BaoHanh": 60,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://www.noithatlinco.com/product-page/bộ-ghế-sofa-phòng-khách-nhỏ-kt96-uixe-vải-nỉ-bố-giá-rẻ",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC006",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "sofa",
+    "TenSanPham": "Tekkashop GVVP133 Sofa văng da cao cấp màu nâu sang trọng, kích thước W1830 x D750 x H740 mm",
+    "ChatLieu": null,
+    "Gia": 11400000,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 148,
+    "ThoiGianGiao": 25,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/sofa-văn-phòng/products/tekkashop-gvvp133-sofa-văng-da-cao-cấp-màu-nâu-sang-trọng-kích-thước-w1830-x-d750-x-h740-mm",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC007",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "sofa",
+    "TenSanPham": "Tekkashop GVVP780 Sofa đơn da cao cấp màu nâu sang trọng, kích thước W730 x D750 x H740 mm",
+    "ChatLieu": null,
+    "Gia": 6643000,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 70,
+    "ThoiGianGiao": 9,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/sofa-văn-phòng/products/tekkashop-gvvp780-sofa-đơn-da-cao-cấp-màu-nâu-sang-trọng-kích-thước-w730-x-d750-x-h740-mm",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
   }
 ]
