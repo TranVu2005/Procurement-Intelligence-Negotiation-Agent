@@ -50,6 +50,14 @@ _INTENT_ENTRY = {
     "out_of_scope": "respond_limits",
 }
 
+# Sau replan phai quay lai DUNG node tool cua intent (PHAN-CONG-CON-LAI muc 5.1).
+# Intent khong co trong bang (out_of_scope, intent la) -> khong goi tool nao.
+_REPLAN_ENTRY = {
+    "search_new": "tool_search",
+    "compare_specific": "tool_compare",
+    "supplier_detail": "tool_detail",
+}
+
 _NODES = {
     "perceive": perceive,
     "plan": plan,
@@ -127,6 +135,13 @@ def route_after_verify(state: AgentState) -> str:
     return "graceful_fail"
 
 
+def route_after_replan(state: AgentState) -> str:
+    if state.get("status") == "needs_input":
+        # replan khong lap duoc ke hoach moi -> can nguoi dung, khong goi tool lai
+        return "graceful_fail"
+    return _REPLAN_ENTRY.get(state.get("intent"), "graceful_fail")
+
+
 def build_graph(overrides: dict | None = None):
     """overrides: {ten_node: ham} de test thay node that bang node gia."""
     nodes = {**_NODES, **(overrides or {})}
@@ -154,7 +169,12 @@ def build_graph(overrides: dict | None = None):
         "graceful_fail": "graceful_fail",
     })
     graph.add_edge("diagnose", "replan")
-    graph.add_edge("replan", "tool_search")
+    graph.add_conditional_edges("replan", route_after_replan, {
+        "tool_search": "tool_search",
+        "tool_compare": "tool_compare",
+        "tool_detail": "tool_detail",
+        "graceful_fail": "graceful_fail",
+    })
 
     graph.add_edge("score_rank", "verify_output")
     graph.add_conditional_edges("verify_output", route_after_verify, {
