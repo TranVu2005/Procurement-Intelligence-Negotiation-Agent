@@ -158,7 +158,12 @@ def tool_detail(state: AgentState) -> dict:
     get_supplier_detail chi nhan 1 MaNCC moi lan goi (interface-contracts.md
     muc 3), nen chi lay ma dau tien.
     """
-    supplier_ids = list((state.get("req") or {}).get("target_supplier_ids") or [])
+    req = state.get("req") or {}
+    supplier_ids = list(req.get("target_supplier_ids") or [])
+    if not supplier_ids and req.get("supplier_id"):
+        # Parser cua A dat MaNCC cua supplier_detail vao supplier_id (so it, contract
+        # muc 1), khong phai supplier_ids -> perceive khong chep sang target_supplier_ids
+        supplier_ids = [req["supplier_id"]]
     if not supplier_ids:
         return {"tool_results": [], "candidates": [],
                 "status": "needs_input", "answer": _NEED_SUPPLIER_IDS}
