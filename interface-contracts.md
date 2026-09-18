@@ -125,6 +125,12 @@ làm crash response (Quyết định 2, architecture.md §8.2).
 ### `get_supplier_detail`
 - **Input:** `{"supplier_id": "string (required)"}`
 - **Output:** toàn bộ 13 field gốc của NCC (MaNCC, TenNCC, LoaiSanPham, ChatLieu, Gia, DonViTinh, MOQ, TonKho, ThoiGianGiao, BaoHanh, ChietKhauTheoSoLuong, DiemUyTin, KhuVuc) cộng bốn trường nguồn (`nguon_url`, `nguon_type`, `fetched_at`, `simulated_fields`) đã có sẵn trên bản ghi gốc — tool này không cần sửa để lộ chúng ra.
+- **Trường bổ sung (thêm, không đổi tên — C, 2026-09-18):** bản ghi `SRC###` (dữ liệu thật từ
+  `src/tools/mock_data/sources/*.csv`) có thêm `TenSanPham` (tên sản phẩm trên trang nguồn) và
+  `nguoi_thu` (A/B/C). `nguon_type` của chúng là `trang_san_pham`. Với bản ghi này, `Gia`, `BaoHanh`,
+  `DiemUyTin`, `ChatLieu` có thể là `null` khi trang không công bố — không mô phỏng. `MOQ`, `TonKho`,
+  `ThoiGianGiao`, `ChietKhauTheoSoLuong` được mô phỏng khi trang không có và luôn có tên trong
+  `simulated_fields`.
 
 ### `compare_price`
 - **Input:** `{"supplier_ids": ["string", "..."], "quantity": "int (required)"}`
@@ -139,6 +145,8 @@ làm crash response (Quyết định 2, architecture.md §8.2).
 **Quy tắc:** nếu 1 supplier_id không tồn tại hoặc dataset thiếu field → trả lỗi theo format chung ở trên cho riêng phần tử đó, không làm fail cả response. Phần tử không lỗi mang thêm `nguon_url` và
 `simulated_fields` để mọi claim về `total_price` truy được về nguồn. Phần tử lỗi giữ nguyên shape
 lỗi chuẩn, không có hai trường này.
+NCC có `Gia` hoặc `MOQ` là `null` trả lỗi riêng phần tử đó (`error_type: "tool_unavailable"`,
+message nêu tên trường thiếu) — không tự điền số.
 
 ### `confirm_order` — đã cập nhật vai trò (buổi họp 4, 15/9)
 - **Vai trò mới**: node `confirm_gate` (pipeline, không phải LLM-callable tool) — chặn lại chờ người dùng xác nhận tường minh (architecture.md §3.5).
@@ -166,6 +174,14 @@ retry. Không đổi input/output của 3 tool hiện có — B có thể chọn
 `call_with_retry(tool_func, ...)`, không bắt buộc phải cập nhật gì ở B nếu chưa dùng.
 
 ---
+
+## 4. Dữ liệu nguồn và phiên bản dữ liệu (C sở hữu)
+
+- Schema thu thập: `src/tools/mock_data/sources/README.md` (cột tiếng Anh theo PHAN-CONG-CON-LAI §6,
+  map sang trường record ở bảng trong `docs/superpowers/plans/2026-09-18-role-c-remaining-work.md` Task 6).
+- `src/tools/mock_data/VERSION`: `<ngày build>+sha256.<12 hex> records=<n>`, sinh bởi
+  `generate_mock_data.py`; test `tests/test_dataset_files.py` fail nếu VERSION lệch `suppliers.json`.
+  AutoEval ghi chuỗi này vào báo cáo.
 
 ## Bảng ký xác nhận
 

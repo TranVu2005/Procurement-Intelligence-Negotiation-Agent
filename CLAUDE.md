@@ -46,20 +46,14 @@ Tests are stdlib `unittest`, not pytest — pytest is not installed and is not i
 
 ## Current state
 
-- 86 tests, 85 passing. The one failure is in `tests/test_integration_ab.py` and is the
-  `material`/`region` dispute listed as Decision 1 in `architecture.md` §8 — a contract
-  disagreement between A and B, not a regression. Don't "fix" it unilaterally.
-- `src/agent.py` does not run: it imports `AgentExecutor`, which `langchain 1.4`
-  removed. `requirements.txt` is now pinned to the environment that actually works
-  (Python 3.14, `langchain==1.4.0`, `langgraph==1.2.11`), so the fix is to move to
-  LangGraph, not to downgrade.
-- `src/reasoning/scoring.py` (leverage score, ranking, negotiation strategy — the core
-  of what the project is named after) is implemented but nothing imports it.
-- `confirm_order` exists in `src/tools/supplier_tools.py` but is not in the tool list
-  handed to the agent.
-- `scripts/run_autoeval.py` still raises `NotImplementedError`.
-  `tests/run_autoeval.py` is a different file that dispatches on `if cid == "case_001"` —
-  it belongs in the unit-test tier and is slated to be renamed.
+- Pipeline LangGraph chạy end-to-end (`src/graph.py::run_request`); `src/agent.py` là REPL mỏng.
+- Test: chạy `python -m unittest discover tests "test_*.py"` để lấy con số hiện tại — không ghi
+  cứng số lượng ở đây vì nó đổi mỗi task.
+- Dữ liệu: 32 bản ghi legacy mô phỏng (`NCC###`), 6 edge case (`EDGE*`), cộng bản ghi thật
+  `SRC###` sinh từ `src/tools/mock_data/sources/*.csv`. Phiên bản ở `src/tools/mock_data/VERSION`.
+- AutoEval: `python scripts/run_autoeval.py --eval-set tests/eval_set --llm real --repeat 3`;
+  báo cáo mới nhất nằm trong `reports/`. `tests/run_autoeval.py` là file khác (tầng unit test).
+- Việc đang chờ A/B: xem `HANDOFF-C-2026-09-18.md`.
 
 ## Architecture
 
