@@ -6,15 +6,24 @@ Owner: Nguoi C
 import json
 import logging
 import os
+import re
 import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
 SENSITIVE_KEYS = {
-    "api_key", "google_api_key", "anthropic_api_key",
+    "api_key", "google_api_key", "anthropic_api_key", "openrouter_api_key",
     "password", "token", "access_token", "refresh_token", "secret",
+    "authorization", "x-api-key", "api-key",
 }
+
+# Chuoi co hinh dang API key (Google, OpenRouter/OpenAI, Anthropic) - che ca khi
+# nam giua van ban tu do, vd nguoi dung dan key vao cau hoi.
+# Chan chu/so dung truoc: slug URL nhu ".../task-ban-lam-viec-go-..." khong duoc bi che.
+_SECRET_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9])(?:AIza[0-9A-Za-z_\-]{30,}|sk-(?:or-|ant-)?[0-9A-Za-z_\-]{20,})"
+)
 
 logger = logging.getLogger("procurement_agent")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s:%(name)s:%(message)s")
@@ -28,8 +37,24 @@ def new_trace_id() -> str:
     return uuid.uuid4().hex
 
 
+def _redact_value(value):
+    if isinstance(value, dict):
+        return {
+            key: ("***" if isinstance(key, str) and key.lower() in SENSITIVE_KEYS
+                  else _redact_value(item))
+            for key, item in value.items()
+        }
+    if isinstance(value, (list, tuple)):
+        return [_redact_value(item) for item in value]
+    if isinstance(value, str):
+        return _SECRET_PATTERN.sub("***", value)
+    return value
+
+
 def redact(payload: dict) -> dict:
-    return {k: ("***" if k.lower() in SENSITIVE_KEYS else v) for k, v in payload.items()}
+    """Ban sao da che secret: key nhay cam o moi cap long nhau va chuoi co
+    hinh dang API key. Khong sua payload goc."""
+    return _redact_value(payload)
 
 
 def _now_iso() -> str:
