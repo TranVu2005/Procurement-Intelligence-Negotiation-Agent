@@ -24,3 +24,6 @@ python-dotenv==1.2.3
 
 # --- Do CPU/RAM cho load test (architecture.md muc 5.6) ---
 psutil==7.2.2
+
+# --- Giao dien demo ---
+streamlit==1.64.0
