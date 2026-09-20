@@ -37,7 +37,7 @@ def render(final: dict) -> str:
 
 
 def main() -> None:
-    if hasattr(sys.stdout, "buffer"):
+    if hasattr(sys.stdout, "buffer") and getattr(sys.stdout, "encoding", "").lower() != "utf-8":
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
     print("\n" + "=" * 60)
