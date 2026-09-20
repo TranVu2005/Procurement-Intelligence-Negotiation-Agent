@@ -43,13 +43,11 @@ class CommittedDatasetTests(unittest.TestCase):
 
 
 class SourceTemplateTests(unittest.TestCase):
-    def test_one_csv_per_product_group_with_the_agreed_header(self) -> None:
+    def test_source_csv_has_the_agreed_header(self) -> None:
         from src.tools.dataset_builder import SOURCE_COLUMNS
-        for name in ("ghe_van_phong", "ban_lam_viec", "tu_ho_so", "ke", "sofa"):
-            path = MOCK_DIR / "sources" / f"{name}.csv"
-            with self.subTest(file=path.name):
-                header = path.read_text(encoding="utf-8-sig").splitlines()[0]
-                self.assertEqual(header.split(","), list(SOURCE_COLUMNS))
+        path = MOCK_DIR / "sources" / "c_sourced_products.csv"
+        header = path.read_text(encoding="utf-8-sig").splitlines()[0]
+        self.assertEqual(header.split(","), list(SOURCE_COLUMNS))
 
 
 if __name__ == "__main__":

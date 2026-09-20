@@ -1,12 +1,8 @@
 # Du lieu nguon that
 
-Moi file CSV la mot nhom san pham; nguoi phu trach thu thap theo phan cong 2026-09-17:
-
-| File | Nguoi thu |
-|---|---|
-| `ghe_van_phong.csv`, `ban_lam_viec.csv` | A |
-| `tu_ho_so.csv`, `ke.csv` | B |
-| `sofa.csv` | C |
+Tat ca du lieu nguon nam trong mot file duy nhat: `c_sourced_products.csv` (nguoi thu: C).
+Cac file nhom theo A/B tung dung tam (`ghe_van_phong.csv`, `ban_lam_viec.csv`, `tu_ho_so.csv`,
+`ke.csv`, `sofa.csv`) da bi xoa vi chi co header, khong co du lieu.
 
 Moi dong la **mot san pham cu the tren mot trang ban hang that**. `generate_mock_data.py`
 doc moi file `*.csv` o day, kiem tra hop le roi sinh ban ghi `SRC###` trong `suppliers.json`.
