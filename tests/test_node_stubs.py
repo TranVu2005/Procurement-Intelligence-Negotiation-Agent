@@ -46,7 +46,7 @@ class NodeContractTests(unittest.TestCase):
     def test_every_node_returns_a_dict_patch_not_full_state(self) -> None:
         state = new_state("Can 50 ghe van phong, ngan sach 200 trieu, giao 14 ngay")
         # Monkeypatch parse_request cho perceive de khong goi mang trong contract test
-        with patch("src.nodes.perceive.parse_request", return_value=_STUB_REQ):
+        with patch("src.nodes.perceive.parse_request", return_value=(_STUB_REQ, 100, 50)):
             for node in ALL_NODES:
                 with self.subTest(node=node.__name__):
                     patch_result = node(state)
@@ -80,7 +80,7 @@ class StubShapeTests(unittest.TestCase):
         Dung monkeypatch parse_request de kiem soat gia tri tra ve va dam bao
         test khong phu thuoc AGENT_LLM hay GOOGLE_API_KEY.
         """
-        with patch("src.nodes.perceive.parse_request", return_value=_STUB_REQ):
+        with patch("src.nodes.perceive.parse_request", return_value=(_STUB_REQ, 100, 50)):
             patch_dict = perceive(new_state("Can 50 ghe van phong, ngan sach 200 trieu, giao 14 ngay"))
         self.assertIn("intent", patch_dict)
         self.assertIn("req", patch_dict)
@@ -92,7 +92,7 @@ class StubShapeTests(unittest.TestCase):
         """Multi-turn: perceive phai goi update_state() (khong phai parse_request)."""
         update_result = {**_STUB_REQ, "hard_constraints": {**_STUB_REQ["hard_constraints"], "budget_max": 300_000_000.0}}
         existing_state = new_state("x", req=_STUB_REQ)
-        with patch("src.nodes.perceive.update_state", return_value=update_result) as mock_update:
+        with patch("src.nodes.perceive.update_state", return_value=(update_result, 100, 50)) as mock_update:
             patch_dict = perceive(existing_state)
         mock_update.assert_called_once()
         self.assertEqual(patch_dict["req"]["hard_constraints"]["budget_max"], 300_000_000.0)

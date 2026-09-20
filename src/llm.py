@@ -146,6 +146,24 @@ def get_llm(streaming: bool = False, temperature: float = 0.0):
             streaming=streaming,
         )
 
+    if provider == "nararouter":
+        api_key = os.getenv("NARAROUTER_API_KEY")
+        if not api_key:
+            raise EnvironmentError(
+                "NARAROUTER_API_KEY chua duoc set. Tao file .env voi "
+                "NARAROUTER_API_KEY=your_key, hoac dat AGENT_LLM=stub de chay khong can mang."
+            )
+
+        from langchain_openai import ChatOpenAI
+
+        return ChatOpenAI(
+            model=os.getenv("NARAROUTER_MODEL", "agnes-2.5-flash"),
+            api_key=api_key,
+            base_url="https://router.bynara.id/v1",
+            temperature=temperature,
+            streaming=streaming,
+        )
+
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
         raise EnvironmentError(

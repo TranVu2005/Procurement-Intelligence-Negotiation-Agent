@@ -4,7 +4,8 @@ Owner: Nguoi A.
 """
 
 from src.graph_state import AgentState
-from src.perception.parser import parse_request, update_state
+from src.perception.parser import parse_request, update_state, MissingFieldError
+from src.memory.db import save_session
 
 
 def perceive(state: AgentState) -> dict:
@@ -30,10 +31,20 @@ def perceive(state: AgentState) -> dict:
 
     is_multi_turn = bool(existing_req.get("conversation_history"))
 
-    if is_multi_turn:
-        req = update_state(existing_req, user_input)
-    else:
-        req = parse_request(user_input, session_id=session_id)
+    try:
+        if is_multi_turn:
+            req, tokens_in, tokens_out = update_state(existing_req, user_input)
+        else:
+            req, tokens_in, tokens_out = parse_request(user_input, session_id=session_id)
+    except MissingFieldError as e:
+        if hasattr(e, "partial_state") and e.partial_state:
+            sid = session_id or e.partial_state.get("session_id")
+            if sid:
+                try:
+                    save_session(sid, e.partial_state)
+                except Exception:
+                    pass
+        raise
 
     intent: str = req.get("intent", "search_new")
 
@@ -44,8 +55,8 @@ def perceive(state: AgentState) -> dict:
     return {
         "intent": intent,
         "req": req,
-        # parser.py goi LLM 1 lan; token count chua duoc do nen ghi 0 tam thoi
+        # parser.py goi LLM 1 lan; token count da duoc do va tra ve
         "llm_calls": 1,
-        "tokens_in": 0,
-        "tokens_out": 0,
+        "tokens_in": tokens_in,
+        "tokens_out": tokens_out,
     }

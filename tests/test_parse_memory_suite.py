@@ -365,5 +365,247 @@ class TestArtifactsTable(unittest.TestCase):
         self.assertEqual(loaded["steps"][0]["params"]["product_type"], "sofa")
 
 
+class TestParserNullFields(unittest.TestCase):
+    """Kiểm tra parser khi dữ liệu có trường null hoặc thiếu trường không bắt buộc.
+
+    Dùng patch _call_llm để không gọi LLM thật — chạy nhanh, offline.
+    Tập trung vào logic validate theo từng intent:
+      - compare_specific: quantity optional
+      - supplier_detail: tất cả hard constraints đều optional
+      - out_of_scope: không cần bất kỳ constraint nào
+      - soft constraints: tất cả có thể là None
+    """
+
+    def _make_extracted(self, **kwargs) -> dict:
+        """Template dict trả về từ _call_llm, tất cả field mặc định là None/[]."""
+        base = {
+            "intent": None,
+            "product_type": None,
+            "quantity": None,
+            "budget_max": None,
+            "delivery_deadline_days": None,
+            "material_preference": None,
+            "region_preference": None,
+            "min_trust_score": None,
+            "supplier_ids": [],
+            "supplier_id": None,
+        }
+        base.update(kwargs)
+        return base
+
+    def test_compare_specific_null_quantity(self):
+        """compare_specific không nêu số lượng → quantity=None được phép, không raise."""
+        from unittest.mock import patch
+        from src.perception.parser import parse_request
+
+        extracted = self._make_extracted(
+            intent="compare_specific",
+            supplier_ids=["NCC001", "NCC002"],
+            quantity=None,
+        )
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
+            state, _, _ = parse_request("So sánh NCC001 với NCC002", session_id="sess_null_01")
+
+        self.assertEqual(state["intent"], "compare_specific")
+        self.assertIsNone(state["hard_constraints"]["quantity"])
+        self.assertEqual(state["supplier_ids"], ["NCC001", "NCC002"])
+
+    def test_compare_specific_with_quantity(self):
+        """compare_specific có nêu số lượng → quantity được parse đúng."""
+        from unittest.mock import patch
+        from src.perception.parser import parse_request
+
+        extracted = self._make_extracted(
+            intent="compare_specific",
+            supplier_ids=["NCC001"],
+            quantity=30,
+        )
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
+            state, _, _ = parse_request("So sánh NCC001, mua 30 cái", session_id="sess_null_02")
+
+        self.assertEqual(state["hard_constraints"]["quantity"], 30)
+
+    def test_supplier_detail_all_null_hard(self):
+        """supplier_detail: 4 hard constraints đều None — hoàn toàn hợp lệ."""
+        from unittest.mock import patch
+        from src.perception.parser import parse_request
+
+        extracted = self._make_extracted(
+            intent="supplier_detail",
+            supplier_id="NCC005",
+        )
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
+            state, _, _ = parse_request("Cho tôi xem chi tiết NCC005", session_id="sess_null_03")
+
+        self.assertEqual(state["intent"], "supplier_detail")
+        hc = state["hard_constraints"]
+        self.assertIsNone(hc["product_type"])
+        self.assertIsNone(hc["quantity"])
+        self.assertIsNone(hc["budget_max"])
+        self.assertIsNone(hc["delivery_deadline_days"])
+        self.assertEqual(state["supplier_id"], "NCC005")
+
+    def test_soft_constraints_all_null(self):
+        """search_new không nêu chất liệu/khu vực/trust → soft constraints đều None."""
+        from unittest.mock import patch
+        from src.perception.parser import parse_request
+
+        extracted = self._make_extracted(
+            intent="search_new",
+            product_type="ghế văn phòng",
+            quantity=10,
+            budget_max=50_000_000,
+            delivery_deadline_days=7,
+            material_preference=None,
+            region_preference=None,
+            min_trust_score=None,
+        )
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
+            state, _, _ = parse_request(
+                "Tôi cần 10 ghế văn phòng, ngân sách 50 triệu, giao trong 7 ngày.",
+                session_id="sess_null_04",
+            )
+
+        sc = state["soft_constraints"]
+        self.assertIsNone(sc["material_preference"])
+        self.assertIsNone(sc["region_preference"])
+        self.assertIsNone(sc["min_trust_score"])
+
+    def test_out_of_scope_no_constraints_required(self):
+        """out_of_scope không cần bất kỳ constraint nào — không raise."""
+        from unittest.mock import patch
+        from src.perception.parser import parse_request
+
+        extracted = self._make_extracted(intent="out_of_scope")
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
+            state, _, _ = parse_request("Thời tiết hôm nay thế nào?", session_id="sess_null_05")
+
+        self.assertEqual(state["intent"], "out_of_scope")
+        hc = state["hard_constraints"]
+        self.assertIsNone(hc["product_type"])
+        self.assertIsNone(hc["quantity"])
+        self.assertIsNone(hc["budget_max"])
+        self.assertIsNone(hc["delivery_deadline_days"])
+
+    def test_update_state_preserves_null_fields_not_mentioned(self):
+        """update_state() chỉ ghi đè field được nêu; field null trước vẫn null sau."""
+        from unittest.mock import patch
+        from src.perception.parser import update_state
+
+        existing = _state(
+            product_type="ghế văn phòng",
+            quantity=50,
+            budget_max=200_000_000,
+            deadline=14,
+        )
+        # Soft constraints ban đầu đều None
+        existing["soft_constraints"] = {
+            "material_preference": None,
+            "region_preference": None,
+            "min_trust_score": None,
+        }
+
+        # LLM chỉ nhận ra "đổi số lượng thành 80"
+        extracted_update = {
+            "intent": "search_new",
+            "product_type": None,
+            "quantity": 80,
+            "budget_max": None,
+            "delivery_deadline_days": None,
+            "material_preference": None,
+            "region_preference": None,
+            "min_trust_score": None,
+            "supplier_ids": [],
+            "supplier_id": None,
+        }
+        with patch("src.perception.parser._call_llm", return_value=(extracted_update, 10, 20)):
+            updated, _, _ = update_state(existing, "Đổi lại số lượng thành 80 cái thôi.")
+
+        self.assertEqual(updated["hard_constraints"]["quantity"], 80)
+        # Budget không được đề cập → giữ nguyên
+        self.assertEqual(updated["hard_constraints"]["budget_max"], 200_000_000.0)
+        # Product type không thay đổi
+        self.assertEqual(updated["hard_constraints"]["product_type"], "ghế văn phòng")
+        # Soft constraints vẫn None
+        self.assertIsNone(updated["soft_constraints"]["material_preference"])
+        self.assertIsNone(updated["soft_constraints"]["region_preference"])
+        # Conversation history tăng thêm 1 turn
+        self.assertEqual(
+            len(updated["conversation_history"]),
+            len(existing["conversation_history"]) + 1,
+        )
+
+    def test_update_state_budget_change_preserves_quantity(self):
+        """update_state() đổi budget → quantity giữ nguyên, history tăng 1."""
+        from unittest.mock import patch
+        from src.perception.parser import update_state
+
+        existing = _state(
+            product_type="bàn làm việc",
+            quantity=20,
+            budget_max=300_000_000,
+            deadline=10,
+        )
+
+        extracted_update = {
+            "intent": "search_new",
+            "product_type": None,
+            "quantity": None,
+            "budget_max": 150_000_000,
+            "delivery_deadline_days": None,
+            "material_preference": None,
+            "region_preference": None,
+            "min_trust_score": None,
+            "supplier_ids": [],
+            "supplier_id": None,
+        }
+        with patch("src.perception.parser._call_llm", return_value=(extracted_update, 10, 20)):
+            updated, _, _ = update_state(existing, "Giảm ngân sách xuống còn 150 triệu thôi.")
+
+        self.assertEqual(updated["hard_constraints"]["budget_max"], 150_000_000.0)
+        self.assertEqual(updated["hard_constraints"]["quantity"], 20)  # giữ nguyên
+
+    def test_trust_score_out_of_range_treated_as_none(self):
+        """min_trust_score ngoài [1,5] → _parse_trust_score trả None, không ghi đè."""
+        from src.perception.parser import _parse_trust_score
+
+        self.assertIsNone(_parse_trust_score(0.5))
+        self.assertIsNone(_parse_trust_score(5.5))
+        self.assertIsNone(_parse_trust_score(0.0))
+
+    def test_parse_request_missing_fields_raises_missing_field_error(self):
+        """search_new thiếu quantity, budget, deadline → MissingFieldError."""
+        from unittest.mock import patch
+        from src.perception.parser import MissingFieldError, parse_request
+
+        extracted = self._make_extracted(
+            intent="search_new",
+            product_type="ghế văn phòng",
+            # quantity, budget_max, delivery_deadline_days đều None
+        )
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
+            with self.assertRaises(MissingFieldError) as ctx:
+                parse_request("Tôi cần ghế văn phòng.", session_id="sess_null_06")
+
+        self.assertIn("số lượng", " ".join(ctx.exception.missing_fields))
+
+    def test_parse_request_invalid_product_type_raises(self):
+        """search_new với product_type không hợp lệ → InvalidProductTypeError."""
+        from unittest.mock import patch
+        from src.perception.parser import InvalidProductTypeError, parse_request
+
+        extracted = self._make_extracted(
+            intent="search_new",
+            product_type="máy lạnh",
+            quantity=5,
+            budget_max=50_000_000,
+            delivery_deadline_days=7,
+        )
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
+            with self.assertRaises(InvalidProductTypeError):
+                parse_request("Mua 5 máy lạnh, 50 triệu, 7 ngày.", session_id="sess_null_07")
+
+
 if __name__ == "__main__":
     unittest.main()
+
