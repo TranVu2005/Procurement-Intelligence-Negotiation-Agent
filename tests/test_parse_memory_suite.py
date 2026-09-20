@@ -403,8 +403,8 @@ class TestParserNullFields(unittest.TestCase):
             supplier_ids=["NCC001", "NCC002"],
             quantity=None,
         )
-        with patch("src.perception.parser._call_llm", return_value=extracted):
-            state = parse_request("So sánh NCC001 với NCC002", session_id="sess_null_01")
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
+            state, _, _ = parse_request("So sánh NCC001 với NCC002", session_id="sess_null_01")
 
         self.assertEqual(state["intent"], "compare_specific")
         self.assertIsNone(state["hard_constraints"]["quantity"])
@@ -420,8 +420,8 @@ class TestParserNullFields(unittest.TestCase):
             supplier_ids=["NCC001"],
             quantity=30,
         )
-        with patch("src.perception.parser._call_llm", return_value=extracted):
-            state = parse_request("So sánh NCC001, mua 30 cái", session_id="sess_null_02")
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
+            state, _, _ = parse_request("So sánh NCC001, mua 30 cái", session_id="sess_null_02")
 
         self.assertEqual(state["hard_constraints"]["quantity"], 30)
 
@@ -434,8 +434,8 @@ class TestParserNullFields(unittest.TestCase):
             intent="supplier_detail",
             supplier_id="NCC005",
         )
-        with patch("src.perception.parser._call_llm", return_value=extracted):
-            state = parse_request("Cho tôi xem chi tiết NCC005", session_id="sess_null_03")
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
+            state, _, _ = parse_request("Cho tôi xem chi tiết NCC005", session_id="sess_null_03")
 
         self.assertEqual(state["intent"], "supplier_detail")
         hc = state["hard_constraints"]
@@ -460,8 +460,8 @@ class TestParserNullFields(unittest.TestCase):
             region_preference=None,
             min_trust_score=None,
         )
-        with patch("src.perception.parser._call_llm", return_value=extracted):
-            state = parse_request(
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
+            state, _, _ = parse_request(
                 "Tôi cần 10 ghế văn phòng, ngân sách 50 triệu, giao trong 7 ngày.",
                 session_id="sess_null_04",
             )
@@ -477,8 +477,8 @@ class TestParserNullFields(unittest.TestCase):
         from src.perception.parser import parse_request
 
         extracted = self._make_extracted(intent="out_of_scope")
-        with patch("src.perception.parser._call_llm", return_value=extracted):
-            state = parse_request("Thời tiết hôm nay thế nào?", session_id="sess_null_05")
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
+            state, _, _ = parse_request("Thời tiết hôm nay thế nào?", session_id="sess_null_05")
 
         self.assertEqual(state["intent"], "out_of_scope")
         hc = state["hard_constraints"]
@@ -518,8 +518,8 @@ class TestParserNullFields(unittest.TestCase):
             "supplier_ids": [],
             "supplier_id": None,
         }
-        with patch("src.perception.parser._call_llm", return_value=extracted_update):
-            updated = update_state(existing, "Đổi lại số lượng thành 80 cái thôi.")
+        with patch("src.perception.parser._call_llm", return_value=(extracted_update, 10, 20)):
+            updated, _, _ = update_state(existing, "Đổi lại số lượng thành 80 cái thôi.")
 
         self.assertEqual(updated["hard_constraints"]["quantity"], 80)
         # Budget không được đề cập → giữ nguyên
@@ -559,8 +559,8 @@ class TestParserNullFields(unittest.TestCase):
             "supplier_ids": [],
             "supplier_id": None,
         }
-        with patch("src.perception.parser._call_llm", return_value=extracted_update):
-            updated = update_state(existing, "Giảm ngân sách xuống còn 150 triệu thôi.")
+        with patch("src.perception.parser._call_llm", return_value=(extracted_update, 10, 20)):
+            updated, _, _ = update_state(existing, "Giảm ngân sách xuống còn 150 triệu thôi.")
 
         self.assertEqual(updated["hard_constraints"]["budget_max"], 150_000_000.0)
         self.assertEqual(updated["hard_constraints"]["quantity"], 20)  # giữ nguyên
@@ -583,7 +583,7 @@ class TestParserNullFields(unittest.TestCase):
             product_type="ghế văn phòng",
             # quantity, budget_max, delivery_deadline_days đều None
         )
-        with patch("src.perception.parser._call_llm", return_value=extracted):
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
             with self.assertRaises(MissingFieldError) as ctx:
                 parse_request("Tôi cần ghế văn phòng.", session_id="sess_null_06")
 
@@ -601,7 +601,7 @@ class TestParserNullFields(unittest.TestCase):
             budget_max=50_000_000,
             delivery_deadline_days=7,
         )
-        with patch("src.perception.parser._call_llm", return_value=extracted):
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
             with self.assertRaises(InvalidProductTypeError):
                 parse_request("Mua 5 máy lạnh, 50 triệu, 7 ngày.", session_id="sess_null_07")
 
