@@ -22,6 +22,15 @@ MODEL_NAME = "gemini-3.6-flash"
 STUB_LATENCY_MEAN_S = 17.5
 STUB_LATENCY_STDDEV_S = 1.7
 
+
+def stub_latency_settings() -> dict:
+    """Do tre MOI LAN goi LLM cua stub. Env ghi de hang so, de hieu chinh ma
+    khong sua code; load test ghi lai gia tri nay vao bao cao."""
+    return {
+        "mean_s": float(os.getenv("AGENT_STUB_LATENCY_MEAN_S", STUB_LATENCY_MEAN_S)),
+        "stddev_s": float(os.getenv("AGENT_STUB_LATENCY_STDDEV_S", STUB_LATENCY_STDDEV_S)),
+    }
+
 _STUB_TEXT = (
     "[STUB] Da tim duoc nha cung cap phu hop. Day la phan hoi co dinh dung cho "
     "load test, khong goi mo hinh that."
@@ -52,7 +61,8 @@ class StubLLM:
         if self._latency_s is not None:
             delay = self._latency_s
         else:
-            delay = random.gauss(STUB_LATENCY_MEAN_S, STUB_LATENCY_STDDEV_S)
+            settings = stub_latency_settings()
+            delay = random.gauss(settings["mean_s"], settings["stddev_s"])
         if delay > 0:
             time.sleep(delay)
 

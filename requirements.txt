@@ -21,6 +21,11 @@ google-generativeai==0.8.6
 # --- Ha tang ---
 pydantic==2.13.4
 python-dotenv==1.2.3
+# Chi dung cho scripts/crawl_sources_draft.py (thu thap du lieu nguon), khong dung o runtime agent
+requests==2.34.2
 
 # --- Do CPU/RAM cho load test (architecture.md muc 5.6) ---
 psutil==7.2.2
+
+# --- Giao dien demo ---
+streamlit==1.64.0

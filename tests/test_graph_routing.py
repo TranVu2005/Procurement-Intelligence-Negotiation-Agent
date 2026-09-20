@@ -1,6 +1,6 @@
 import unittest
 
-from src.graph import route_after_filter, route_after_verify, route_intent
+from src.graph import route_after_filter, route_after_replan, route_after_verify, route_intent
 from src.graph_state import MAX_REPLAN, new_state
 
 
@@ -68,6 +68,27 @@ class RouteAfterVerifyTests(unittest.TestCase):
 
     def test_missing_verdict_is_treated_as_failed(self) -> None:
         self.assertEqual(route_after_verify(state_with(replan_count=MAX_REPLAN)), "graceful_fail")
+
+
+class RouteAfterReplanTests(unittest.TestCase):
+    def test_each_intent_returns_to_its_own_tool_node(self) -> None:
+        cases = {
+            "search_new": "tool_search",
+            "compare_specific": "tool_compare",
+            "supplier_detail": "tool_detail",
+        }
+        for intent, expected in cases.items():
+            with self.subTest(intent=intent):
+                self.assertEqual(route_after_replan(state_with(intent=intent)), expected)
+
+    def test_out_of_scope_or_unknown_intent_never_calls_a_tool(self) -> None:
+        for intent in ("out_of_scope", "dat_ve_may_bay", None):
+            with self.subTest(intent=intent):
+                self.assertEqual(route_after_replan(state_with(intent=intent)), "graceful_fail")
+
+    def test_a_replan_that_needs_user_input_stops(self) -> None:
+        state = state_with(intent="compare_specific", status="needs_input")
+        self.assertEqual(route_after_replan(state), "graceful_fail")
 
 
 if __name__ == "__main__":

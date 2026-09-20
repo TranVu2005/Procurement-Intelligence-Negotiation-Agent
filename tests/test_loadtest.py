@@ -60,5 +60,30 @@ class RunLevelTests(unittest.TestCase):
         self.assertIn("rss_mb", result)
 
 
+class MarkdownReportTests(unittest.TestCase):
+    REPORT = {
+        "generated_at": "2026-09-18T10:00:00", "llm_mode": "stub", "prompt": "x",
+        "stub_latency": {"mean_s": 9.2, "stddev_s": 1.1},
+        "levels": [{"concurrency": 10, "requests": 20, "elapsed_s": 30.0,
+                    "throughput_rps": 0.667, "latency_p50_ms": 18500.0,
+                    "latency_p95_ms": 21000.0, "error_rate": 0.0,
+                    "cpu_percent": 12.5, "rss_mb": 180.2}],
+    }
+
+    def test_stub_parameters_are_stated_in_the_report(self) -> None:
+        text = run_loadtest.to_markdown(self.REPORT)
+        self.assertIn("stub", text)
+        self.assertIn("mean=9.2s", text)
+
+    def test_every_level_is_a_table_row(self) -> None:
+        text = run_loadtest.to_markdown(self.REPORT)
+        self.assertIn("| 10 | 20 | 0.667 | 18500.0 | 21000.0 | 0.0 | 12.5 | 180.2 |", text)
+
+    def test_real_mode_has_no_stub_line(self) -> None:
+        report = {**self.REPORT, "llm_mode": "real"}
+        report.pop("stub_latency")
+        self.assertIn("- LLM: real", run_loadtest.to_markdown(report))
+
+
 if __name__ == "__main__":
     unittest.main()

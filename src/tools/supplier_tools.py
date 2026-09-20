@@ -44,6 +44,10 @@ def _error(error_type: str, message: str) -> dict:
     return {"error": True, "error_type": error_type, "message": message}
 
 
+def _is_number(value) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
 def search_suppliers(product_type: str, material: str | None = None, region: str | None = None,
                       _simulate_error: str | None = None) -> dict:
     """
@@ -189,6 +193,18 @@ def compare_price(supplier_ids: list[str], quantity: int,
             comparisons.append({
                 "MaNCC": sid,
                 **_error("no_match", f"supplier_id='{sid}' khong ton tai"),
+            })
+            continue
+
+        # Du lieu that co the de null (khong co gia niem yet) -> loi rieng phan tu
+        # nay, khong tu dien so va khong lam fail ca response (muc 3 contract)
+        missing = [field for field in ("Gia", "MOQ") if not _is_number(record.get(field))]
+        if missing:
+            comparisons.append({
+                "MaNCC": sid,
+                **_error("tool_unavailable",
+                         f"NCC '{sid}' chua co du lieu {', '.join(missing)}; "
+                         "khong tu dien so lieu"),
             })
             continue
 

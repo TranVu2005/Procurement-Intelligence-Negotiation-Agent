@@ -89,6 +89,16 @@ credit) hoặc 1000 request/ngày (đã nạp tối thiểu $10).
 python -m src.agent
 ```
 
+## Chạy giao diện web
+
+```bash
+streamlit run app.py
+```
+
+Giao diện giữ lịch sử theo session, hiển thị bảng xếp hạng, link nguồn, trường
+mô phỏng, trace/metric và nút xác nhận chốt đơn. Cấu hình LLM vẫn đọc từ
+`.env` giống REPL; không đưa API key vào giao diện hoặc commit lên Git.
+
 ## Chạy test
 
 ```bash
@@ -156,10 +166,15 @@ thuộc tier unit-test cũ, không phải AutoEval báo cáo chính thức.
 python scripts/run_loadtest.py --levels 1 --requests-per-level 5 --llm stub
 ```
 
-## Trạng thái hiện tại (2026-09-17)
+## Trạng thái hiện tại (2026-09-19)
 
-- 243/243 unit test pass (`AGENT_LLM=stub python -m unittest discover tests
+- 256/256 unit test pass (`AGENT_LLM=stub python -m unittest discover tests
   "test_*.py"`).
+- Giao diện Streamlit đã boot qua healthcheck và render bằng AppTest không có
+  exception; hỗ trợ chat, lịch sử, card xếp hạng, provenance, nhãn mô phỏng,
+  confirmation gate và trace/metric.
+- `data/sources_b_tu_ke.csv` là file nguồn thật do Người B bàn giao để C tích
+  hợp; các trường chưa có bằng chứng được ghi thiếu, không tự điền số liệu.
 - Pipeline LangGraph chạy thông cả 4 intent; `mock_data/suppliers.json` đã có
   `nguon_url`/`nguon_type`/`simulated_fields` đầy đủ nên `verify_output`
   không còn chặn vì thiếu trích dẫn (`citation_correctness = 1.0` trong

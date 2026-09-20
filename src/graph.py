@@ -6,6 +6,7 @@ co dinh dem duoc.
 """
 
 import time
+import json
 from functools import lru_cache
 
 from langgraph.graph import END, START, StateGraph
@@ -16,10 +17,12 @@ from src.memory.db import (
     append_conversation,
     init_db,
     load_session,
+    save_decision,
     save_session,
     session_exists,
 )
 from src.nodes.perceive import perceive
+from src.perception.parser import InvalidProductTypeError, MissingFieldError
 from src.nodes.reasoning import (
     diagnose, filter_hard, graceful_fail, plan, replan, respond_limits, score_rank, verify_output,
 )
@@ -48,6 +51,14 @@ _INTENT_ENTRY = {
     "out_of_scope": "respond_limits",
 }
 
+# Sau replan phai quay lai DUNG node tool cua intent (PHAN-CONG-CON-LAI muc 5.1).
+# Intent khong co trong bang (out_of_scope, intent la) -> khong goi tool nao.
+_REPLAN_ENTRY = {
+    "search_new": "tool_search",
+    "compare_specific": "tool_compare",
+    "supplier_detail": "tool_detail",
+}
+
 _NODES = {
     "perceive": perceive,
     "plan": plan,
@@ -67,8 +78,43 @@ _NODES = {
 
 
 def route_intent(state: AgentState) -> str:
-    """Intent la gi cung phai ra mot node hop le. Intent la -> neu gioi han."""
+    """Intent la gi cung phai ra mot node hop le. Intent la -> neu gioi han.
+
+    Perception bao thieu/sai thong tin (status=needs_input) -> dung lai hoi
+    nguoi dung, khong goi tool nao.
+    """
+    if state.get("status") == "needs_input":
+        return "graceful_fail"
     return _INTENT_ENTRY.get(state.get("intent"), "respond_limits")
+
+
+def guard_perceive(func):
+    """Boc node perceive cua A ma khong sua file cua A.
+
+    1. Loi do NGUOI DUNG (thieu field, san pham ngoai catalog, so <= 0) -> hoi
+       lai (status=needs_input), khong bien thanh loi he thong. SYSTEM-RULES
+       muc 3: khong tu dien thong tin con thieu.
+    2. Chep req["session_id"] (parser tu sinh o luot dau) len state, de
+       run_request luu dung phien va tra session_id cho luot sau.
+    JSONDecodeError (LLM tra JSON hong) la loi he thong -> nem tiep cho
+    run_request bien thanh graceful_fail.
+    """
+    def node(state: AgentState) -> dict:
+        try:
+            out = dict(func(state) or {})
+        except (MissingFieldError, InvalidProductTypeError) as exc:
+            return {"status": "needs_input", "answer": str(exc), "llm_calls": 1}
+        except json.JSONDecodeError:
+            raise
+        except ValueError as exc:
+            return {"status": "needs_input",
+                    "answer": f"Thong tin chua hop le: {exc}. Vui long nhap lai.",
+                    "llm_calls": 1}
+        req = out.get("req") or {}
+        if not state.get("session_id") and req.get("session_id"):
+            out["session_id"] = req["session_id"]
+        return out
+    return node
 
 
 def route_after_filter(state: AgentState) -> str:
@@ -90,13 +136,20 @@ def route_after_verify(state: AgentState) -> str:
     return "graceful_fail"
 
 
+def route_after_replan(state: AgentState) -> str:
+    if state.get("status") == "needs_input":
+        # replan khong lap duoc ke hoach moi -> can nguoi dung, khong goi tool lai
+        return "graceful_fail"
+    return _REPLAN_ENTRY.get(state.get("intent"), "graceful_fail")
+
+
 def build_graph(overrides: dict | None = None):
     """overrides: {ten_node: ham} de test thay node that bang node gia."""
     nodes = {**_NODES, **(overrides or {})}
 
     graph = StateGraph(AgentState)
     for name, func in nodes.items():
-        graph.add_node(name, func)
+        graph.add_node(name, guard_perceive(func) if name == "perceive" else func)
 
     graph.add_edge(START, "perceive")
     graph.add_conditional_edges("perceive", route_intent, {
@@ -104,6 +157,7 @@ def build_graph(overrides: dict | None = None):
         "tool_compare": "tool_compare",
         "tool_detail": "tool_detail",
         "respond_limits": "respond_limits",
+        "graceful_fail": "graceful_fail",
     })
 
     graph.add_edge("plan", "tool_search")
@@ -116,7 +170,12 @@ def build_graph(overrides: dict | None = None):
         "graceful_fail": "graceful_fail",
     })
     graph.add_edge("diagnose", "replan")
-    graph.add_edge("replan", "tool_search")
+    graph.add_conditional_edges("replan", route_after_replan, {
+        "tool_search": "tool_search",
+        "tool_compare": "tool_compare",
+        "tool_detail": "tool_detail",
+        "graceful_fail": "graceful_fail",
+    })
 
     graph.add_edge("score_rank", "verify_output")
     graph.add_conditional_edges("verify_output", route_after_verify, {
@@ -136,6 +195,26 @@ def build_graph(overrides: dict | None = None):
 @lru_cache(maxsize=1)
 def get_graph():
     return build_graph()
+
+
+def _confirmed_orders(final: dict) -> list[dict]:
+    """Ket qua confirm_order da thuc thi thanh cong trong request nay."""
+    return [
+        entry["result"] for entry in final.get("tool_results") or []
+        if entry.get("tool") == "confirm_order" and entry.get("status") == "ok"
+        and isinstance(entry.get("result"), dict) and entry["result"].get("order_confirmed")
+    ]
+
+
+def _with_decisions(req: dict | None, final: dict) -> dict | None:
+    """Them don vua chot vao req["decisions_made"] (schema cua A, muc 1 contract)."""
+    orders = _confirmed_orders(final)
+    if not req or not orders:
+        return req
+    decisions = list(req.get("decisions_made") or [])
+    decisions.extend({"supplier_id": order["supplier_id"],
+                      "confirmed_at": order["confirmed_at"]} for order in orders)
+    return {**req, "decisions_made": decisions}
 
 
 def run_request(
@@ -194,9 +273,12 @@ def run_request(
     sid = final.get("session_id") or session_id or ""
     if sid:
         try:
-            req_to_save = final.get("req")
+            req_to_save = _with_decisions(final.get("req"), final)
             if req_to_save:
+                final["req"] = req_to_save
                 save_session(sid, req_to_save)
+            for order in _confirmed_orders(final):
+                save_decision(sid, order["supplier_id"])
             agent_answer = final.get("answer", "")
             if agent_answer:
                 append_conversation(sid, "agent", agent_answer)

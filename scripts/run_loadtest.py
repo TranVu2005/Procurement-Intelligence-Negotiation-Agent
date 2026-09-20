@@ -43,6 +43,31 @@ def percentile(values: list[float], pct: float) -> float | None:
     return ordered[index]
 
 
+def to_markdown(report: dict) -> str:
+    stub = report.get("stub_latency")
+    mode = report["llm_mode"]
+    if stub:
+        mode = (f"stub (mean={stub['mean_s']}s, stddev={stub['stddev_s']}s moi lan goi LLM, "
+                "2 lan goi/request)")
+    lines = [
+        "# Bao cao load test",
+        "",
+        f"- Thoi diem: {report['generated_at']}",
+        f"- LLM: {mode}",
+        f"- Prompt: {report['prompt']}",
+        "",
+        "| CCU | req | rps | p50_ms | p95_ms | error_rate | cpu% | rss_mb |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for level in report["levels"]:
+        lines.append(
+            f"| {level['concurrency']} | {level['requests']} | {level['throughput_rps']} | "
+            f"{level['latency_p50_ms']} | {level['latency_p95_ms']} | {level['error_rate']} | "
+            f"{level['cpu_percent']} | {level['rss_mb']} |"
+        )
+    return "\n".join(lines) + "\n"
+
+
 def _one_request(prompt: str) -> tuple[float, bool]:
     started = time.perf_counter()
     try:
@@ -96,10 +121,17 @@ def main() -> None:
         "levels": [run_level(args.prompt, level, args.requests_per_level) for level in levels],
     }
 
+    if args.llm == "stub":
+        from src.llm import stub_latency_settings
+        report["stub_latency"] = stub_latency_settings()
+
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     path = REPORT_DIR / f"loadtest_{stamp}.json"
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    md_path = REPORT_DIR / f"loadtest_{stamp}.md"
+    md_path.write_text(to_markdown(report), encoding="utf-8")
 
     print(f"LLM: {args.llm}")
     print(f"{'CCU':>5} {'rps':>8} {'p50_ms':>10} {'p95_ms':>10} {'err':>6} {'cpu%':>6} {'rss_mb':>8}")
@@ -107,7 +139,7 @@ def main() -> None:
         print(f"{level['concurrency']:>5} {level['throughput_rps']:>8} "
               f"{level['latency_p50_ms']:>10} {level['latency_p95_ms']:>10} "
               f"{level['error_rate']:>6} {level['cpu_percent']:>6} {level['rss_mb']:>8}")
-    print(f"\nDa ghi {path}")
+    print(f"\nDa ghi {path} va {md_path}")
 
 
 if __name__ == "__main__":

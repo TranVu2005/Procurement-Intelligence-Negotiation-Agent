@@ -38,6 +38,7 @@ def _format_supplier(item: dict) -> str:
     strategy = item.get("negotiation_strategy") or {}
     return (
         f"- {item.get('TenNCC')} (MaNCC={item.get('MaNCC')})\n"
+        f"  san_pham={item.get('TenSanPham') or 'khong ghi ten san pham'}\n"
         f"  don_gia_sau_chiet_khau={item.get('unit_price')} VND\n"
         f"  tong_tien={item.get('total_price')} VND\n"
         f"  thoi_gian_giao={item.get('ThoiGianGiao')} ngay | MOQ={item.get('MOQ')}"

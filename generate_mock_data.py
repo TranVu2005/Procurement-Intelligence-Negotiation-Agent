@@ -20,10 +20,21 @@ DiemUyTin/KhuVuc giu nguyen (thuoc ve cong ty, khong thuoc ve tung dong SP).
 
 import json
 import random
+from datetime import date
+from pathlib import Path
+
+from src.tools.dataset_builder import (
+    build_source_records,
+    distribution,
+    read_source_rows,
+    write_dataset,
+)
 
 random.seed(42)
 
 OUT_PATH = "src/tools/mock_data/suppliers.json"
+SOURCES_DIR = Path("src/tools/mock_data/sources")
+VERSION_PATH = Path("src/tools/mock_data/VERSION")
 
 # Ten cong ty that (nguon: website chinh thuc cua tung cong ty, kiem tra qua
 # WebSearch ngay 2026-09-17, xem source_url tung dong) + khu vuc gan voi
@@ -349,12 +360,18 @@ def gen_eval_cases():
 
 
 def main():
-    bulk, next_idx = gen_bulk(start_idx=1)
-    edge = add_edge_cases(next_idx)
+    # 32 ban ghi "bulk" (cong ty/gia random, khong gan voi hanh vi test cu the nao)
+    # da bi bo theo yeu cau "toan bo du lieu la that". EDGE giu nguyen: day la
+    # fixture co y (nguon_type=du_lieu_test_gia_lap, da minh bach khong gia mao
+    # cong ty that) dung de kiem tra 6 hanh vi bat buoc trong SYSTEM-RULES.md
+    # (thieu DiemUyTin, het hang, nguon mau thuan, MOQ vuot ngan sach, loi tool
+    # cuc bo, gioi han replan) - khong co du lieu that nao tai tao dung cac
+    # quirk nay nen khong the thay the bang SRC.
+    edge = add_edge_cases(1)
+    sourced = build_source_records(read_source_rows(SOURCES_DIR.glob("*.csv")))
 
-    all_records = bulk + edge
-    with open(OUT_PATH, "w", encoding="utf-8") as f:
-        json.dump(all_records, f, ensure_ascii=False, indent=2)
+    all_records = edge + sourced
+    version = write_dataset(all_records, OUT_PATH, VERSION_PATH, date.today().isoformat())
 
     with open("session_states_sample.json", "w", encoding="utf-8") as f:
         json.dump(gen_session_state_samples(), f, ensure_ascii=False, indent=2)
@@ -362,8 +379,12 @@ def main():
     with open("eval_cases.json", "w", encoding="utf-8") as f:
         json.dump(gen_eval_cases(), f, ensure_ascii=False, indent=2)
 
-    print(f"Sinh {len(bulk)} ban ghi bulk + {len(edge)} ban ghi edge case = {len(all_records)} tong.")
-    print("Ghi: mock_data.json, session_states_sample.json, eval_cases.json")
+    dist = distribution(all_records)
+    print(f"Sinh {len(edge)} edge + {len(sourced)} nguon that "
+          f"= {len(all_records)} ban ghi.")
+    print(f"dataset_version = {version}")
+    print(f"Nguon that theo LoaiSanPham: {dict(dist['product_type'])}")
+    print(f"Nguon that theo KhuVuc: {dict(dist['region'])}")
 
 
 if __name__ == "__main__":

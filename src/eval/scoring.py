@@ -5,6 +5,8 @@ chi la them mot dong JSONL, khong sua code - day la thu rubric phat khi thay
 `if case_id == ...` (architecture.md muc 5.1, 5.2).
 """
 
+import re
+import statistics
 from typing import Any
 
 METRIC_NAMES = (
@@ -87,6 +89,63 @@ def _claim_is_grounded(claim: dict, records: list[dict]) -> bool:
     return False
 
 
+# So trong van ban: nhom nghin (1.626.836 / 81,341,800) hoac so thuong (4.5, 3),
+# khong dinh chu o truoc (bo qua ma NCC001), tuy chon don vi trieu/ty phia sau.
+_NUMBER = re.compile(
+    r"(?<![A-Za-z0-9_])(\d{1,3}(?:[.,]\d{3})+|\d+(?:[.,]\d+)?)(?!\d)"
+    r"(?:\s*(triệu|trieu|tỷ|ty|tr)(?![A-Za-zÀ-ỹ]))?",
+    re.IGNORECASE,
+)
+_THOUSANDS = re.compile(r"\d{1,3}(?:[.,]\d{3})+")
+_UNIT_SCALE = {"triệu": 1e6, "trieu": 1e6, "tr": 1e6, "tỷ": 1e9, "ty": 1e9}
+# So nho (so thu tu, so ngay, %) khong du de phan biet bia voi that
+_MIN_CHECKED = 100
+
+
+def _numbers_in_text(text: str) -> list[tuple[str, float, bool]]:
+    found = []
+    for match in _NUMBER.finditer(text or ""):
+        raw, unit = match.group(1), match.group(2)
+        if _THOUSANDS.fullmatch(raw):
+            value = float(re.sub(r"[.,]", "", raw))
+        else:
+            value = float(raw.replace(",", "."))
+        scale = _UNIT_SCALE.get(unit.lower(), 1.0) if unit else 1.0
+        label = f"{raw} {unit}" if unit else raw
+        found.append((label, value * scale, bool(unit)))
+    return found
+
+
+def _collect_numbers(value: Any, out: set[float]) -> None:
+    if isinstance(value, bool):
+        return
+    if isinstance(value, (int, float)):
+        out.add(float(value))
+    elif isinstance(value, str):
+        out.update(number for _label, number, _scaled in _numbers_in_text(value))
+    elif isinstance(value, dict):
+        for item in value.values():
+            _collect_numbers(item, out)
+    elif isinstance(value, (list, tuple)):
+        for item in value:
+            _collect_numbers(item, out)
+
+
+def invented_numbers(final: dict) -> list[str]:
+    """Cac so >= _MIN_CHECKED trong answer khong truy duoc ve du lieu cua state."""
+    known: set[float] = set()
+    for key in ("tool_results", "ranked", "req", "pending_confirmation", "verdict"):
+        _collect_numbers(final.get(key), known)
+    invented = []
+    for label, value, scaled in _numbers_in_text(final.get("answer") or ""):
+        if value < _MIN_CHECKED:
+            continue
+        tolerance = 0.01 * value if scaled else 0.0
+        if not any(abs(value - number) <= tolerance for number in known):
+            invented.append(label)
+    return invented
+
+
 def grade_case(case: dict, final: dict) -> dict:
     """Cham 1 case theo oracle khai bao. Tra ve ket qua + cac tin hieu de tong hop."""
     oracle: dict[str, Any] = case.get("oracle") or {}
@@ -132,6 +191,14 @@ def grade_case(case: dict, final: dict) -> dict:
 
     if oracle.get("must_state_limits") and "pham vi" not in (final.get("answer") or "").lower():
         failures.append("must_state_limits: cau tra loi khong neu gioi han he thong")
+
+    if oracle.get("must_ask_user") and final.get("status") != "needs_input":
+        failures.append(f"must_ask_user: status={final.get('status')}, khong hoi lai nguoi dung")
+
+    if oracle.get("must_not_invent_numbers"):
+        invented = invented_numbers(final)
+        if invented:
+            failures.append(f"must_not_invent_numbers: so khong truy duoc {invented}")
 
     tool_entries = final.get("tool_results") or []
     counted = [e for e in tool_entries if e.get("status") != "blocked"]
@@ -189,3 +256,16 @@ def aggregate(results: list[dict]) -> dict:
         "failed_cases": [{"id": r["id"], "category": r["category"], "failures": r["failures"]}
                          for r in results if not r["passed"]],
     }
+
+
+def round_spread(round_reports: list[dict]) -> dict:
+    """Min/max/do lech chuan tung metric qua cac lan chay lai (architecture.md muc 5.7)."""
+    spread: dict = {}
+    for name in METRIC_NAMES:
+        values = [r["metrics"][name] for r in round_reports if r["metrics"][name] is not None]
+        spread[name] = None if not values else {
+            "min": min(values),
+            "max": max(values),
+            "stdev": round(statistics.pstdev(values), 4),
+        }
+    return spread

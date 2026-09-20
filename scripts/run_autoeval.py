@@ -22,7 +22,7 @@ from dotenv import load_dotenv  # noqa: E402
 
 load_dotenv(ROOT / ".env")
 
-from src.eval.scoring import METRIC_NAMES, aggregate, grade_case  # noqa: E402
+from src.eval.scoring import METRIC_NAMES, aggregate, grade_case, round_spread  # noqa: E402
 
 VERSION_PATH = ROOT / "src" / "tools" / "mock_data" / "VERSION"
 REPORT_DIR = ROOT / "reports"
@@ -79,10 +79,16 @@ def to_markdown(report: dict) -> str:
         f"| avg_llm_calls | {report['avg_llm_calls']} |",
         f"| latency_p50_ms | {report['latency_p50_ms']} |",
         f"| latency_p95_ms | {report['latency_p95_ms']} |",
-        "",
-        "## Case truot",
-        "",
     ]
+    spread = report.get("spread") or {}
+    if report.get("repeat", 1) > 1 and spread:
+        lines += ["", "## Do dao dong qua cac lan chay", "",
+                  "| Chi so | min | max | stdev |", "|---|---|---|---|"]
+        for name in METRIC_NAMES:
+            item = spread.get(name)
+            lines.append(f"| {name} | khong do duoc | | |" if item is None
+                         else f"| {name} | {item['min']} | {item['max']} | {item['stdev']} |")
+    lines += ["", "## Case truot", ""]
     if not report["failed_cases"]:
         lines.append("Khong co case nao truot.")
     for item in report["failed_cases"]:
@@ -107,10 +113,10 @@ def main() -> None:
     if not cases:
         raise SystemExit(f"Khong tim thay case nao co oracle trong {args.eval_set}")
 
-    results = []
+    per_round = []
     for _round in range(args.repeat):
-        for case in cases:
-            results.append(grade_case(case, run_one(case)))
+        per_round.append([grade_case(case, run_one(case)) for case in cases])
+    results = [result for round_results in per_round for result in round_results]
 
     report = {
         "generated_at": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
@@ -118,6 +124,7 @@ def main() -> None:
         "llm_mode": args.llm,
         "repeat": args.repeat,
         **aggregate(results),
+        "spread": round_spread([aggregate(round_results) for round_results in per_round]),
     }
 
     out_dir = Path(args.out_dir)
