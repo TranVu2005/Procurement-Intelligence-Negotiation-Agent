@@ -360,13 +360,17 @@ def gen_eval_cases():
 
 
 def main():
-    # Thu tu goi random giu nguyen nhu cu (seed 42): 32 ban ghi legacy + EDGE
-    # sinh ra giong het byte, ID NCC001..NCC032 khong doi -> test hien co khong vo.
-    bulk, next_idx = gen_bulk(start_idx=1)
-    edge = add_edge_cases(next_idx)
+    # 32 ban ghi "bulk" (cong ty/gia random, khong gan voi hanh vi test cu the nao)
+    # da bi bo theo yeu cau "toan bo du lieu la that". EDGE giu nguyen: day la
+    # fixture co y (nguon_type=du_lieu_test_gia_lap, da minh bach khong gia mao
+    # cong ty that) dung de kiem tra 6 hanh vi bat buoc trong SYSTEM-RULES.md
+    # (thieu DiemUyTin, het hang, nguon mau thuan, MOQ vuot ngan sach, loi tool
+    # cuc bo, gioi han replan) - khong co du lieu that nao tai tao dung cac
+    # quirk nay nen khong the thay the bang SRC.
+    edge = add_edge_cases(1)
     sourced = build_source_records(read_source_rows(SOURCES_DIR.glob("*.csv")))
 
-    all_records = bulk + edge + sourced
+    all_records = edge + sourced
     version = write_dataset(all_records, OUT_PATH, VERSION_PATH, date.today().isoformat())
 
     with open("session_states_sample.json", "w", encoding="utf-8") as f:
@@ -376,7 +380,7 @@ def main():
         json.dump(gen_eval_cases(), f, ensure_ascii=False, indent=2)
 
     dist = distribution(all_records)
-    print(f"Sinh {len(bulk)} legacy + {len(edge)} edge + {len(sourced)} nguon that "
+    print(f"Sinh {len(edge)} edge + {len(sourced)} nguon that "
           f"= {len(all_records)} ban ghi.")
     print(f"dataset_version = {version}")
     print(f"Nguon that theo LoaiSanPham: {dict(dist['product_type'])}")

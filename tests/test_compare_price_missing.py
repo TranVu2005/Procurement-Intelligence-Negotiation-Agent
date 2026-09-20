@@ -32,11 +32,11 @@ class ComparePriceMissingFieldTests(unittest.TestCase):
 class ToolDetailSupplierIdTests(unittest.TestCase):
     def test_singular_supplier_id_from_the_parser_is_used(self) -> None:
         from src.nodes.tools import tool_detail
-        state = {**new_state("Cho xem NCC006"),
-                 "req": {"supplier_id": "NCC006", "supplier_ids": [], "target_supplier_ids": []}}
+        state = {**new_state("Cho xem EDGE001"),
+                 "req": {"supplier_id": "EDGE001", "supplier_ids": [], "target_supplier_ids": []}}
         out = tool_detail(state)
         self.assertNotIn("status", out)
-        self.assertEqual([c["MaNCC"] for c in out["candidates"]], ["NCC006"])
+        self.assertEqual([c["MaNCC"] for c in out["candidates"]], ["EDGE001"])
 
     def test_no_code_at_all_still_asks_the_user(self) -> None:
         from src.nodes.tools import tool_detail

@@ -1,1141 +1,5 @@
 [
   {
-    "MaNCC": "NCC001",
-    "TenNCC": "Noi That Hoa Phat",
-    "LoaiSanPham": "ghế văn phòng",
-    "ChatLieu": "da_that",
-    "Gia": 1677150,
-    "DonViTinh": "cai",
-    "MOQ": 5,
-    "TonKho": 71,
-    "ThoiGianGiao": 6,
-    "BaoHanh": 36,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      }
-    ],
-    "DiemUyTin": 4.3,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://noithathoaphat.com.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC002",
-    "TenNCC": "Noi That Hoa Phat",
-    "LoaiSanPham": "sofa",
-    "ChatLieu": "da_that",
-    "Gia": 12806804,
-    "DonViTinh": "cai",
-    "MOQ": 50,
-    "TonKho": 13,
-    "ThoiGianGiao": 20,
-    "BaoHanh": 6,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      },
-      {
-        "tu_so_luong": 100,
-        "phan_tram_giam": 12
-      }
-    ],
-    "DiemUyTin": 4.6,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://noithathoaphat.com.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC003",
-    "TenNCC": "Noi That Hoa Phat",
-    "LoaiSanPham": "tủ hồ sơ",
-    "ChatLieu": "kim_loai",
-    "Gia": 6743118,
-    "DonViTinh": "cai",
-    "MOQ": 10,
-    "TonKho": 3,
-    "ThoiGianGiao": 8,
-    "BaoHanh": 24,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      }
-    ],
-    "DiemUyTin": 4.9,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://noithathoaphat.com.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC004",
-    "TenNCC": "Noi That Xuan Hoa",
-    "LoaiSanPham": "ghế văn phòng",
-    "ChatLieu": "da_that",
-    "Gia": 1055657,
-    "DonViTinh": "cai",
-    "MOQ": 10,
-    "TonKho": 176,
-    "ThoiGianGiao": 22,
-    "BaoHanh": 12,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      },
-      {
-        "tu_so_luong": 100,
-        "phan_tram_giam": 12
-      }
-    ],
-    "DiemUyTin": 4.5,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://xuanhoa.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC005",
-    "TenNCC": "Noi That Xuan Hoa",
-    "LoaiSanPham": "sofa",
-    "ChatLieu": "vai_boc",
-    "Gia": 7644095,
-    "DonViTinh": "cai",
-    "MOQ": 50,
-    "TonKho": 150,
-    "ThoiGianGiao": 23,
-    "BaoHanh": 36,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      }
-    ],
-    "DiemUyTin": 4.3,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://xuanhoa.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC006",
-    "TenNCC": "Noi That 190",
-    "LoaiSanPham": "ghế văn phòng",
-    "ChatLieu": "luoi_nhua",
-    "Gia": 1605874,
-    "DonViTinh": "cai",
-    "MOQ": 10,
-    "TonKho": 40,
-    "ThoiGianGiao": 10,
-    "BaoHanh": 0,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      }
-    ],
-    "DiemUyTin": 4.6,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://noithat190.com.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC007",
-    "TenNCC": "Noi That Fami",
-    "LoaiSanPham": "tủ hồ sơ",
-    "ChatLieu": "kim_loai",
-    "Gia": 3557472,
-    "DonViTinh": "cai",
-    "MOQ": 10,
-    "TonKho": 36,
-    "ThoiGianGiao": 22,
-    "BaoHanh": 6,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      }
-    ],
-    "DiemUyTin": 4.0,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://fami.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC008",
-    "TenNCC": "Sieu Thi Noi That GOVI",
-    "LoaiSanPham": "sofa",
-    "ChatLieu": "vai_boc",
-    "Gia": 6876966,
-    "DonViTinh": "cai",
-    "MOQ": 5,
-    "TonKho": 16,
-    "ThoiGianGiao": 13,
-    "BaoHanh": 24,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      }
-    ],
-    "DiemUyTin": 4.2,
-    "KhuVuc": "TP.HCM",
-    "nguon_url": "https://govi.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC009",
-    "TenNCC": "Sieu Thi Noi That GOVI",
-    "LoaiSanPham": "bàn làm việc",
-    "ChatLieu": "kim_loai",
-    "Gia": 3539709,
-    "DonViTinh": "cai",
-    "MOQ": 5,
-    "TonKho": 255,
-    "ThoiGianGiao": 15,
-    "BaoHanh": 24,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      }
-    ],
-    "DiemUyTin": 4.0,
-    "KhuVuc": "TP.HCM",
-    "nguon_url": "https://govi.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC010",
-    "TenNCC": "Noi That Le Vin Decor",
-    "LoaiSanPham": "tủ hồ sơ",
-    "ChatLieu": "kim_loai",
-    "Gia": 4836646,
-    "DonViTinh": "cai",
-    "MOQ": 5,
-    "TonKho": 70,
-    "ThoiGianGiao": 19,
-    "BaoHanh": 24,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      }
-    ],
-    "DiemUyTin": 3.5,
-    "KhuVuc": "TP.HCM",
-    "nguon_url": "https://levindecor.com/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC011",
-    "TenNCC": "Noi That Le Vin Decor",
-    "LoaiSanPham": "kệ",
-    "ChatLieu": "go_cong_nghiep",
-    "Gia": 2470667,
-    "DonViTinh": "cai",
-    "MOQ": 50,
-    "TonKho": 32,
-    "ThoiGianGiao": 15,
-    "BaoHanh": 24,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      }
-    ],
-    "DiemUyTin": 3.6,
-    "KhuVuc": "TP.HCM",
-    "nguon_url": "https://levindecor.com/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC012",
-    "TenNCC": "Noi That Le Vin Decor",
-    "LoaiSanPham": "sofa",
-    "ChatLieu": "da_that",
-    "Gia": 27826523,
-    "DonViTinh": "cai",
-    "MOQ": 1,
-    "TonKho": 274,
-    "ThoiGianGiao": 11,
-    "BaoHanh": 12,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      }
-    ],
-    "DiemUyTin": 3.7,
-    "KhuVuc": "TP.HCM",
-    "nguon_url": "https://levindecor.com/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC013",
-    "TenNCC": "Noi That Van Phong Proce",
-    "LoaiSanPham": "tủ hồ sơ",
-    "ChatLieu": "go_cong_nghiep",
-    "Gia": 7045398,
-    "DonViTinh": "cai",
-    "MOQ": 10,
-    "TonKho": 259,
-    "ThoiGianGiao": 22,
-    "BaoHanh": 6,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 100,
-        "phan_tram_giam": 12
-      }
-    ],
-    "DiemUyTin": 3.8,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://proce.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC014",
-    "TenNCC": "Noi That Van Phong Proce",
-    "LoaiSanPham": "bàn làm việc",
-    "ChatLieu": "kim_loai",
-    "Gia": 904797,
-    "DonViTinh": "cai",
-    "MOQ": 50,
-    "TonKho": 165,
-    "ThoiGianGiao": 18,
-    "BaoHanh": 0,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      }
-    ],
-    "DiemUyTin": 4.1,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://proce.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC015",
-    "TenNCC": "Noi That Van Phong Proce",
-    "LoaiSanPham": "sofa",
-    "ChatLieu": "vai_boc",
-    "Gia": 13034686,
-    "DonViTinh": "cai",
-    "MOQ": 1,
-    "TonKho": 123,
-    "ThoiGianGiao": 21,
-    "BaoHanh": 0,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      }
-    ],
-    "DiemUyTin": 3.5,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://proce.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC016",
-    "TenNCC": "MyChair",
-    "LoaiSanPham": "bàn làm việc",
-    "ChatLieu": "go_tu_nhien",
-    "Gia": 2285185,
-    "DonViTinh": "cai",
-    "MOQ": 10,
-    "TonKho": 270,
-    "ThoiGianGiao": 22,
-    "BaoHanh": 24,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      },
-      {
-        "tu_so_luong": 100,
-        "phan_tram_giam": 12
-      }
-    ],
-    "DiemUyTin": 4.3,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://mychair.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC017",
-    "TenNCC": "MyChair",
-    "LoaiSanPham": "sofa",
-    "ChatLieu": "da_that",
-    "Gia": 15459463,
-    "DonViTinh": "cai",
-    "MOQ": 20,
-    "TonKho": 191,
-    "ThoiGianGiao": 17,
-    "BaoHanh": 36,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      }
-    ],
-    "DiemUyTin": 3.8,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://mychair.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC018",
-    "TenNCC": "MyChair",
-    "LoaiSanPham": "tủ hồ sơ",
-    "ChatLieu": "go_cong_nghiep",
-    "Gia": 6735091,
-    "DonViTinh": "cai",
-    "MOQ": 50,
-    "TonKho": 117,
-    "ThoiGianGiao": 21,
-    "BaoHanh": 6,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 100,
-        "phan_tram_giam": 12
-      }
-    ],
-    "DiemUyTin": 3.8,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://mychair.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC019",
-    "TenNCC": "Noi That Ngoc Diep",
-    "LoaiSanPham": "ghế văn phòng",
-    "ChatLieu": "da_that",
-    "Gia": 947197,
-    "DonViTinh": "cai",
-    "MOQ": 50,
-    "TonKho": 121,
-    "ThoiGianGiao": 11,
-    "BaoHanh": 24,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      }
-    ],
-    "DiemUyTin": 4.5,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://ngocdiep.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC020",
-    "TenNCC": "Tekkashop",
-    "LoaiSanPham": "sofa",
-    "ChatLieu": "vai_boc",
-    "Gia": 18658665,
-    "DonViTinh": "cai",
-    "MOQ": 5,
-    "TonKho": 48,
-    "ThoiGianGiao": 6,
-    "BaoHanh": 24,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      }
-    ],
-    "DiemUyTin": 4.2,
-    "KhuVuc": "TP.HCM",
-    "nguon_url": "https://tekkashop.com.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC021",
-    "TenNCC": "Tekkashop",
-    "LoaiSanPham": "kệ",
-    "ChatLieu": "go_cong_nghiep",
-    "Gia": 3440790,
-    "DonViTinh": "cai",
-    "MOQ": 1,
-    "TonKho": 31,
-    "ThoiGianGiao": 15,
-    "BaoHanh": 12,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      }
-    ],
-    "DiemUyTin": 3.8,
-    "KhuVuc": "TP.HCM",
-    "nguon_url": "https://tekkashop.com.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC022",
-    "TenNCC": "Tekkashop",
-    "LoaiSanPham": "ghế văn phòng",
-    "ChatLieu": "luoi_nhua",
-    "Gia": 2531621,
-    "DonViTinh": "cai",
-    "MOQ": 5,
-    "TonKho": 216,
-    "ThoiGianGiao": 8,
-    "BaoHanh": 12,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      },
-      {
-        "tu_so_luong": 100,
-        "phan_tram_giam": 12
-      }
-    ],
-    "DiemUyTin": 3.7,
-    "KhuVuc": "TP.HCM",
-    "nguon_url": "https://tekkashop.com.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC023",
-    "TenNCC": "AmiA",
-    "LoaiSanPham": "ghế văn phòng",
-    "ChatLieu": "luoi_nhua",
-    "Gia": 4156553,
-    "DonViTinh": "cai",
-    "MOQ": 1,
-    "TonKho": 47,
-    "ThoiGianGiao": 10,
-    "BaoHanh": 6,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      }
-    ],
-    "DiemUyTin": 3.8,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://noithatamia.com/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC024",
-    "TenNCC": "AmiA",
-    "LoaiSanPham": "sofa",
-    "ChatLieu": "da_that",
-    "Gia": 10524305,
-    "DonViTinh": "cai",
-    "MOQ": 20,
-    "TonKho": 1,
-    "ThoiGianGiao": 15,
-    "BaoHanh": 12,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      },
-      {
-        "tu_so_luong": 100,
-        "phan_tram_giam": 12
-      }
-    ],
-    "DiemUyTin": 3.5,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://noithatamia.com/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC025",
-    "TenNCC": "AmiA",
-    "LoaiSanPham": "tủ hồ sơ",
-    "ChatLieu": "kim_loai",
-    "Gia": 3098529,
-    "DonViTinh": "cai",
-    "MOQ": 5,
-    "TonKho": 151,
-    "ThoiGianGiao": 9,
-    "BaoHanh": 0,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      }
-    ],
-    "DiemUyTin": 3.7,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://noithatamia.com/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC026",
-    "TenNCC": "Melinh Plaza",
-    "LoaiSanPham": "ghế văn phòng",
-    "ChatLieu": "luoi_nhua",
-    "Gia": 2649795,
-    "DonViTinh": "cai",
-    "MOQ": 50,
-    "TonKho": 271,
-    "ThoiGianGiao": 8,
-    "BaoHanh": 0,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      }
-    ],
-    "DiemUyTin": 4.1,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://noithatmelinh.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC027",
-    "TenNCC": "Noi That ERADO",
-    "LoaiSanPham": "ghế văn phòng",
-    "ChatLieu": "vai_boc",
-    "Gia": 4599340,
-    "DonViTinh": "cai",
-    "MOQ": 50,
-    "TonKho": 126,
-    "ThoiGianGiao": 21,
-    "BaoHanh": 36,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      }
-    ],
-    "DiemUyTin": 4.0,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://erado.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC028",
-    "TenNCC": "Noi That ERADO",
-    "LoaiSanPham": "bàn làm việc",
-    "ChatLieu": "kim_loai",
-    "Gia": 5285419,
-    "DonViTinh": "cai",
-    "MOQ": 10,
-    "TonKho": 133,
-    "ThoiGianGiao": 9,
-    "BaoHanh": 12,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      }
-    ],
-    "DiemUyTin": 4.0,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://erado.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC029",
-    "TenNCC": "Noi That ERADO",
-    "LoaiSanPham": "kệ",
-    "ChatLieu": "kim_loai",
-    "Gia": 2617738,
-    "DonViTinh": "cai",
-    "MOQ": 10,
-    "TonKho": 37,
-    "ThoiGianGiao": 3,
-    "BaoHanh": 24,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      }
-    ],
-    "DiemUyTin": 3.7,
-    "KhuVuc": "Ha Noi",
-    "nguon_url": "https://erado.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC030",
-    "TenNCC": "Inter Office",
-    "LoaiSanPham": "bàn làm việc",
-    "ChatLieu": "go_tu_nhien",
-    "Gia": 1477063,
-    "DonViTinh": "cai",
-    "MOQ": 5,
-    "TonKho": 189,
-    "ThoiGianGiao": 12,
-    "BaoHanh": 6,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      }
-    ],
-    "DiemUyTin": 4.4,
-    "KhuVuc": "TP.HCM",
-    "nguon_url": "https://interoffice.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC031",
-    "TenNCC": "Inter Office",
-    "LoaiSanPham": "tủ hồ sơ",
-    "ChatLieu": "go_cong_nghiep",
-    "Gia": 7402442,
-    "DonViTinh": "cai",
-    "MOQ": 50,
-    "TonKho": 153,
-    "ThoiGianGiao": 24,
-    "BaoHanh": 0,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      }
-    ],
-    "DiemUyTin": 4.3,
-    "KhuVuc": "TP.HCM",
-    "nguon_url": "https://interoffice.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
-    "MaNCC": "NCC032",
-    "TenNCC": "Inter Office",
-    "LoaiSanPham": "ghế văn phòng",
-    "ChatLieu": "vai_boc",
-    "Gia": 3763921,
-    "DonViTinh": "cai",
-    "MOQ": 50,
-    "TonKho": 79,
-    "ThoiGianGiao": 11,
-    "BaoHanh": 12,
-    "ChietKhauTheoSoLuong": [
-      {
-        "tu_so_luong": 10,
-        "phan_tram_giam": 3
-      },
-      {
-        "tu_so_luong": 50,
-        "phan_tram_giam": 7
-      },
-      {
-        "tu_so_luong": 100,
-        "phan_tram_giam": 12
-      }
-    ],
-    "DiemUyTin": 4.3,
-    "KhuVuc": "TP.HCM",
-    "nguon_url": "https://interoffice.vn/",
-    "nguon_type": "website_chinh_thuc",
-    "fetched_at": "2026-09-17",
-    "simulated_fields": [
-      "Gia",
-      "MOQ",
-      "TonKho",
-      "ThoiGianGiao",
-      "BaoHanh",
-      "ChietKhauTheoSoLuong",
-      "DiemUyTin"
-    ]
-  },
-  {
     "MaNCC": "EDGE001",
     "TenNCC": "Noi That Cao Cap Kim Long",
     "LoaiSanPham": "ghế văn phòng",
@@ -1574,6 +438,3285 @@
     "nguon_url": "https://tekkashop.com.vn/collections/sofa-văn-phòng/products/tekkashop-gvvp780-sofa-đơn-da-cao-cấp-màu-nâu-sang-trọng-kích-thước-w730-x-d750-x-h740-mm",
     "nguon_type": "trang_san_pham",
     "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC008",
+    "TenNCC": "Noi That Hunter",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Ghế gấp nệm văn phòng GG03",
+    "ChatLieu": null,
+    "Gia": 220000,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 239,
+    "ThoiGianGiao": 8,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://noithathunter.com/san-pham/ghe-chan-quy-1/",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC009",
+    "TenNCC": "Noi That Hunter",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Ghế gấp nhựa 2 mảnh",
+    "ChatLieu": null,
+    "Gia": 240000,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 297,
+    "ThoiGianGiao": 16,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://noithathunter.com/san-pham/ghe-gap-nhua-2-manh/",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC010",
+    "TenNCC": "Noi That Hunter",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Ghế luna",
+    "ChatLieu": null,
+    "Gia": 245000,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 215,
+    "ThoiGianGiao": 25,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://noithathunter.com/san-pham/ghe-luna/",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC011",
+    "TenNCC": "Noi That Hunter",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Ghế gấp Qui Phúc GG02",
+    "ChatLieu": null,
+    "Gia": 295000,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 181,
+    "ThoiGianGiao": 16,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://noithathunter.com/san-pham/ghe-gap-qui-phuc/",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC012",
+    "TenNCC": "Noi That Hunter",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Ghế xếp liền bàn GG01",
+    "ChatLieu": null,
+    "Gia": 380000,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 299,
+    "ThoiGianGiao": 20,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://noithathunter.com/san-pham/ghe-xep-lien-ban/",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC013",
+    "TenNCC": "Noi That Hunter",
+    "LoaiSanPham": "bàn làm việc",
+    "TenSanPham": "Bàn làm việc chữ K BLVK01",
+    "ChatLieu": null,
+    "Gia": 480000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 47,
+    "ThoiGianGiao": 7,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://noithathunter.com/san-pham/ban-lam-viec-chu-k/",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC014",
+    "TenNCC": "Hoa Phat HCM",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Kệ Sắt V Lỗ",
+    "ChatLieu": null,
+    "Gia": 750000,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 131,
+    "ThoiGianGiao": 9,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://hoaphathcm.vn/san-pham/ke-sat-v-lo-762.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC015",
+    "TenNCC": "Hoa Phat HCM",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Kệ Sắt Đựng Hồ Sơ 3 Tầng",
+    "ChatLieu": null,
+    "Gia": 750000,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 252,
+    "ThoiGianGiao": 21,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://hoaphathcm.vn/san-pham/ke-sat-dung-ho-so-3-tang-844.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC016",
+    "TenNCC": "Hoa Phat HCM",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Kệ Sắt V Lỗ 3 Tầng Hòa Phát",
+    "ChatLieu": null,
+    "Gia": 750000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 272,
+    "ThoiGianGiao": 18,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://hoaphathcm.vn/san-pham/ke-sat-v-lo-3-tang-hoa-phat-857.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC017",
+    "TenNCC": "Hoa Phat HCM",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Kệ Sắt V Lỗ 4 Tầng",
+    "ChatLieu": null,
+    "Gia": 823000,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 191,
+    "ThoiGianGiao": 10,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://hoaphathcm.vn/san-pham/ke-sat-v-lo-4-tang-763.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC018",
+    "TenNCC": "Hoa Phat HCM",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Kệ Sắt Đựng Hồ Sơ 4 Tầng",
+    "ChatLieu": null,
+    "Gia": 823000,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 180,
+    "ThoiGianGiao": 12,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://hoaphathcm.vn/san-pham/ke-sat-dung-ho-so-4-tang-845.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC019",
+    "TenNCC": "Noi That Xuan Hoa",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "TỦ GỖ VĂN PHÒNG 17-01",
+    "ChatLieu": null,
+    "Gia": null,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 278,
+    "ThoiGianGiao": 9,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://xuanhoa.vn/sp/tu-go-tg-17-01-bh-2294",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC020",
+    "TenNCC": "Noi That Xuan Hoa",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "TỦ SẮT VĂN PHÒNG 3A",
+    "ChatLieu": null,
+    "Gia": null,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 269,
+    "ThoiGianGiao": 4,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://xuanhoa.vn/sp/tu-sat-ca-3a-lg",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC021",
+    "TenNCC": "Noi That Xuan Hoa",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "TỦ SẮT VĂN PHÒNG 1A",
+    "ChatLieu": null,
+    "Gia": null,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 79,
+    "ThoiGianGiao": 10,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://xuanhoa.vn/sp/tu-sat-ca-1a-lg",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC022",
+    "TenNCC": "Noi That Xuan Hoa",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "TỦ SẮT CHỨA ĐỒ (LOCKER) 9 NGĂN",
+    "ChatLieu": null,
+    "Gia": null,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 243,
+    "ThoiGianGiao": 12,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://xuanhoa.vn/sp/tu-sat-ca-lk-9n-03-1-724",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC023",
+    "TenNCC": "Noi That Xuan Hoa",
+    "LoaiSanPham": "bàn làm việc",
+    "TenSanPham": "BÀN LÀM VIỆC BLV-02-00",
+    "ChatLieu": null,
+    "Gia": null,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 36,
+    "ThoiGianGiao": 13,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://xuanhoa.vn/sp/ban-lam-viec-blv-02-00",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC024",
+    "TenNCC": "Noi That Xuan Hoa",
+    "LoaiSanPham": "bàn làm việc",
+    "TenSanPham": "BÀN VI TÍNH ALPHA BVT-07-03",
+    "ChatLieu": null,
+    "Gia": null,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 135,
+    "ThoiGianGiao": 24,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://xuanhoa.vn/sp/ban-vi-tinh-bvt-07-03-alpha-388",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC025",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Tekkashop HTGV8008 Ghế văn phòng chân xoay lưng lưới nệm ngồi màu xanh",
+    "ChatLieu": null,
+    "Gia": 1170000,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 211,
+    "ThoiGianGiao": 17,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/ghế-văn-phòng/products/tekkashop-htgv8008-ghế-văn-phòng-chân-xoay-lưng-lưới-nệm-ngồi-màu-xanh",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC026",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Tekkashop HTGV8007 Ghế văn phòng chân xoay khung nhựa PP nệm xanh",
+    "ChatLieu": null,
+    "Gia": 1170000,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 201,
+    "ThoiGianGiao": 8,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/ghế-văn-phòng/products/tekkashop-htgv8007-ghế-văn-phòng-chân-xoay-khung-nhựa-pp-nệm-xanh",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC027",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Tekkashop HTGV7061 Ghế phòng họp chân quỳ lưng lưới màu đen",
+    "ChatLieu": null,
+    "Gia": 1390000,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 137,
+    "ThoiGianGiao": 4,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/ghế-văn-phòng/products/tekkashop-htgv7061-ghế-phòng-họp-chân-quỳ-lưng-lưới-màu-đen",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC028",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Tekkashop HTGV7061 Ghế phòng họp chân quỳ lưng lưới nệm xanh",
+    "ChatLieu": null,
+    "Gia": 1390000,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 111,
+    "ThoiGianGiao": 10,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/ghế-văn-phòng/products/tekkashop-htgv7061-ghế-phòng-họp-chân-quỳ-lưng-lưới-nệm-xanh",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC029",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Tekkashop HTGV7061 Ghế văn phòng chân xoay lưng lưới cao cấp",
+    "ChatLieu": null,
+    "Gia": 1480000,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 37,
+    "ThoiGianGiao": 16,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/ghế-văn-phòng/products/tekkashop-htgv7061-ghế-văn-phòng-chân-xoay-lưng-lưới-cao-cấp",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC030",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Tekkashop HTGV8007 Ghế phòng họp chân quỳ lưng nhựa PP bọc lưới",
+    "ChatLieu": null,
+    "Gia": 1080000,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 197,
+    "ThoiGianGiao": 5,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://tekkashop.com.vn/collections/ghế-văn-phòng/products/tekkashop-htgv8007-ghế-phòng-họp-chân-quỳ-lưng-nhựa-pp-bọc-lưới",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC031",
+    "TenNCC": "Ngoc Tin",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Kệ Hồ Sơ Văn Phòng NTKHSVP9094",
+    "ChatLieu": null,
+    "Gia": 899999,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 266,
+    "ThoiGianGiao": 22,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://kesatngoctin.com/san-pham/gia-de-ho-so",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC032",
+    "TenNCC": "Ngoc Tin",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Kệ hồ sơ 5 Tầng NTKSVL56 Dài 1m x Rộng 0.3m x Cao 2m",
+    "ChatLieu": null,
+    "Gia": 1090000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 185,
+    "ThoiGianGiao": 12,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://kesatngoctin.com/san-pham/ke-sat-v-lo-5-tang-de-tai-lieu-ntksvl56",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC033",
+    "TenNCC": "Ngoc Tin",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Kệ Hồ Sơ Văn Phòng NTKHSVP9103",
+    "ChatLieu": null,
+    "Gia": 1255000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 85,
+    "ThoiGianGiao": 11,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://kesatngoctin.com/san-pham/ke-ho-so-van-phong-gia-re-ntkhsvp9103",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC034",
+    "TenNCC": "Ngoc Tin",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Kệ hồ sơ văn phòng NTKHSVP9097",
+    "ChatLieu": null,
+    "Gia": 1265000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 260,
+    "ThoiGianGiao": 16,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://kesatngoctin.com/san-pham/ke-sat-van-phong-05",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC035",
+    "TenNCC": "Ngoc Tin",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Kệ hồ sơ văn phòng NTKHSVP9099",
+    "ChatLieu": null,
+    "Gia": 1265000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 266,
+    "ThoiGianGiao": 19,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "TP.HCM",
+    "nguon_url": "https://kesatngoctin.com/san-pham/ke-sat-van-phong-04",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC036",
+    "TenNCC": "Ngoc Tin",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Kệ Hồ Sơ Văn Phòng NTKHSVP9092",
+    "ChatLieu": null,
+    "Gia": 899000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 164,
+    "ThoiGianGiao": 16,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://kesatngoctin.com/san-pham/ke-de-ho-so",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC037",
+    "TenNCC": "Gia Ke De Hang Pro",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "kệ để đồ  ( dài 80cm x sâu 40cm x cao 100cm ) 3 tầng",
+    "ChatLieu": null,
+    "Gia": 450000,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 160,
+    "ThoiGianGiao": 9,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://giakedehangpro.com/ke-de-do-dai-80cm-x-sau-40cm-x-cao-100cm-3-tang",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC038",
+    "TenNCC": "Gia Ke De Hang Pro",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Kệ để hàng đa năng v lỗ 4 tầng - Để đựng Hàng hóa, Đồ dùng, Rượu (DxRxC 1m x 0.4m x 1m)",
+    "ChatLieu": null,
+    "Gia": 600000,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 189,
+    "ThoiGianGiao": 12,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://giakedehangpro.com/ke-de-ruou-dai-1m-x-sau-0-4m-x-cao-1m-4-tang",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC039",
+    "TenNCC": "Gia Ke De Hang Pro",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "kệ giày dép ( dài 1m x sâu 0.4m x cao 1m ) 4 tầng",
+    "ChatLieu": null,
+    "Gia": 600000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 246,
+    "ThoiGianGiao": 11,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://giakedehangpro.com/ke-giay-dep-dai-1m-x-sau-0-4m-x-cao-1m-4-tang",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC040",
+    "TenNCC": "Gia Ke De Hang Pro",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Giá kệ  trưng bày tạp hóa",
+    "ChatLieu": null,
+    "Gia": 620000,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 42,
+    "ThoiGianGiao": 4,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://giakedehangpro.com/gia-ke-trung-bay-tap-hoa",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC041",
+    "TenNCC": "Gia Ke De Hang Pro",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Giá kệ kho lắp ghép",
+    "ChatLieu": null,
+    "Gia": 630000,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 113,
+    "ThoiGianGiao": 9,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://giakedehangpro.com/gia-ke-kho-lap-ghep",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC042",
+    "TenNCC": "Gia Ke De Hang Pro",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "tủ sắt locket 4 ô",
+    "ChatLieu": null,
+    "Gia": 1050000,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 34,
+    "ThoiGianGiao": 11,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://giakedehangpro.com/tu-sat-locket-4-o",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-18",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC043",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Tekkashop HTGVB2312 Ghế văn phòng chân xoay, lưng lưới xanh lá phối nệm đen",
+    "ChatLieu": null,
+    "Gia": 1820000,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 146,
+    "ThoiGianGiao": 19,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/ghế-văn-phòng/products/tekkashop-htgvb2312-ghế-văn-phòng-chân-xoay-lưng-lưới-xanh-lá-phối-nệm-đen",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC044",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Tekkashop HTGV2312 Ghế văn phòng công thái học lưng lưới chân xoay",
+    "ChatLieu": null,
+    "Gia": 1660000,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 139,
+    "ThoiGianGiao": 17,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/ghế-văn-phòng/products/tekkashop-htgv2312-ghế-văn-phòng-công-thái-học-lưng-lưới-chân-xoay",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC045",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Tekkashop HTGV2312 Ghế văn phòng công thái học có tựa đầu lưng lưới",
+    "ChatLieu": null,
+    "Gia": 1860000,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 197,
+    "ThoiGianGiao": 13,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/ghế-văn-phòng/products/tekkashop-htgv2312-ghế-văn-phòng-công-thái-học-có-tựa-đầu-lưng-lưới",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC046",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Tekkashop HTGV2211 Ghế văn phòng kiểu dáng công thái học lưng lưới có tựa đầu, gác chân",
+    "ChatLieu": null,
+    "Gia": 5440000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 36,
+    "ThoiGianGiao": 24,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/ghế-văn-phòng/products/tekkashop-htgv2211-ghế-văn-phòng-kiểu-dáng-công-thái-học-lưng-lưới-có-tựa-đầu-gác-chân",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC047",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Tekkashop HTGV2211 Ghế văn phòng công thái học lưng lưới có tựa đầu, gác chân",
+    "ChatLieu": null,
+    "Gia": 5730000,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 117,
+    "ThoiGianGiao": 12,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/ghế-văn-phòng/products/tekkashop-htgv2211-ghế-văn-phòng-công-thái-học-lưng-lưới-có-tựa-đầu-gác-chân",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC048",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Tekkashop HTGV2201 Ghế phòng họp thiết kế công thái học lưng lưới chân quỳ",
+    "ChatLieu": null,
+    "Gia": 1560000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 275,
+    "ThoiGianGiao": 22,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/ghế-văn-phòng/products/tekkashop-htgv2201-ghế-phòng-họp-thiết-kế-công-thái-học-lưng-lưới-chân-quỳ",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC049",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Tekkashop HTGV2201 Ghế phòng họp công thái học lưng lưới chân quỳ",
+    "ChatLieu": null,
+    "Gia": 2080000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 203,
+    "ThoiGianGiao": 19,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/ghế-văn-phòng/products/tekkashop-htgv2201-ghế-phòng-họp-công-thái-học-lưng-lưới-chân-quỳ",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC050",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Tekkashop HTGV2201 Ghế văn phòng công thái học chân xoay có tựa đầu lưng lưới",
+    "ChatLieu": null,
+    "Gia": 1860000,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 25,
+    "ThoiGianGiao": 9,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/ghế-văn-phòng/products/tekkashop-htgv2201-ghế-văn-phòng-công-thái-học-chân-xoay-có-tựa-đầu-lưng-lưới",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC051",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "bàn làm việc",
+    "TenSanPham": "Tekkashop GVVP310 Bàn làm việc 1m4 kèm hộc tủ 3 ngăn kéo, chân vuông chữ U, gỗ công nghiệp phủ Melamine, khung thép sơn tĩnh điện",
+    "ChatLieu": "go_cong_nghiep",
+    "Gia": 2643000,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 22,
+    "ThoiGianGiao": 3,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/bàn-làm-việc/products/tekkashop-gvvp310-bàn-làm-việc-1m4-kèm-hộc-tủ-3-ngăn-kéo-chân-vuông-chữ-u-gỗ-công-nghiệp-phủ-melamine-khung-thép-sơn-tĩnh-điện",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC052",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "bàn làm việc",
+    "TenSanPham": "Tekkashop GVVP280 Bàn làm việc 1m2 kèm hộc tủ 3 ngăn kéo, chân vuông chữ U, gỗ công nghiệp phủ Melamine, khung thép sơn tĩnh điện",
+    "ChatLieu": "go_cong_nghiep",
+    "Gia": 2357000,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 129,
+    "ThoiGianGiao": 6,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/bàn-làm-việc/products/tekkashop-gvvp280-bàn-làm-việc-1m2-kèm-hộc-tủ-3-ngăn-kéo-chân-vuông-chữ-u-gỗ-công-nghiệp-phủ-melamine-khung-thép-sơn-tĩnh-điện",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC053",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "bàn làm việc",
+    "TenSanPham": "Tekkashop GVVP230 Bàn làm việc 1m2 gỗ công nghiệp phủ Melamine, khung sắt sơn tĩnh điện, chân vuông chữ U màu trắng phối gỗ",
+    "ChatLieu": "go_cong_nghiep",
+    "Gia": 1986000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 284,
+    "ThoiGianGiao": 22,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/bàn-làm-việc/products/tekkashop-gvvp230-bàn-làm-việc-1m2-gỗ-công-nghiệp-phủ-melamine-khung-sắt-sơn-tĩnh-điện-chân-vuông-chữ-u-màu-trắng-phối-gỗ",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC054",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "bàn làm việc",
+    "TenSanPham": "Tekkashop GVVP210 Bàn làm việc chân vuông chữ U kèm tủ treo 2 ngăn, mặt bàn gỗ công nghiệp phủ Melamine, kích thước: W1200 x D600 x H750 mm",
+    "ChatLieu": "go_cong_nghiep",
+    "Gia": 1829000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 36,
+    "ThoiGianGiao": 9,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/bàn-làm-việc/products/tekkashop-gvvp210-bàn-làm-việc-chân-vuông-chữ-u-kèm-tủ-treo-2-ngăn-mặt-bàn-gỗ-công-nghiệp-phủ-melamine-kích-thước-w1200-x-d600-x-h750-mm",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC055",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "bàn làm việc",
+    "TenSanPham": "Tekkashop GVVP190 Bàn làm việc chân vuông chữ U, kèm tủ 2 ngăn kéo, mặt bàn gỗ công nghiệp phủ Melamine, kích thước: W1200 x D600 x H750 mm",
+    "ChatLieu": "go_cong_nghiep",
+    "Gia": 1643000,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 67,
+    "ThoiGianGiao": 8,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/bàn-làm-việc/products/tekkashop-gvvp190-bàn-làm-việc-chân-vuông-chữ-u-kèm-tủ-2-ngăn-kéo-mặt-bàn-gỗ-công-nghiệp-phủ-melamine-kích-thước-w1200-x-d600-x-h750-mm",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC056",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "bàn làm việc",
+    "TenSanPham": "Tekkashop GVVP180 Bàn làm việc chân vuông kèm ngăn kéo có khóa, mặt bàn gỗ công nghiệp phủ Melamine, kích thước: W1200 x D600 x H750 mm",
+    "ChatLieu": "go_cong_nghiep",
+    "Gia": 1314000,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 297,
+    "ThoiGianGiao": 20,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/bàn-làm-việc/products/tekkashop-gvvp180-bàn-làm-việc-chân-vuông-kèm-ngăn-kéo-có-khóa-mặt-bàn-gỗ-công-nghiệp-phủ-melamine-kích-thước-w1200-x-d600-x-h750-mm",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC057",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "Tekkashop HOVP321 Tủ Hồ Sơ Cá Nhân 3 Ngăn Kéo Gỗ Cao Su AA Xuất Khẩu",
+    "ChatLieu": "go_cao_su",
+    "Gia": 2750000,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 43,
+    "ThoiGianGiao": 21,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/tủ-gỗ/products/tekkashop-hovp321-tủ-hồ-sơ-cá-nhân-3-ngăn-kéo-gỗ-cao-su-aa-xuất-khẩu",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC058",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "Tekkashop HOVP321 Tủ Hồ Sơ Cá Nhân 3 Ngăn Kéo Gỗ Cao Su AA Màu Cánh Gián",
+    "ChatLieu": "go_cao_su",
+    "Gia": 2750000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 294,
+    "ThoiGianGiao": 11,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/tủ-gỗ/products/tekkashop-hovp321-tủ-hồ-sơ-cá-nhân-3-ngăn-kéo-gỗ-cao-su-aa-màu-cánh-gián",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC059",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "Tekkashop HOVP303 Tủ Hồ Sơ Cá Nhân 1 Ngăn Kéo và 1 Ngăn Cửa Bằng Gỗ Cao Su AA Cao Cấp",
+    "ChatLieu": "go_cao_su",
+    "Gia": 2600000,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 103,
+    "ThoiGianGiao": 3,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/tủ-gỗ/products/tekkashop-hovp303-tủ-hồ-sơ-cá-nhân-1-ngăn-kéo-và-1-ngăn-cửa-bằng-gỗ-cao-su-aa-cao-cấp",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC060",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "Tekkashop HOVP525 Tủ Hồ Sơ Để Đầu Bàn Gỗ Cao Su AA, Có Ngăn Để Cây Xanh",
+    "ChatLieu": "go_cao_su",
+    "Gia": 4500000,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 228,
+    "ThoiGianGiao": 20,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/tủ-gỗ/products/tekkashop-hovp525-tủ-hồ-sơ-để-đầu-bàn-gỗ-cao-su-aa-có-ngăn-để-cây-xanh",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC061",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "Tekkashop HOVP293 Tủ Gỗ Đựng Hồ Sơ Văn Phòng W2700xD350xH1700 mm",
+    "ChatLieu": null,
+    "Gia": 25150000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 196,
+    "ThoiGianGiao": 13,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/tủ-gỗ/products/tekkashop-hovp293-tủ-gỗ-đựng-hồ-sơ-văn-phòng-w2700xd350xh1700-mm",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC062",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "Tekkashop HOVP800 Tủ Hồ Sơ Gỗ Cao Su 4 Tầng Cửa Kính",
+    "ChatLieu": "go_cao_su",
+    "Gia": 6860000,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 182,
+    "ThoiGianGiao": 24,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/tủ-gỗ/products/tekkashop-hovp800-tủ-hồ-sơ-gỗ-cao-su-4-tầng-cửa-kính",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC063",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "Tekkashop HOVP825 Tủ Hồ Sơ 4 Tầng Gỗ Cao Su Cửa Kính",
+    "ChatLieu": "go_cao_su",
+    "Gia": 7080000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 122,
+    "ThoiGianGiao": 4,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/tủ-gỗ/products/tekkashop-hovp825-tủ-hồ-sơ-4-tầng-gỗ-cao-su-cửa-kính",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC064",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Tekkashop GVVP150 Giá kệ sắt 6 tầng (Xám đậm)",
+    "ChatLieu": "kim_loai",
+    "Gia": 1286000,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 167,
+    "ThoiGianGiao": 25,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/kệ-kho/products/tekkashop-gvvp150-giá-kệ-sắt-6-tầng-xám-đậm-kích-thước-w1000-x-d400-x-h2000-mm",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC065",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Tekkashop GVVP150 Giá kệ sắt 6 tầng (Trắng)",
+    "ChatLieu": "kim_loai",
+    "Gia": 1286000,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 212,
+    "ThoiGianGiao": 16,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/kệ-kho/products/tekkashop-gvvp150-giá-kệ-sắt-6-tầng-trắng-kích-thước-w1000x-d400x-h2000-mm",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC066",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Tekkashop GVVP130 Giá kệ sắt 5 tầng (Xám)",
+    "ChatLieu": "kim_loai",
+    "Gia": 1143000,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 200,
+    "ThoiGianGiao": 25,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/kệ-kho/products/tekkashop-gvvp130-giá-kệ-sắt-5-tầng-xám-kích-thước-w1000x-d400x-h2000-mm",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC067",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Tekkashop GVVP130 Giá kệ sắt 4 tầng (Xám đậm)",
+    "ChatLieu": "kim_loai",
+    "Gia": 1071000,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 88,
+    "ThoiGianGiao": 14,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/kệ-kho/products/tekkashop-gvvp130-giá-kệ-sắt-4-tầng-xám-đậm-kích-thước-w1000-x-d400-x-h2000-mm",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC068",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Tekkashop GVVP900 Giá kệ sắt 3 tầng (Xám đậm)",
+    "ChatLieu": "kim_loai",
+    "Gia": 786000,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 264,
+    "ThoiGianGiao": 19,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/kệ-kho/products/tekkashop-gvvp900-giá-kệ-sắt-3-tầng-xám-đậm-kích-thước-w1000-x-d400-x-h1200-mm",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC069",
+    "TenNCC": "Tekkashop",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Tekkashop GVVP210 Giá kệ sắt 6 tầng (Đen)",
+    "ChatLieu": "kim_loai",
+    "Gia": 1786000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 111,
+    "ThoiGianGiao": 25,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Da Nang",
+    "nguon_url": "https://tekkashop.com.vn/collections/kệ-kho/products/tekkashop-gvvp210-giá-kệ-sắt-6-tầng-đen-kích-thước-w1000x-d400x-h2000-mm",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC070",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Ghế chân quỳ da nâu FMQ551N",
+    "ChatLieu": "da_that",
+    "Gia": 1927000,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 216,
+    "ThoiGianGiao": 13,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/ghe-chan-quy-da-nau-fmq551n.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC071",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Ghế Chân Quỳ FMQ565",
+    "ChatLieu": null,
+    "Gia": 2450000,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 105,
+    "ThoiGianGiao": 22,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Ghế-Chân-Quỳ-FMQ565.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC072",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Ghế công thái học FMX328G",
+    "ChatLieu": null,
+    "Gia": 2287000,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 300,
+    "ThoiGianGiao": 22,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Ghế-công-thái-học-FMX328G.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC073",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Ghế da chân quỳ FMQ551",
+    "ChatLieu": "da_that",
+    "Gia": 1927000,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 151,
+    "ThoiGianGiao": 7,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Ghế-da-chân-quỳ-FMQ551.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC074",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Ghế lưới lưng cao FMX821T",
+    "ChatLieu": "luoi_nhua",
+    "Gia": 2287000,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 52,
+    "ThoiGianGiao": 15,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Ghế-lưới-lưng-cao-FMX821T.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC075",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Ghế lưới nhân viên cỡ lớn GL217",
+    "ChatLieu": "luoi_nhua",
+    "Gia": 1187700,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 24,
+    "ThoiGianGiao": 6,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Ghế-lưới-nhân-viên-cỡ-lớn-GL217.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC076",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "ghế văn phòng",
+    "TenSanPham": "Ghế lưới nhân viên GL216",
+    "ChatLieu": "luoi_nhua",
+    "Gia": 1380300,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 56,
+    "ThoiGianGiao": 9,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Ghế-lưới-nhân-viên-GL216.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC077",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "bàn làm việc",
+    "TenSanPham": "Bàn chân sắt 1m2 BRI120C15",
+    "ChatLieu": "kim_loai",
+    "Gia": 2033000,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 23,
+    "ThoiGianGiao": 25,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Bàn-chân-sắt-1m2-BRI120C15.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC078",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "bàn làm việc",
+    "TenSanPham": "Bàn chân sắt 1m6 BRI160C15",
+    "ChatLieu": "kim_loai",
+    "Gia": 2450300,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 161,
+    "ThoiGianGiao": 11,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Bàn-chân-sắt-1m6-BRI160C15.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC079",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "bàn làm việc",
+    "TenSanPham": "Bàn chân sắt Hòa Phát LUX140C10",
+    "ChatLieu": "kim_loai",
+    "Gia": 2000900,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 95,
+    "ThoiGianGiao": 10,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Bàn-chân-sắt-Hòa-Phát-LUX140C10.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC080",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "bàn làm việc",
+    "TenSanPham": "Bàn chân sắt hộc liền 1m2 BRI120SHLC15",
+    "ChatLieu": "kim_loai",
+    "Gia": 2525200,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 96,
+    "ThoiGianGiao": 22,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Bàn-chân-sắt-hộc-liền-1m2-BRI120SHLC15.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC081",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "bàn làm việc",
+    "TenSanPham": "Bàn chân sắt mặt gỗ 1m4 BRI140C15",
+    "ChatLieu": null,
+    "Gia": 2247000,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 62,
+    "ThoiGianGiao": 4,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Bàn-chân-sắt-mặt-gỗ-1m4-BRI140C15.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC082",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "bàn làm việc",
+    "TenSanPham": "Bàn chuyên viên chân sắt 1m2 BRI120SC15",
+    "ChatLieu": "kim_loai",
+    "Gia": 1904600,
+    "DonViTinh": "cai",
+    "MOQ": 10,
+    "TonKho": 42,
+    "ThoiGianGiao": 20,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Bàn-chuyên-viên-chân-sắt-1m2-BRI120SC15.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC083",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "Tủ hồ sơ 2 buồng DC940VM9",
+    "ChatLieu": null,
+    "Gia": 6184600,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 40,
+    "ThoiGianGiao": 13,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Tủ-hồ-sơ-2-buồng-DC940VM9.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC084",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "Tủ hồ sơ 3 buồng DC1240V9",
+    "ChatLieu": null,
+    "Gia": 9020100,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 247,
+    "ThoiGianGiao": 18,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Tủ-hồ-sơ-3-buồng-DC1240V9.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC085",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "Tủ hồ sơ 3 ngăn kéo TU3FD",
+    "ChatLieu": null,
+    "Gia": 2418200,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 71,
+    "ThoiGianGiao": 4,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Tủ-hồ-sơ-3-ngăn-kéo-TU3FD.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC086",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "Tủ hồ sơ 4 khoang TU09K8CK",
+    "ChatLieu": null,
+    "Gia": 6773100,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 60,
+    "ThoiGianGiao": 23,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Tủ-hồ-sơ-4-khoang-TU09K8CK.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC087",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "Tủ hồ sơ 4 ngăn TU09K4D",
+    "ChatLieu": "kim_loai",
+    "Gia": 3327700,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 284,
+    "ThoiGianGiao": 12,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Tủ-hồ-sơ-4-ngăn-TU09K4D.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC088",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "tủ hồ sơ",
+    "TenSanPham": "Tủ hồ sơ 6 ngăn TU09K6D",
+    "ChatLieu": "kim_loai",
+    "Gia": 3381200,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 22,
+    "ThoiGianGiao": 22,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Tủ-hồ-sơ-6-ngăn-TU09K6D.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC089",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Giá sắt 4 tầng GTT15-4P",
+    "ChatLieu": "kim_loai",
+    "Gia": 2428900,
+    "DonViTinh": "cai",
+    "MOQ": 20,
+    "TonKho": 214,
+    "ThoiGianGiao": 4,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Giá-sắt-4-tầng-GTT15-4P.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC090",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Giá sắt trung tải 3 tầng GTT15-3P",
+    "ChatLieu": "kim_loai",
+    "Gia": 1979500,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 160,
+    "ThoiGianGiao": 4,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Giá-sắt-trung-tải-3-tầng-GTT15-3P.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC091",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Giá sắt đựng tập File GS6",
+    "ChatLieu": "kim_loai",
+    "Gia": 2086500,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 47,
+    "ThoiGianGiao": 6,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Giá-sắt-đựng-tập-File-GS6.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC092",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Giá thép đa năng GS2K1",
+    "ChatLieu": "kim_loai",
+    "Gia": 1926000,
+    "DonViTinh": "cai",
+    "MOQ": 50,
+    "TonKho": 246,
+    "ThoiGianGiao": 7,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Giá-thép-đa-năng-GS2K1.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC093",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Kệ sắt 4 tầng GTT20-4P",
+    "ChatLieu": "kim_loai",
+    "Gia": 3135100,
+    "DonViTinh": "cai",
+    "MOQ": 5,
+    "TonKho": 201,
+    "ThoiGianGiao": 15,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      },
+      {
+        "tu_so_luong": 100,
+        "phan_tram_giam": 12
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Kệ-sắt-4-tầng-GTT20-4P.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC094",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "kệ",
+    "TenSanPham": "Kệ sắt trung tải 3 tầng GTT20-3P",
+    "ChatLieu": "kim_loai",
+    "Gia": 2514500,
+    "DonViTinh": "cai",
+    "MOQ": 1,
+    "TonKho": 209,
+    "ThoiGianGiao": 4,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Kệ-sắt-trung-tải-3-tầng-GTT20-3P.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC095",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "sofa",
+    "TenSanPham": "Bộ ghế sofa bọc vải SF47",
+    "ChatLieu": "vai_boc",
+    "Gia": 13407100,
+    "DonViTinh": "bo",
+    "MOQ": 5,
+    "TonKho": 248,
+    "ThoiGianGiao": 17,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Bộ-ghế-sofa-bọc-vải-SF47.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC096",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "sofa",
+    "TenSanPham": "Bộ ghế sofa cao cấp Hòa Phát SF508",
+    "ChatLieu": null,
+    "Gia": 17344700,
+    "DonViTinh": "bo",
+    "MOQ": 5,
+    "TonKho": 204,
+    "ThoiGianGiao": 7,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Bộ-ghế-sofa-cao-cấp-Hòa-Phát-SF508.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC097",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "sofa",
+    "TenSanPham": "Bộ ghế sofa cao cấp SF306A",
+    "ChatLieu": null,
+    "Gia": 24577900,
+    "DonViTinh": "bo",
+    "MOQ": 1,
+    "TonKho": 21,
+    "ThoiGianGiao": 19,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Bộ-ghế-sofa-cao-cấp-SF306A.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC098",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "sofa",
+    "TenSanPham": "Bộ ghế sofa gia đình SF312",
+    "ChatLieu": null,
+    "Gia": 21111100,
+    "DonViTinh": "bo",
+    "MOQ": 20,
+    "TonKho": 87,
+    "ThoiGianGiao": 18,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Bộ-ghế-sofa-gia-đình-SF312.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC099",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "sofa",
+    "TenSanPham": "Bộ ghế sofa góc cỡ lớn SF602",
+    "ChatLieu": null,
+    "Gia": 16381700,
+    "DonViTinh": "bo",
+    "MOQ": 10,
+    "TonKho": 194,
+    "ThoiGianGiao": 21,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Bộ-ghế-sofa-góc-cỡ-lớn-SF602.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
+    "nguoi_thu": "C",
+    "simulated_fields": [
+      "MOQ",
+      "TonKho",
+      "ThoiGianGiao",
+      "ChietKhauTheoSoLuong"
+    ]
+  },
+  {
+    "MaNCC": "SRC100",
+    "TenNCC": "Noi That Hoa Phat",
+    "LoaiSanPham": "sofa",
+    "TenSanPham": "Bộ ghế sofa góc Hòa Phát SF101A",
+    "ChatLieu": null,
+    "Gia": 17997400,
+    "DonViTinh": "bo",
+    "MOQ": 20,
+    "TonKho": 66,
+    "ThoiGianGiao": 14,
+    "BaoHanh": null,
+    "ChietKhauTheoSoLuong": [
+      {
+        "tu_so_luong": 10,
+        "phan_tram_giam": 3
+      },
+      {
+        "tu_so_luong": 50,
+        "phan_tram_giam": 7
+      }
+    ],
+    "DiemUyTin": null,
+    "KhuVuc": "Ha Noi",
+    "nguon_url": "https://noithathoaphat.com.vn/products/Bộ-ghế-sofa-góc-Hòa-Phát-SF101A.html",
+    "nguon_type": "trang_san_pham",
+    "fetched_at": "2026-09-19",
     "nguoi_thu": "C",
     "simulated_fields": [
       "MOQ",
