@@ -103,7 +103,13 @@ def guard_perceive(func):
         try:
             out = dict(func(state) or {})
         except (MissingFieldError, InvalidProductTypeError) as exc:
-            return {"status": "needs_input", "answer": str(exc), "llm_calls": 1}
+            out = {"status": "needs_input", "answer": str(exc), "llm_calls": 1}
+            # perceive da luu partial_state theo session nay; tra session_id ve de
+            # luot bo sung sau ("20 cai, 60 trieu...") ghep duoc voi luot hien tai
+            partial_sid = (getattr(exc, "partial_state", None) or {}).get("session_id")
+            if not state.get("session_id") and partial_sid:
+                out["session_id"] = partial_sid
+            return out
         except json.JSONDecodeError:
             raise
         except ValueError as exc:

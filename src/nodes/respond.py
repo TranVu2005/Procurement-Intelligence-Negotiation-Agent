@@ -15,6 +15,7 @@ import time
 
 from src.graph_state import AgentState
 from src.llm import get_llm, usage_of
+from src.nodes.tools import is_confirmation_turn
 
 SYSTEM_PROMPT = """Ban la tro ly mua sam noi that. Nhiem vu cua ban la trinh bay lai
 KET QUA DA DUOC TINH SAN ben duoi thanh cau tra loi tieng Viet ngan gon cho nguoi mua.
@@ -32,6 +33,9 @@ Tien te: VND, viet dang so thuan."""
 
 _NO_EVIDENCE = "KHONG CO BANG CHUNG"
 
+# So NCC bi loai liet ke tung dong; con lai chi ghi so luong de prompt khong phinh
+MAX_REJECTED_LINES = 10
+
 
 def _format_supplier(item: dict) -> str:
     simulated = ", ".join(item.get("simulated_fields") or []) or "khong co"
@@ -42,12 +46,31 @@ def _format_supplier(item: dict) -> str:
         f"  don_gia_sau_chiet_khau={item.get('unit_price')} VND\n"
         f"  tong_tien={item.get('total_price')} VND\n"
         f"  thoi_gian_giao={item.get('ThoiGianGiao')} ngay | MOQ={item.get('MOQ')}"
+        f" | ton_kho={item.get('TonKho')} | bao_hanh={item.get('BaoHanh')} thang"
         f" | diem_uy_tin={item.get('DiemUyTin')}\n"
+        f"  khu_vuc={item.get('KhuVuc')} | chat_lieu={item.get('ChatLieu')}\n"
         f"  leverage_score={item.get('leverage_score')}\n"
         f"  chien_luoc_dam_phan={strategy}\n"
         f"  nguon={item.get('nguon_url')}\n"
         f"  truong_mo_phong=[{simulated}]"
     )
+
+
+def _format_rejected(rejected: list[dict]) -> list[str]:
+    """Ly do loai tung NCC, de LLM khong noi "khong co du lieu" voi NCC bi loai."""
+    if not rejected:
+        return []
+    lines = ["Cac NCC bi loai (khong duoc khuyen nghi), kem ly do:"]
+    for item in rejected[:MAX_REJECTED_LINES]:
+        reasons = "; ".join(
+            f"{v.get('code')} ({v.get('field')}: thuc_te={v.get('actual')}, "
+            f"yeu_cau={v.get('required')})"
+            for v in item.get("violations") or []
+        )
+        lines.append(f"- MaNCC={item.get('supplier_id')}: {reasons}")
+    if len(rejected) > MAX_REJECTED_LINES:
+        lines.append(f"- ... va {len(rejected) - MAX_REJECTED_LINES} NCC khac bi loai.")
+    return lines
 
 
 def build_evidence_block(state: AgentState) -> str:
@@ -57,6 +80,7 @@ def build_evidence_block(state: AgentState) -> str:
         return _NO_EVIDENCE
 
     lines = [_format_supplier(item) for item in ranked[:5]]
+    lines.extend(_format_rejected(state.get("rejected") or []))
     claims = (state.get("verdict") or {}).get("claims") or []
     if claims:
         lines.append("Cac khang dinh da duoc kiem chung:")
@@ -99,6 +123,11 @@ def respond(state: AgentState) -> dict:
             "status": "graceful_fail",
             "llm_calls": 0,
         }
+
+    if is_confirmation_turn(state):
+        # confirm_gate se chot don va tu viet tom tat; goi LLM o day chi ton 1 lan
+        # goi va sinh cau "toi khong chot don" mau thuan voi ket qua
+        return {"answer": "", "status": "success", "llm_calls": 0}
 
     messages = [
         ("system", SYSTEM_PROMPT),
