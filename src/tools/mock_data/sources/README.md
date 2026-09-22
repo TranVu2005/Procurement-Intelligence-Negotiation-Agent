@@ -25,6 +25,20 @@ doc moi file `*.csv` o day, kiem tra hop le roi sinh ban ghi `SRC###` trong `sup
 | `warranty_months`, `trust_score` | khong | chi dien khi trang ghi ro. Trong thi de `null`, khong mo phong |
 | `note` | khong | ghi chu cho nguoi duyet, khong dua vao du lieu |
 
+## Doi chieu voi trang that
+
+```bash
+python scripts/verify_sources.py            # chi bao cao: reports/source_verification_<ngay>.csv
+python scripts/verify_sources.py --apply    # cap nhat CSV theo quy tac trong docstring cua script
+python generate_mock_data.py                # sinh lai suppliers.json + VERSION
+```
+
+Script doc gia ban hien tai cua **san pham chinh** tren tung trang (khong doc khoi "san pham
+lien quan"), gia goc gach ngang, chat lieu va bao hanh ghi ro tren trang. Trang Hoa Phat co
+bien the (so cho, chat lieu boc, chan nhua/chan ma) gia khac nhau: gia duoc gan voi dung mot
+bien the qua API `hp_variation_price.php`, ten bien the ghi vao `product_name`. Xung dot chat
+lieu giua CSV va trang chi duoc bao cao, nguoi sua tay va ghi ly do vao `note`.
+
 ## Kiem tra truoc khi gui
 
 ```bash
