@@ -37,17 +37,21 @@ dùng để trả lời phản biện.
 
 **Vì sao chọn câu này:** deadline 7 ngày loại hết ghế gấp giá rẻ của Đà Nẵng
 (SRC008 giao 8 ngày), nên top 4 là ghế văn phòng thật, trông hợp lý. Với câu mẫu
-"50 ghế, 200 triệu, 14 ngày" thì hạng 1 là **ghế gấp nệm 204.600 VND** (SRC008),
+"50 ghế, 200 triệu, 14 ngày" thì hạng 1 là **ghế gấp nệm 220.000 VND** (SRC008),
 thắng vì dư ngân sách — nhìn rất kém khi demo.
 
 **Kết quả kỳ vọng (đã kiểm chứng):**
 
 | Hạng | MaNCC | Sản phẩm | Tổng tiền (VND) | Giao | Leverage |
 |---|---|---|---|---|---|
-| 1 | SRC030 | Tekkashop HTGV8007 (Hà Nội) | 20952000 | 5 ngày | 64.84 |
-| 2 | SRC075 | Hòa Phát GL217 ghế lưới | 23041380 | 6 ngày | 60.23 |
-| 3 | SRC027 | Tekkashop HTGV7061 | 26966000 | 4 ngày | 60.09 |
-| 4 | SRC073 | Hòa Phát FMQ551 ghế da | 37383800 | 7 ngày | 29.94 |
+| 1 | SRC030 | Tekkashop HTGV8007 (Hà Nội) | 21600000 | 5 ngày | 64.09 |
+| 2 | SRC027 | Tekkashop HTGV7061 | 27800000 | 4 ngày | 59.13 |
+| 3 | SRC075 | Hòa Phát GL217 ghế lưới, chân nhựa | 23754000 | 6 ngày | 54.52 |
+| 4 | SRC073 | Hòa Phát FMQ551 ghế bọc da | 38540000 | 7 ngày | 29.49 |
+
+Cập nhật 2026-09-22 tối: giá là **giá niêm yết trên trang** (trước đây trừ chiết khấu mô
+phỏng), và bảo hành 12 tháng của Hòa Phát giờ có dữ liệu thật nên được tính điểm. Vì vậy
+SRC027 lên hạng 2. Chạy tất định; cần chạy lại với Gemini trước giờ demo.
 
 - `status = needs_confirmation`, `llm_calls = 2`, `replan_count = 0`, 29 tool call.
 - Bị loại: 23 `delivery_deadline_unmet`, 7 `budget_exceeded`, 6 `quantity_below_moq`.
@@ -76,8 +80,8 @@ Chạy tiếp KB1 trong **cùng session**:
 
 | Lượt | Input | Kết quả kỳ vọng (đã kiểm chứng) |
 |---|---|---|
-| 2 | `Tăng lên 30 cái nhé, các điều kiện khác giữ nguyên.` | Chỉ `quantity` đổi 20→30; budget 40tr, deadline 7, region giữ nguyên. Chỉ còn **SRC030** (31428000). SRC075 bị loại `stock_below_quantity` (tồn 24 < 30); SRC027 bị loại `budget_exceeded` (40449000 > 40000000); SRC073 vượt ngân sách. |
-| 3 | `Vậy nâng ngân sách lên 60 triệu.` | Chỉ `budget_max` đổi. Quay lại 3 phương án: SRC030 31428000, SRC027 40449000, SRC073 56075700. **SRC075 vẫn bị loại** vì tồn kho — ràng buộc cũ còn hiệu lực. |
+| 2 | `Tăng lên 30 cái nhé, các điều kiện khác giữ nguyên.` | Chỉ `quantity` đổi 20→30; budget 40tr, deadline 7, region giữ nguyên. Chỉ còn **SRC030** (32400000). SRC075 bị loại `stock_below_quantity` (tồn 24 < 30); SRC027 bị loại `budget_exceeded` (41700000 > 40000000); SRC073 vượt ngân sách. |
+| 3 | `Vậy nâng ngân sách lên 60 triệu.` | Chỉ `budget_max` đổi. Quay lại 3 phương án: SRC030 32400000, SRC027 41700000, SRC073 57810000. **SRC075 vẫn bị loại** vì tồn kho — ràng buộc cũ còn hiệu lực. |
 | 4 | `Ok, chốt đơn đi` | `confirm_order` chạy đúng 1 lần, `status = success`, ghi vào `decisions_made`. |
 
 **Vì sao kịch bản này mạnh:** mỗi lượt thay đúng 1 field và tập ứng viên đổi vì
@@ -90,8 +94,8 @@ hành động (chỉ chốt khi có xác nhận tường minh ở lượt ≥ 2)
 câu từ chối không kích hoạt `confirm_order` (case C15).
 
 Lượt 4 không gọi LLM (llm_calls chỉ từ perceive) và trả tóm tắt tất định: "Da chot don
-voi Tekkashop (SRC030) ...: so luong 30, don gia sau chiet khau 1047600 VND, tong tien
-31428000 VND, giao trong 5 ngay. Nguon: ...". Nói "chốt đơn đi" thêm lần nữa thì trả
+voi Tekkashop (SRC030) ...: so luong 30, don gia sau chiet khau 1080000 VND, tong tien
+32400000 VND, giao trong 5 ngay. Nguon: ...". Nói "chốt đơn đi" thêm lần nữa thì trả
 "da duoc chot truoc do luc ... Toi khong tao them don trung", không gọi `confirm_order`.
 
 ---
@@ -104,8 +108,8 @@ voi Tekkashop (SRC030) ...: so luong 30, don gia sau chiet khau 1047600 VND, ton
 đúng 3 field thiếu (số lượng, ngân sách, thời hạn). Case C16.
 
 Lượt bổ sung `Khoảng 20 cái, ngân sách 60 triệu, cần trong 6 ngày` ghép đúng với lượt 1
-(cùng session, `material_preference = "gỗ tự nhiên"` được giữ) và ra SRC081 43591800 /
-SRC052 45725800 / SRC051 51274200. Đây là kịch bản thay thế tốt cho KB2 nếu muốn demo
+(cùng session, `material_preference = "gỗ tự nhiên"` được giữ) và ra SRC081 44940000 /
+SRC052 47140000 / SRC051 52860000. Đây là kịch bản thay thế tốt cho KB2 nếu muốn demo
 "thiếu dữ liệu" thay vì "đổi yêu cầu".
 
 ### KB4 — Ràng buộc mâu thuẫn
@@ -122,7 +126,7 @@ không gợi ý nhà cung cấp nào. Chẩn đoán: `budget_exceeded` (27 NCC),
 
 `So sánh giúp tôi SRC075, SRC076 và SRC074 cho 30 cái` → nhánh `compare_specific`,
 **không gọi `search_suppliers`**, 4 tool call. SRC075 bị loại `stock_below_quantity`
-(24 < 30); SRC076 40166730 xếp trên SRC074 66551700. Dùng để chứng minh "chọn đúng
+(24 < 30); SRC076 41409000 xếp trên SRC074 68610000. Dùng để chứng minh "chọn đúng
 tool, không gọi thừa" (Tool 2.0).
 
 ### KB6 — Hỏi chi tiết 1 NCC
@@ -162,13 +166,13 @@ nên plan hay LLM không có đường nào gọi được nó; chỉ `confirm_g
 ### KB9 — Session isolation
 
 Mở 2 tab Streamlit, mỗi tab một yêu cầu khác nhau (ví dụ KB1 và `Cần 15 tủ hồ sơ,
-ngân sách 50 triệu, giao trong 14 ngày` → SRC042 15277500). Lượt 2 ở tab này không
+ngân sách 50 triệu, giao trong 14 ngày` → SRC042 15750000). Lượt 2 ở tab này không
 nhận ràng buộc của tab kia. Nút reset trong sidebar tạo session mới (Memory 1.0).
 
 ### KB10 — Dữ liệu thiếu giá (lỗi cô lập trong batch)
 
-`Cần 20 bàn làm việc, ngân sách 60 triệu, giao trong 6 ngày` → SRC081 43591800 /
-SRC052 45725800 / SRC051 51274200. Hai bản ghi SRC023, SRC024 có `Gia = null`:
+`Cần 20 bàn làm việc, ngân sách 60 triệu, giao trong 6 ngày` → SRC081 44940000 /
+SRC052 47140000 / SRC051 52860000. Hai bản ghi SRC023, SRC024 có `Gia = null`:
 `compare_price` chỉ báo lỗi riêng 2 phần tử đó (`tool_result_error` ×2 trong
 `rejected`), các NCC còn lại vẫn được so sánh — đúng yêu cầu "một phần tử lỗi không
 làm hỏng cả response".
@@ -185,10 +189,10 @@ Vùng yêu cầu cho kết quả đẹp (đã chạy):
 
 | Yêu cầu | Top 1 | Ghi chú |
 |---|---|---|
-| 40 kệ, 50tr, 14 ngày | SRC037 17460000 | 10 phương án hợp lệ |
-| 15 tủ hồ sơ, 50tr, 14 ngày | SRC042 15277500 | 5 phương án |
-| 10 sofa, 100tr, 15 ngày, vải bọc | SRC004 72750000 | Linco có bảo hành 60 tháng |
-| 20 bàn, 60tr, 6 ngày | SRC081 43591800 | có 2 NCC thiếu giá bị loại riêng |
+| 40 kệ, 50tr, 14 ngày | SRC037 18000000 | 10 phương án hợp lệ |
+| 15 tủ hồ sơ, 50tr, 14 ngày | SRC042 15750000 | 5 phương án |
+| 10 sofa, 100tr, 15 ngày, vải bọc | SRC004 75000000 | Linco có bảo hành 60 tháng |
+| 20 bàn, 60tr, 6 ngày | SRC081 44940000 | có 2 NCC thiếu giá bị loại riêng |
 
 Cần biết trước để không bị bất ngờ:
 
