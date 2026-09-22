@@ -52,12 +52,13 @@ class CaseSchemaTests(unittest.TestCase):
                         self.assertIn(tool, VALID_TOOLS)
 
     def test_every_injected_case_names_a_known_error_type(self) -> None:
-        from src.nodes.tool_exec import INJECTABLE_ERROR_TYPES
+        # "timeout" = loi moi lan goi, "timeout:1" = chi loi lan goi dau (loi thoang qua)
+        from src.nodes.tool_exec import _parse_injection
         for filename, case in load_all_cases():
-            for tool, error_type in (case.get("inject") or {}).items():
+            for tool, value in (case.get("inject") or {}).items():
                 with self.subTest(case=f"{filename}:{case['id']}"):
                     self.assertIn(tool, VALID_TOOLS)
-                    self.assertIn(error_type, INJECTABLE_ERROR_TYPES)
+                    self.assertIsNotNone(_parse_injection(value)[0])
 
     def test_case_ids_are_unique_across_files(self) -> None:
         ids = [case["id"] for _f, case in load_all_cases()]

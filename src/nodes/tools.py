@@ -210,6 +210,30 @@ def _is_confirmed(user_input: str) -> bool:
     return any(word in folded for word in CONFIRM_WORDS)
 
 
+def _previous_order(state: AgentState, supplier_id: str | None) -> dict | None:
+    """Don da chot voi dung NCC nay trong phien (req["decisions_made"])."""
+    for decision in (state.get("req") or {}).get("decisions_made") or []:
+        if isinstance(decision, dict) and decision.get("supplier_id") == supplier_id:
+            return decision
+    return None
+
+
+def is_confirmation_turn(state: AgentState) -> bool:
+    """True khi confirm_gate se thuc thi chot don o luot nay.
+
+    respond dung ham nay de bo qua LLM: neu khong, LLM (khong biet don sap
+    duoc chot) viet "toi khong chot don" roi gate lai noi "da chot don".
+    """
+    ranked = state.get("ranked") or []
+    quantity = ((state.get("req") or {}).get("hard_constraints") or {}).get("quantity")
+    return bool(
+        ranked and ranked[0].get("MaNCC") and quantity
+        and state.get("intent") != "supplier_detail"
+        and _is_confirmed(state.get("user_input", ""))
+        and _has_previous_turn(state)
+    )
+
+
 def confirm_gate(state: AgentState) -> dict:
     """Chan buoc chot don lai, cho den khi nguoi dung xac nhan tuong minh.
 
@@ -227,6 +251,18 @@ def confirm_gate(state: AgentState) -> dict:
     supplier_id = top.get("MaNCC")
     confirmed_now = _is_confirmed(state.get("user_input", ""))
     earlier_turn = _has_previous_turn(state)
+
+    previous = _previous_order(state, supplier_id)
+    if confirmed_now and earlier_turn and previous:
+        # Xac nhan lap lai khong duoc tao them don (confirm_order khong idempotent)
+        return {
+            "pending_confirmation": None,
+            "status": "success",
+            "answer": (
+                f"Don voi {top.get('TenNCC')} ({supplier_id}) da duoc chot truoc do luc "
+                f"{previous.get('confirmed_at')}. Toi khong tao them don trung."
+            ),
+        }
 
     if not (confirmed_now and earlier_turn) or not supplier_id:
         note = _FIRST_TURN_NOTE if confirmed_now and not earlier_turn else ""
@@ -263,13 +299,16 @@ def confirm_gate(state: AgentState) -> dict:
                 "status": "graceful_fail",
                 "answer": f"Khong chot duoc don: {result.get('message')}"}
 
+    # respond da bo qua LLM o luot nay (is_confirmation_turn), nen cau tra loi la
+    # tom tat tat dinh tu chinh ban ghi da chot - khong noi vao van ban cu
     return {
         "tool_results": [entry],
         "pending_confirmation": None,
         "status": "success",
         "answer": (
-            f"{state.get('answer', '')}\n\n"
-            f"Da chot don voi {top.get('TenNCC')} ({supplier_id}), so luong {quantity}, "
-            f"luc {result['confirmed_at']}."
-        ).strip(),
+            f"Da chot don voi {top.get('TenNCC')} ({supplier_id}) luc {result['confirmed_at']}: "
+            f"so luong {quantity}, don gia sau chiet khau {top.get('unit_price')} VND, "
+            f"tong tien {top.get('total_price')} VND, giao trong {top.get('ThoiGianGiao')} ngay. "
+            f"Nguon: {top.get('nguon_url')}."
+        ),
     }

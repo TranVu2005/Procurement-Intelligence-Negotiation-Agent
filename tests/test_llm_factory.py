@@ -73,7 +73,7 @@ class GetLLMTests(unittest.TestCase):
         self.assertIn("GOOGLE_API_KEY", str(ctx.exception))
 
     def test_model_name_is_single_source_of_truth(self) -> None:
-        self.assertEqual(MODEL_NAME, "gemini-3.6-flash")
+        self.assertEqual(MODEL_NAME, "gemini-3.5-flash-lite")
 
     def test_openrouter_provider_missing_key_raises_actionable_error(self) -> None:
         env = {k: v for k, v in os.environ.items()
@@ -93,6 +93,14 @@ class GetLLMTests(unittest.TestCase):
         self.assertIsInstance(llm, ChatOpenAI)
         self.assertEqual(str(llm.openai_api_base), "https://openrouter.ai/api/v1")
         self.assertEqual(llm.model_name, "openrouter/free")
+
+    def test_openrouter_retries_rate_limits_more_than_the_client_default(self) -> None:
+        # Model free cua OpenRouter hay tra 429 "rate-limited upstream" (2026-09-22)
+        env = {"LLM_PROVIDER": "openrouter", "OPENROUTER_API_KEY": "sk-test",
+               "AGENT_LLM": ""}
+        with patch.dict(os.environ, env, clear=False):
+            llm = get_llm()
+        self.assertGreaterEqual(llm.max_retries, 5)
 
     def test_openrouter_model_is_overridable_via_env(self) -> None:
         env = {"LLM_PROVIDER": "openrouter", "OPENROUTER_API_KEY": "sk-test",

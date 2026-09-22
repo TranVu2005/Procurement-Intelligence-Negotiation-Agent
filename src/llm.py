@@ -14,11 +14,11 @@ import time
 
 from langchain_core.messages import AIMessage
 
-MODEL_NAME = "gemini-3.6-flash"
+MODEL_NAME = "gemini-3.5-flash-lite"
 
 # Do tre gia lap cua stub. Do thuc te bang scripts/run_loadtest.py --levels 1
 # --requests-per-level 5 --llm real (Task 16 buoc 6): p50=17542ms, p95=20966ms
-# tren gemini-3.6-flash, CCU=1, ngay 2026-09-14.
+# tren gemini-3.5-flash-lite, CCU=1, ngay 2026-09-14.
 STUB_LATENCY_MEAN_S = 17.5
 STUB_LATENCY_STDDEV_S = 1.7
 
@@ -113,6 +113,9 @@ class _BoundStubLLM(StubLLM):
 
 
 DEFAULT_OPENROUTER_MODEL = "openrouter/free"
+# Model free dung chung pool cua nha cung cap, hay tra 429 "rate-limited upstream"
+# (do 2026-09-22); client tu retry voi backoff mu truoc khi coi la loi.
+OPENROUTER_MAX_RETRIES = 6
 
 
 def get_llm(streaming: bool = False, temperature: float = 0.0):
@@ -144,6 +147,7 @@ def get_llm(streaming: bool = False, temperature: float = 0.0):
             base_url="https://openrouter.ai/api/v1",
             temperature=temperature,
             streaming=streaming,
+            max_retries=OPENROUTER_MAX_RETRIES,
         )
 
     if provider == "nararouter":

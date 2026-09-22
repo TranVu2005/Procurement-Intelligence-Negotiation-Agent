@@ -31,6 +31,36 @@ TOOL_REGISTRY = {
 INJECTABLE_ERROR_TYPES = {"timeout", "tool_unavailable", "no_match", "invalid_input"}
 
 
+def _parse_injection(value) -> tuple[str | None, int | None]:
+    """"timeout" -> loi o moi lan goi; "timeout:1" -> chi loi o 1 lan goi dau.
+
+    Dang ":N" gia lap loi thoang qua, de AutoEval thay retry phuc hoi that su
+    thay vi luon ket thuc bang graceful_fail.
+    """
+    if not isinstance(value, str):
+        return None, None
+    error_type, _, count = value.partition(":")
+    if error_type not in INJECTABLE_ERROR_TYPES:
+        return None, None
+    if not count:
+        return error_type, None
+    return (error_type, int(count)) if count.isdigit() else (None, None)
+
+
+def _fail_first_calls(tool_func, error_type: str, failures: int):
+    """Boc tool: 'failures' lan goi dau tra loi gia lap, cac lan sau goi that."""
+    calls = {"n": 0}
+
+    def wrapped(**kwargs):
+        calls["n"] += 1
+        if calls["n"] <= failures:
+            return tool_func(**kwargs, _simulate_error=error_type)
+        return tool_func(**kwargs)
+
+    wrapped.__name__ = getattr(tool_func, "__name__", "tool")
+    return wrapped
+
+
 def run_tool(state: AgentState, tool_name: str, params: dict,
              step_id: int | None = None) -> tuple[dict, dict]:
     """Goi 1 tool, tra ve (ket qua tool, phan tu audit trail).
@@ -53,10 +83,14 @@ def run_tool(state: AgentState, tool_name: str, params: dict,
         return result, entry
 
     call_kwargs = dict(params)
-    injected = (state.get("inject") or {}).get(tool_name)
-    if injected in INJECTABLE_ERROR_TYPES:
-        call_kwargs["_simulate_error"] = injected
-        log_event(trace_id, "failure_injected", tool=tool_name, error_type=injected)
+    error_type, failures = _parse_injection((state.get("inject") or {}).get(tool_name))
+    if error_type and failures is None:
+        call_kwargs["_simulate_error"] = error_type
+    elif error_type:
+        tool_func = _fail_first_calls(tool_func, error_type, failures)
+    if error_type:
+        log_event(trace_id, "failure_injected", tool=tool_name, error_type=error_type,
+                  failures=failures or "all")
 
     stats: dict = {}
     started = time.perf_counter()

@@ -49,8 +49,8 @@ Tests are stdlib `unittest`, not pytest — pytest is not installed and is not i
 - Pipeline LangGraph chạy end-to-end (`src/graph.py::run_request`); `src/agent.py` là REPL mỏng.
 - Test: chạy `python -m unittest discover tests "test_*.py"` để lấy con số hiện tại — không ghi
   cứng số lượng ở đây vì nó đổi mỗi task.
-- Dữ liệu: 32 bản ghi legacy mô phỏng (`NCC###`), 6 edge case (`EDGE*`), cộng bản ghi thật
-  `SRC###` sinh từ `src/tools/mock_data/sources/*.csv`. Phiên bản ở `src/tools/mock_data/VERSION`.
+- Dữ liệu: 106 bản ghi = 100 bản ghi thật `SRC###` sinh từ `src/tools/mock_data/sources/*.csv`
+  + 6 edge case (`EDGE*`). Không còn bản ghi legacy `NCC###`. Phiên bản ở `src/tools/mock_data/VERSION`.
 - AutoEval: `python scripts/run_autoeval.py --eval-set tests/eval_set --llm real --repeat 3`;
   báo cáo mới nhất nằm trong `reports/`. `tests/run_autoeval.py` là file khác (tầng unit test).
 - Việc đang chờ A/B: xem `HANDOFF-C-2026-09-18.md`.
@@ -85,8 +85,8 @@ Modules:
   `make_plan` deliberately emits only the search step — supplier IDs for `compare_price`
   do not exist until search returns, so the orchestrator appends the dependent calls.
 - **`src/tools/`** — `StructuredTool` wrappers with Pydantic `args_schema`
-  (`supplier_tools.py`) over the mock dataset (`mock_data/suppliers.json`: 38 records
-  today, target 50–55, fields `MaNCC, TenNCC, LoaiSanPham, ChatLieu, Gia, DonViTinh, MOQ,
+  (`supplier_tools.py`) over the mock dataset (`mock_data/suppliers.json`: 106 records
+  today, fields `MaNCC, TenNCC, LoaiSanPham, ChatLieu, Gia, DonViTinh, MOQ,
   TonKho, ThoiGianGiao, BaoHanh, ChietKhauTheoSoLuong, DiemUyTin, KhuVuc`). Tools return
   structured JSON only, never free text; every error uses the shared shape
   `{"error": true, "error_type": "no_match|timeout|invalid_input|tool_unavailable", "message": "..."}`.
