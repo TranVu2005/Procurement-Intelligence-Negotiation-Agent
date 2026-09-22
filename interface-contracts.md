@@ -148,6 +148,13 @@ lỗi chuẩn, không có hai trường này.
 NCC có `Gia` hoặc `MOQ` là `null` trả lỗi riêng phần tử đó (`error_type: "tool_unavailable"`,
 message nêu tên trường thiếu) — không tự điền số.
 
+**Đổi ý nghĩa (C, 2026-09-22, không đổi tên hay shape):** `unit_price` là **giá niêm yết trên
+trang nguồn**. Bậc `ChietKhauTheoSoLuong` chỉ được trừ vào giá khi bậc đó có nguồn (không nằm
+trong `simulated_fields`); với bản ghi hiện tại (bậc chiết khấu luôn mô phỏng) `discount_applied`
+là `"0%"` và `total_price = Gia × quantity`. Lý do: trước đây agent báo "đơn giá sau chiết khấu"
+213400 cho SRC008 trong khi trang ghi 220000, tức là một con số không có trên nguồn. Bậc chiết
+khấu mô phỏng vẫn có trong `get_supplier_detail` để B dùng làm đòn bẩy đàm phán. Cần B xác nhận.
+
 ### `confirm_order` — đã cập nhật vai trò (buổi họp 4, 15/9)
 - **Vai trò mới**: node `confirm_gate` (pipeline, không phải LLM-callable tool) — chặn lại chờ người dùng xác nhận tường minh (architecture.md §3.5).
 - **Input/Output giữ nguyên** như cũ.

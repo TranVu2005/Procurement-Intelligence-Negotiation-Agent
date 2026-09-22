@@ -307,7 +307,7 @@ def confirm_gate(state: AgentState) -> dict:
         "status": "success",
         "answer": (
             f"Da chot don voi {top.get('TenNCC')} ({supplier_id}) luc {result['confirmed_at']}: "
-            f"so luong {quantity}, don gia sau chiet khau {top.get('unit_price')} VND, "
+            f"so luong {quantity}, don gia niem yet {top.get('unit_price')} VND, "
             f"tong tien {top.get('total_price')} VND, giao trong {top.get('ThoiGianGiao')} ngay. "
             f"Nguon: {top.get('nguon_url')}."
         ),

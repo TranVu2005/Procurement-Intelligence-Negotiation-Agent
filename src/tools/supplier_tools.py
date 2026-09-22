@@ -144,10 +144,16 @@ def get_supplier_detail(supplier_id: str, _simulate_error: str | None = None) ->
     return result
 
 
-def _apply_discount(price: int, quantity: int, tiers: list[dict]) -> tuple[int, int]:
-    """Chon bac giam gia cao nhat ma quantity dat duoc. Tra ve (unit_price, phan_tram_giam)."""
+def _apply_discount(price: int, quantity: int, tiers: list[dict],
+                    simulated: bool = False) -> tuple[int, int]:
+    """Chon bac giam gia cao nhat ma quantity dat duoc. Tra ve (unit_price, phan_tram_giam).
+
+    simulated=True: bac chiet khau la so lieu mo phong (co ten trong simulated_fields),
+    nen KHONG tru vao gia - con so hien cho nguoi dung phai trung gia tren trang nguon.
+    Bac chiet khau van nam trong ChietKhauTheoSoLuong de lam don bay dam phan.
+    """
     applicable = [t for t in (tiers or []) if quantity >= t["tu_so_luong"]]
-    if not applicable:
+    if simulated or not applicable:
         return price, 0
     best = max(applicable, key=lambda t: t["phan_tram_giam"])
     pct = best["phan_tram_giam"]
@@ -209,7 +215,10 @@ def compare_price(supplier_ids: list[str], quantity: int,
             continue
 
         try:
-            unit_price, pct = _apply_discount(record["Gia"], quantity, record.get("ChietKhauTheoSoLuong"))
+            unit_price, pct = _apply_discount(
+                record["Gia"], quantity, record.get("ChietKhauTheoSoLuong"),
+                simulated="ChietKhauTheoSoLuong" in (record.get("simulated_fields") or []),
+            )
             comparisons.append({
                 "MaNCC": sid,
                 "unit_price": unit_price,
@@ -365,7 +374,9 @@ compare_price_tool = StructuredTool.from_function(
     func=compare_price,
     name="compare_price",
     description=(
-        "So sánh giá sau chiết khấu theo số lượng và kiểm tra điều kiện MOQ cho 1 danh sách nhà cung cấp. "
+        "So sánh giá theo số lượng (giá niêm yết trên trang nguồn; chiết khấu chỉ được trừ khi "
+        "bậc chiết khấu có nguồn, không phải số mô phỏng) và kiểm tra điều kiện MOQ cho 1 danh "
+        "sách nhà cung cấp. "
         "DÙNG KHI: đã có danh sách MaNCC ứng viên và đã biết rõ số lượng dự kiến đặt mua, cần tính "
         "unit_price/total_price/meets_moq để làm cơ sở leverage score hoặc đề xuất. "
         "KHÔNG DÙNG KHI: chưa biết số lượng cụ thể (phải hỏi người dùng trước, không được tự giả định "

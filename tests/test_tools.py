@@ -79,6 +79,7 @@ class GetSupplierDetailTests(unittest.TestCase):
 
 class ComparePriceTests(unittest.TestCase):
     def test_valid_id_returns_discounted_price_and_moq(self) -> None:
+        # T001 co bac chiet khau THAT (khong nam trong simulated_fields) -> duoc tru
         with patch_data():
             result = compare_price(["T001"], quantity=10)
         comparison = result["comparisons"][0]
@@ -86,6 +87,16 @@ class ComparePriceTests(unittest.TestCase):
         self.assertEqual(comparison["discount_applied"], "5%")
         self.assertEqual(comparison["total_price"], 9_500_000)
         self.assertTrue(comparison["meets_moq"])
+
+    def test_simulated_discount_is_not_deducted_from_the_listed_price(self) -> None:
+        # Bac chiet khau mo phong khong duoc tru vao gia: unit_price phai la dung
+        # gia niem yet tren trang nguon (SRC008: web 220000, truoc day hien 213400)
+        simulated = [{**FAKE_DATA[0], "simulated_fields": ["MOQ", "ChietKhauTheoSoLuong"]}]
+        with patch("src.tools.supplier_tools._load_data", return_value=simulated):
+            comparison = compare_price(["T001"], quantity=10)["comparisons"][0]
+        self.assertEqual(comparison["unit_price"], 1_000_000)
+        self.assertEqual(comparison["discount_applied"], "0%")
+        self.assertEqual(comparison["total_price"], 10_000_000)
 
     def test_unknown_id_errors_only_that_element(self) -> None:
         with patch_data():
