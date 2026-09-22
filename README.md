@@ -119,8 +119,9 @@ Test dùng `unittest` chuẩn (không phải pytest — pytest không có trong
 python generate_mock_data.py
 ```
 
-Sinh lại `src/tools/mock_data/suppliers.json` (38 bản ghi: 32 từ 14 công ty
-nội thất văn phòng thật tại Việt Nam + 6 edge case thủ công `EDGE00x`). Tên
+Sinh lại `src/tools/mock_data/suppliers.json` (106 bản ghi: 100 bản ghi `SRC###` từ
+trang sản phẩm của các công ty nội thất văn phòng thật tại Việt Nam + 6 edge
+case thủ công `EDGE00x`; xem `src/tools/mock_data/VERSION`). Tên
 công ty, khu vực và `nguon_url` là thật (website chính thức từng công ty,
 verify qua WebSearch); mọi field số (`Gia`, `MOQ`, `TonKho`, `ThoiGianGiao`,
 `BaoHanh`, `ChietKhauTheoSoLuong`, `DiemUyTin`) là dữ liệu mô phỏng, được khai
