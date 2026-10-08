@@ -103,7 +103,22 @@ def guard_perceive(func):
         try:
             out = dict(func(state) or {})
         except (MissingFieldError, InvalidProductTypeError) as exc:
-            return {"status": "needs_input", "answer": str(exc), "llm_calls": 1}
+            # A.4: giữ lại intent và req tạm từ partial_state để không mất thông tin
+            # đã trích được; cũng giữ token nếu perceive đã trả về trước khi raise.
+            partial = getattr(exc, "partial_state", None) or {}
+            result: dict = {
+                "status":    "needs_input",
+                "answer":    str(exc),
+                "llm_calls": 1,
+            }
+            if partial.get("intent"):
+                result["intent"] = partial["intent"]
+            if partial:
+                result["req"] = partial
+            # Tokens: perceive trả trong out trước khi raise — không có ở đây
+            # vì exception bị ném từ parser trước khi perceive trả giá trị.
+            # C sẽ cộng tokens ở guard_perceive phía C (C.2); ở đây giữ 0 là đúng.
+            return result
         except json.JSONDecodeError:
             raise
         except ValueError as exc:

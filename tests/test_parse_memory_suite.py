@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from src.perception.parser import (
     VALID_PRODUCT_TYPES,
     VALID_INTENTS,
+    VALID_PRIORITIES,
     MissingFieldError,
     InvalidProductTypeError,
     _parse_product_type,
@@ -28,6 +29,7 @@ from src.perception.parser import (
     _parse_deadline,
     _parse_trust_score,
     _parse_intent,
+    _parse_priority,
 )
 from src.memory.db import (
     init_db,
@@ -606,6 +608,277 @@ class TestParserNullFields(unittest.TestCase):
                 parse_request("Mua 5 máy lạnh, 50 triệu, 7 ngày.", session_id="sess_null_07")
 
 
+class TestPriority(unittest.TestCase):
+    """A.2: Test trích xuất priority và ghi đè priority khi đổi ở lượt 2."""
+
+    # --------------- _parse_priority ---------------
+
+    def test_parse_priority_valid_values(self):
+        """Các giá trị hợp lệ phải được trả về đúng và priority_is_default=False."""
+        for p in ("price", "delivery", "quality"):
+            with self.subTest(priority=p):
+                value, is_default = _parse_priority(p)
+                self.assertEqual(value, p)
+                self.assertFalse(is_default,
+                                 f"{p} là giá trị người dùng nói rõ nên priority_is_default phải False")
+
+    def test_parse_priority_none_returns_balanced_default(self):
+        """LLM trả null → mặc định balanced, priority_is_default=True."""
+        value, is_default = _parse_priority(None)
+        self.assertEqual(value, "balanced")
+        self.assertTrue(is_default)
+
+    def test_parse_priority_empty_string_returns_balanced(self):
+        value, is_default = _parse_priority("")
+        self.assertEqual(value, "balanced")
+        self.assertTrue(is_default)
+
+    def test_parse_priority_balanced_explicit_returns_default_flag(self):
+        """LLM trả \"balanced\" (người dùng không nói rõ) → vẫn là mặc định."""
+        # balanced được coi như không nói rõ vì đây là fallback mặc định
+        value, is_default = _parse_priority("balanced")
+        self.assertEqual(value, "balanced")
+        self.assertTrue(is_default)
+
+    def test_parse_priority_unknown_value_fallback_balanced(self):
+        """Giá trị lạ → fallback về balanced mặc định."""
+        value, is_default = _parse_priority("unknown_priority")
+        self.assertEqual(value, "balanced")
+        self.assertTrue(is_default)
+
+    def test_valid_priorities_has_four_values(self):
+        self.assertEqual(VALID_PRIORITIES, {"price", "delivery", "quality", "balanced"})
+
+    # --------------- parse_request với priority ---------------
+
+    def test_parse_request_extracts_price_priority(self):
+        """parse_request: câu có 'rẻ nhất' → priority='price', is_default=False."""
+        from unittest.mock import patch
+        from src.perception.parser import parse_request
+
+        extracted = {
+            "intent": "search_new",
+            "product_type": "ghế văn phòng",
+            "quantity": 50,
+            "budget_max": 200_000_000,
+            "delivery_deadline_days": 14,
+            "material_preference": None,
+            "region_preference": None,
+            "min_trust_score": None,
+            "supplier_ids": [],
+            "supplier_id": None,
+            "priority": "price",
+        }
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
+            state, _, _ = parse_request(
+                "Can mua 50 ghe van phong, ngan sach 200tr, giao 14 ngay, gia re nhat co the",
+                session_id="sess_prio_01",
+            )
+
+        sc = state["soft_constraints"]
+        self.assertEqual(sc["priority"], "price")
+        self.assertFalse(sc["priority_is_default"],
+                         "priority_is_default phải False khi người dùng nói rõ")
+
+    def test_parse_request_no_priority_mentioned_defaults_balanced(self):
+        """parse_request không có priority → balanced + priority_is_default=True."""
+        from unittest.mock import patch
+        from src.perception.parser import parse_request
+
+        extracted = {
+            "intent": "search_new",
+            "product_type": "ghế văn phòng",
+            "quantity": 50,
+            "budget_max": 200_000_000,
+            "delivery_deadline_days": 14,
+            "material_preference": None,
+            "region_preference": None,
+            "min_trust_score": None,
+            "supplier_ids": [],
+            "supplier_id": None,
+            "priority": None,
+        }
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
+            state, _, _ = parse_request(
+                "Can mua 50 ghe van phong, ngan sach 200tr, giao 14 ngay",
+                session_id="sess_prio_02",
+            )
+
+        sc = state["soft_constraints"]
+        self.assertEqual(sc["priority"], "balanced")
+        self.assertTrue(sc["priority_is_default"])
+
+    def test_parse_request_delivery_priority(self):
+        """'can gap' → priority='delivery'."""
+        from unittest.mock import patch
+        from src.perception.parser import parse_request
+
+        extracted = {
+            "intent": "search_new",
+            "product_type": "bàn làm việc",
+            "quantity": 10,
+            "budget_max": 80_000_000,
+            "delivery_deadline_days": 5,
+            "material_preference": None,
+            "region_preference": None,
+            "min_trust_score": None,
+            "supplier_ids": [],
+            "supplier_id": None,
+            "priority": "delivery",
+        }
+        with patch("src.perception.parser._call_llm", return_value=(extracted, 10, 20)):
+            state, _, _ = parse_request(
+                "Can mua 10 ban lam viec, 80tr, giao trong 5 ngay, can gap lam",
+                session_id="sess_prio_03",
+            )
+
+        sc = state["soft_constraints"]
+        self.assertEqual(sc["priority"], "delivery")
+        self.assertFalse(sc["priority_is_default"])
+
+    # --------------- update_state: ghi đè priority ---------------
+
+    def test_update_state_overwrites_priority(self):
+        """update_state: ‘thôi ưu tiên giao nhanh’ → priority ghi đè từ balanced → delivery."""
+        from unittest.mock import patch
+        from src.perception.parser import update_state
+
+        existing = {
+            "session_id":       "sess_prio_upd_01",
+            "created_at":       "2026-10-08T10:00:00",
+            "updated_at":       "2026-10-08T10:00:00",
+            "intent":           "search_new",
+            "hard_constraints": {
+                "product_type":           "ghế văn phòng",
+                "quantity":               50,
+                "budget_max":             200_000_000.0,
+                "delivery_deadline_days": 14,
+            },
+            "soft_constraints": {
+                "material_preference": None,
+                "region_preference":   None,
+                "min_trust_score":     None,
+                "priority":            "balanced",
+                "priority_is_default": True,
+            },
+            "conversation_history": [{"role": "user", "content": "luot 1", "timestamp": "T1"}],
+            "decisions_made":   [],
+        }
+
+        extracted_update = {
+            "intent": None,
+            "product_type": None,
+            "quantity": None,
+            "budget_max": None,
+            "delivery_deadline_days": None,
+            "material_preference": None,
+            "region_preference": None,
+            "min_trust_score": None,
+            "supplier_ids": [],
+            "supplier_id": None,
+            "priority": "delivery",   # người dùng nói rõ mướn giao nhanh
+        }
+        with patch("src.perception.parser._call_llm", return_value=(extracted_update, 5, 10)):
+            updated, _, _ = update_state(existing, "Thoi uu tien giao hang nhanh la duoc")
+
+        sc = updated["soft_constraints"]
+        self.assertEqual(sc["priority"], "delivery",
+                         "priority phải được ghi đè thành delivery")
+        self.assertFalse(sc["priority_is_default"],
+                         "priority_is_default phải False sau khi người dùng nói rõ")
+        # Hard constraints không thay đổi
+        self.assertEqual(updated["hard_constraints"]["budget_max"], 200_000_000.0)
+        self.assertEqual(updated["hard_constraints"]["quantity"], 50)
+
+    def test_update_state_no_priority_mentioned_keeps_existing(self):
+        """update_state không nhắc đến priority → giữ nguyên priority cũ."""
+        from unittest.mock import patch
+        from src.perception.parser import update_state
+
+        existing = {
+            "session_id":       "sess_prio_upd_02",
+            "created_at":       "T0",
+            "updated_at":       "T0",
+            "intent":           "search_new",
+            "hard_constraints": {
+                "product_type":           "sofa",
+                "quantity":               10,
+                "budget_max":             300_000_000.0,
+                "delivery_deadline_days": 20,
+            },
+            "soft_constraints": {
+                "material_preference": None,
+                "region_preference":   None,
+                "min_trust_score":     None,
+                "priority":            "quality",  # đã được set từ luợt trước
+                "priority_is_default": False,
+            },
+            "conversation_history": [{"role": "user", "content": "luot 1", "timestamp": "T0"}],
+            "decisions_made":   [],
+        }
+
+        # LLM không nhận ra priority mới (trả null)
+        extracted_update = {
+            "intent": None,
+            "product_type": None,
+            "quantity": None,
+            "budget_max": 200_000_000,  # chỉ đổi budget
+            "delivery_deadline_days": None,
+            "material_preference": None,
+            "region_preference": None,
+            "min_trust_score": None,
+            "supplier_ids": [],
+            "supplier_id": None,
+            "priority": None,  # không nhắc priority
+        }
+        with patch("src.perception.parser._call_llm", return_value=(extracted_update, 5, 10)):
+            updated, _, _ = update_state(existing, "Giam ngan sach xuong 200tr thoi")
+
+        sc = updated["soft_constraints"]
+        self.assertEqual(sc["priority"], "quality",
+                         "priority phải giữ nguyên 'quality' khi không nhắc trong luượt mới")
+        self.assertFalse(sc["priority_is_default"])
+
+    def test_update_state_priority_overwrite_from_price_to_quality(self):
+        """update_state: đổi priority từ price → quality khi người dùng nói rõ."""
+        from unittest.mock import patch
+        from src.perception.parser import update_state
+
+        existing = {
+            "session_id":       "sess_prio_upd_03",
+            "created_at":       "T0",
+            "updated_at":       "T0",
+            "intent":           "search_new",
+            "hard_constraints": {
+                "product_type":           "kệ",
+                "quantity":               5,
+                "budget_max":             50_000_000.0,
+                "delivery_deadline_days": 7,
+            },
+            "soft_constraints": {
+                "material_preference": None,
+                "region_preference":   None,
+                "min_trust_score":     None,
+                "priority":            "price",
+                "priority_is_default": False,
+            },
+            "conversation_history": [{"role": "user", "content": "luot 1", "timestamp": "T0"}],
+            "decisions_made":   [],
+        }
+
+        extracted_update = {
+            "intent": None, "product_type": None, "quantity": None, "budget_max": None,
+            "delivery_deadline_days": None, "material_preference": None,
+            "region_preference": None, "min_trust_score": None,
+            "supplier_ids": [], "supplier_id": None,
+            "priority": "quality",
+        }
+        with patch("src.perception.parser._call_llm", return_value=(extracted_update, 5, 10)):
+            updated, _, _ = update_state(existing, "Thay ra muon uu tien chat luong bao hanh hon")
+
+        self.assertEqual(updated["soft_constraints"]["priority"], "quality")
+        self.assertFalse(updated["soft_constraints"]["priority_is_default"])
+
+
 if __name__ == "__main__":
     unittest.main()
-

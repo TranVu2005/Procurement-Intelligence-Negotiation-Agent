@@ -29,7 +29,9 @@ Lưu trong SQLite, expose ra dạng dict/JSON khi A truyền cho B/C dùng.
   "soft_constraints": {
     "material_preference": "gỗ tự nhiên",
     "region_preference": null,
-    "min_trust_score": 4.0
+    "min_trust_score": 4.0,
+    "priority": "delivery",
+    "priority_is_default": false
   },
 
   "conversation_history": [
@@ -57,11 +59,14 @@ Lưu trong SQLite, expose ra dạng dict/JSON khi A truyền cho B/C dùng.
 | `material_preference` | string \| null | không | ràng buộc mềm |
 | `region_preference` | string \| null | không | ràng buộc mềm |
 | `min_trust_score` | float \| null | không | ràng buộc mềm, 1–5 |
+| `priority` | string | có | `"price"` \| `"delivery"` \| `"quality"` \| `"balanced"` — A ghi, B đọc để chọn preset trọng số; mặc định `"balanced"` (xem `priority_is_default`) |
+| `priority_is_default` | bool | có | `true` nếu người dùng không nói rõ ưu tiên (A dùng mặc định `balanced`); `false` khi người dùng nói rõ |
 | `decisions_made` | list | không | lịch sử lựa chọn đã chốt, dùng để tránh hỏi lại |
 
 **Quy tắc cập nhật:** khi khách đổi yêu cầu, A **ghi đè** field liên quan trong
 `hard_constraints`/`soft_constraints`, không giữ song song bản cũ — B/C luôn đọc bản
-mới nhất từ `updated_at`.
+mới nhất từ `updated_at`. Đặc biệt: khi khách nói rõ ưu tiên mới (ví dụ "thôi ưu tiên
+giao nhanh"), `priority` bị ghi đè và `priority_is_default` chuyển về `false`.
 
 ---
 

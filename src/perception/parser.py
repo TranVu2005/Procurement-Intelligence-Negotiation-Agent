@@ -17,7 +17,9 @@ State schema contract (SYSTEM-RULES.md §2.1):
     "soft_constraints": {
         "material_preference":  str | None,
         "region_preference":    str | None,
-        "min_trust_score":      float | None  # 1–5
+        "min_trust_score":      float | None,  # 1–5
+        "priority":             str,           # "price" | "delivery" | "quality" | "balanced" (mặc định)
+        "priority_is_default":  bool           # True nếu người dùng không nói rõ
     },
     "conversation_history": [...],
     "decisions_made": [...]
@@ -56,6 +58,9 @@ VALID_PRODUCT_TYPES = {
 }
 
 VALID_INTENTS = frozenset({"search_new", "compare_specific", "supplier_detail", "out_of_scope"})
+
+# Giá trị hợp lệ cho soft_constraints.priority (A.2)
+VALID_PRIORITIES = frozenset({"price", "delivery", "quality", "balanced"})
 
 # Intent không cần full hard constraints (chỉ cần MaNCC hoặc thông tin cụ thể)
 _INTENT_SKIP_HARD_VALIDATION: frozenset[str] = frozenset({"compare_specific", "supplier_detail"})
@@ -107,22 +112,34 @@ Nhiệm vụ: Đọc câu yêu cầu và trích xuất thông tin vào JSON vớ
   "region_preference": "khu vực hoặc null",
   "min_trust_score": số_thực_1_5_hoặc_null,
   "supplier_ids": ["MaNCC1", ...] hoặc [],
-  "supplier_id": "MaNCC_cu_the hoặc null"
+  "supplier_id": "MaNCC_cu_the hoặc null",
+  "priority": "price | delivery | quality | null"
 }
 
 Quy tắc bắt buộc:
 1. Chỉ điền giá trị khi khách đề cập RÕ RÀNG trong câu.
 2. KHÔNG suy diễn hoặc tự điền giá trị mặc định.
 3. Nếu không tìm thấy thông tin → dùng null hoặc [].
-4. budget_max: chuyển về số VND thuần (VD: "200 triệu" → 200000000, "5 tỷ" → 5000000000).
-5. delivery_deadline_days: chuyển về số ngày (VD: "2 tuần" → 14, "1 tháng" → 30).
-6. product_type: normalize về đúng 1 trong {ghế văn phòng, bàn làm việc, tủ hồ sơ, kệ, sofa} nếu nhận ra.
-7. intent:
+4. budget_max: chuyển về số VND thuần:
+   - "200 triệu" → 200000000, "5 tỷ" → 5000000000
+   - "50tr", "50t" → 50000000 ("tr" hoặc "t" sau số = triệu)
+   - "500k" → 500000 ("k" = nghìn)
+5. delivery_deadline_days: chuyển về số ngày:
+   - "2 tuần" → 14, "1 tháng" → 30, "3 ngày" → 3
+   - "tuần tới" → 7, "tháng tới" → 30
+6. quantity: nếu "vài chục" → 30, "vài cái" → 5, "một ít" → null (không rõ).
+7. product_type: normalize về đúng 1 trong {ghế văn phòng, bàn làm việc, tủ hồ sơ, kệ, sofa} nếu nhận ra.
+8. intent:
    - "search_new": khách muốn TÌM nhà cung cấp mới theo yêu cầu (cần đầy đủ hard constraints). Nếu câu có kèm hỏi ngoài lề nhưng VẪN CÓ nhu cầu mua sắm, chọn search_new thay vì out_of_scope.
    - "compare_specific": khách nêu tên/mã NCC cụ thể muốn so sánh (chỉ cần supplier_ids + quantity).
    - "supplier_detail": khách hỏi chi tiết về một NCC cụ thể (chỉ cần supplier_id).
    - "out_of_scope": câu hỏi HOÀN TOÀN nằm ngoài phạm vi mua sắm nội thất.
-8. Chỉ trả JSON thuần, không giải thích thêm.
+9. priority — chỉ điền khi khách NÓI RÕ ưu tiên:
+   - "price": "rẻ nhất", "giá thấp nhất", "tiết kiệm chi phí", "giá ưu tiên"
+   - "delivery": "cần gấp", "giao nhanh", "giao sớm nhất", "tốc độ giao hàng", "ưu tiên thời gian"
+   - "quality": "chất lượng cao", "uy tín", "bảo hành tốt", "ưu tiên chất lượng/bảo hành"
+   - null: khi khách không đề cập ưu tiên (sẽ dùng preset mặc định "balanced")
+10. Chỉ trả JSON thuần, không giải thích thêm.
 """
 
 _UPDATE_SYSTEM_PROMPT = """Bạn là trợ lý cập nhật yêu cầu mua sắm nội thất khi khách thay đổi thông tin.
@@ -138,13 +155,21 @@ Nhiệm vụ: Đọc tin nhắn và trích xuất CÁC THÔNG TIN ĐƯỢC ĐỀ
   "region_preference": "khu vực hoặc null",
   "min_trust_score": số_thực_1_5_hoặc_null,
   "supplier_ids": ["MaNCC1", ...] hoặc [],
-  "supplier_id": "MaNCC_cu_the hoặc null"
+  "supplier_id": "MaNCC_cu_the hoặc null",
+  "priority": "price | delivery | quality | null"
 }
 
 Quy tắc:
 1. Trả null cho field KHÔNG được đề cập (sẽ được giữ nguyên từ yêu cầu trước). Việc trả lời "chốt đơn", "chưa chốt", hay xác nhận đồng ý/từ chối đều tính là không thay đổi intent (trả null).
-2. Chuyển đổi đơn vị: triệu→VND, tuần→ngày.
-3. Chỉ trả JSON thuần.
+2. Chuyển đổi đơn vị:
+   - triệu/tr/t → VND (nhân 1_000_000); "50tr" → 50000000
+   - tuần → ngày (×7); tháng → ngày (×30)
+3. priority — chỉ điền khi khách NÓI RÕ thay đổi ưu tiên:
+   - "price": "thôi ưu tiên giá rẻ hơn", "muốn giá thấp nhất"
+   - "delivery": "thôi ưu tiên giao nhanh", "cần gấp hơn"
+   - "quality": "muốn chú trọng chất lượng hơn"
+   - null: khi không nhắc đến ưu tiên (KHÔNG ghi đè priority cũ)
+4. Chỉ trả JSON thuần.
 """
 
 
@@ -223,6 +248,26 @@ def _parse_intent(raw: str | None) -> str:
     if not raw or str(raw).strip() not in VALID_INTENTS:
         return "search_new"
     return str(raw).strip()
+
+
+def _parse_priority(raw: str | None) -> tuple[str, bool]:
+    """Parse priority từ LLM output.
+
+    Returns:
+        (priority_value, priority_is_default)
+        - priority_value: "price" | "delivery" | "quality" | "balanced"
+        - priority_is_default: True nếu người dùng không nói rõ (dùng balanced mặc định)
+
+    Quy tắc (A.2): chỉ ghi nhận ưu tiên khi người dùng NÓI RÕ; không tự đoán.
+    """
+    if raw is None or str(raw).strip() in ("", "null", "balanced"):
+        # LLM trả null → người dùng không nêu ưu tiên → dùng balanced mặc định
+        return "balanced", True
+    candidate = str(raw).strip().lower()
+    if candidate in VALID_PRIORITIES:
+        return candidate, False
+    # Giá trị lạ → fallback về balanced mặc định
+    return "balanced", True
 
 
 # ---------------------------------------------------------------------------
@@ -311,10 +356,14 @@ def parse_request(text: str, session_id: Optional[str] = None) -> tuple[dict, in
 
     # --- Validate & build soft constraints ---
     raw_trust = extracted.get("min_trust_score")
+    raw_priority = extracted.get("priority")
+    priority, priority_is_default = _parse_priority(raw_priority)
     soft = {
-        "material_preference": extracted.get("material_preference"),
-        "region_preference":   extracted.get("region_preference"),
-        "min_trust_score":     _parse_trust_score(raw_trust) if raw_trust is not None else None,
+        "material_preference":  extracted.get("material_preference"),
+        "region_preference":    extracted.get("region_preference"),
+        "min_trust_score":      _parse_trust_score(raw_trust) if raw_trust is not None else None,
+        "priority":             priority,
+        "priority_is_default":  priority_is_default,
     }
 
     state_dict = {
@@ -383,6 +432,10 @@ def update_state(existing_state: dict, new_text: str) -> tuple[dict, int, int]:
             updated_hard[field] = parser(extracted[field])
 
     updated_soft = dict(existing_state.get("soft_constraints", {}))
+    # Đảm bảo priority và priority_is_default luôn tồn tại (backward compat)
+    if "priority" not in updated_soft:
+        updated_soft["priority"] = "balanced"
+        updated_soft["priority_is_default"] = True
     for field in ("material_preference", "region_preference"):
         if extracted.get(field) is not None:
             updated_soft[field] = extracted[field]
@@ -390,6 +443,11 @@ def update_state(existing_state: dict, new_text: str) -> tuple[dict, int, int]:
         parsed = _parse_trust_score(extracted["min_trust_score"])
         if parsed is not None:  # chỉ ghi đè khi giá trị hợp lệ; ngoài range giữ nguyên
             updated_soft["min_trust_score"] = parsed
+    # Ghi đè priority nếu người dùng đề cập rõ ràng
+    raw_priority_upd = extracted.get("priority")
+    if raw_priority_upd is not None and str(raw_priority_upd).strip() in VALID_PRIORITIES:
+        updated_soft["priority"] = str(raw_priority_upd).strip()
+        updated_soft["priority_is_default"] = False
 
     # Cập nhật supplier_ids / supplier_id nếu đề cập
     updated_supplier_ids = existing_state.get("supplier_ids", [])
