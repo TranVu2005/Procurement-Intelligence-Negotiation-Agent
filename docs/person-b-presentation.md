@@ -91,3 +91,24 @@ thiếu; không tự suy diễn số liệu.
   A cung cấp.
 - Giá niêm yết trên website có thể thay đổi và không đồng nghĩa với báo giá mua
   số lượng lớn; cần kiểm tra lại trước khi ra quyết định mua thật.
+
+## 10. Cập nhật final sau chấm điểm — 2026-10-09
+
+- Scoring có bốn preset `balanced`, `price`, `delivery`, `quality` theo
+  `soft_constraints.priority`; session cũ mặc định `balanced` để giữ kết quả cũ.
+- Final state và UI hiển thị `weights_used`: preset, năm trọng số và lý do chọn.
+- Khi không có phương án, `relax_suggestions` đưa ngưỡng ngân sách/deadline/
+  số lượng lấy từ rejected evidence và luôn kèm `supplier_ids`; hệ thống không
+  tự áp dụng gợi ý.
+- Conflict detection phân biệt các model khác nhau bằng `TenSanPham`.
+
+### Nội dung thay cho Slide 10–11
+
+**Slide 10 — Reasoning thích ứng:** bảng bốn preset, ảnh UI “Trọng số xếp hạng
+đang dùng”, ví dụ cùng tập NCC nhưng `price` chọn NCC rẻ còn `delivery` chọn NCC
+giao nhanh.
+
+**Slide 11 — Evaluation:** thay bảng StubLLM cũ bằng bảng hai tầng do C sinh từ
+report: deterministic pipeline và Gemini thật. Mỗi tỷ lệ phải có `n/N`, task
+success theo category, latency p50/p95, token và chi phí/request. Không tự điền
+số trước khi báo cáo cuối tồn tại.

@@ -15,7 +15,12 @@ load_dotenv()
 
 # Load local configuration before importing the graph/LLM modules.
 from src.graph import run_request  # noqa: E402
-from src.ui_viewmodel import run_metrics, supplier_view_models  # noqa: E402
+from src.ui_viewmodel import (  # noqa: E402
+    relax_suggestion_view_models,
+    run_metrics,
+    supplier_view_models,
+    weights_view_model,
+)
 
 st.set_page_config(
     page_title="Procurement Intelligence Agent",
@@ -122,12 +127,36 @@ def _render_metrics(final: dict) -> None:
         st.code(f"trace_id={metrics['trace_id']}")
 
 
+def _render_decision_policy(final: dict) -> None:
+    weights = weights_view_model(final.get("weights_used"))
+    if weights["weights"]:
+        with st.expander("Trọng số xếp hạng đang dùng"):
+            st.write(f"Preset: **{weights['preset']}**")
+            st.caption(weights["reason"])
+            labels = {
+                "price": "Giá", "moq": "MOQ", "delivery": "Giao hàng",
+                "warranty": "Bảo hành", "trust": "Uy tín",
+            }
+            st.table({labels.get(key, key): [value] for key, value in weights["weights"].items()})
+
+    suggestions = relax_suggestion_view_models(final.get("relax_suggestions"))
+    if suggestions:
+        st.subheader("Gợi ý điều chỉnh — chỉ áp dụng khi bạn xác nhận")
+        for item in suggestions:
+            supplier_ids = ", ".join(item["supplier_ids"])
+            st.warning(
+                f"{item['constraint']}: {item['current']} → {item['suggested']} · "
+                f"Căn cứ: {supplier_ids}. {item['reason']}"
+            )
+
+
 def _render_message(message: dict) -> None:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
         final = message.get("state")
         if isinstance(final, dict):
             _render_cards(final)
+            _render_decision_policy(final)
             _render_metrics(final)
 
 

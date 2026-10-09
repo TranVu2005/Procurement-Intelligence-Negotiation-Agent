@@ -4,9 +4,11 @@ from src.graph_state import AgentState
 from src.reasoning.planner import PlanningError, ReplanLimitReached, make_plan, make_replan
 from src.reasoning.scoring import (
     ScoringError,
+    build_relax_suggestions,
     diagnose as diagnose_rejections,
     filter_hard_constraints,
     rank_suppliers,
+    resolve_weights,
     verify_output as verify_recommendation,
 )
 
@@ -152,10 +154,12 @@ def score_rank(state: AgentState) -> dict:
     """Tra ve: {"ranked": [...]}. Goi rank_suppliers() cua scoring.py."""
     candidates = list(state.get("candidates") or [])
     intent = state.get("intent")
-    hard = (state.get("req") or {}).get("hard_constraints") or {}
+    req = state.get("req") or {}
+    hard = req.get("hard_constraints") or {}
+    weights_used = resolve_weights(req)
 
     if intent == "supplier_detail":
-        return {"ranked": candidates}
+        return {"ranked": candidates, "weights_used": weights_used}
     if intent == "compare_specific" and not all(
         hard.get(field) is not None for field in _FULL_HARD_FIELDS
     ):
@@ -167,11 +171,11 @@ def score_rank(state: AgentState) -> dict:
                 str(item.get("MaNCC", "")),
             ),
         )
-        return {"ranked": ranked}
+        return {"ranked": ranked, "weights_used": weights_used}
     try:
-        return {"ranked": rank_suppliers(candidates, state.get("req") or {})}
+        return {"ranked": rank_suppliers(candidates, req), "weights_used": weights_used}
     except (KeyError, TypeError, ScoringError):
-        return {"ranked": []}
+        return {"ranked": [], "weights_used": weights_used}
 
 
 def verify_output(state: AgentState) -> dict:
@@ -192,7 +196,14 @@ def verify_output(state: AgentState) -> dict:
 def diagnose(state: AgentState) -> dict:
     """Tra ve: {"replan_reason": str} - ma nguyen nhan lay tu
     hard_constraint_violations() va tu loi trong tool_results."""
-    return {"replan_reason": _diagnosis_for(state)["replan_reason"]}
+    diagnosis = _diagnosis_for(state)
+    suggestions = build_relax_suggestions(
+        state.get("rejected") or [], state.get("req") or {},
+    )
+    return {
+        "replan_reason": diagnosis["replan_reason"],
+        "relax_suggestions": suggestions,
+    }
 
 
 def replan(state: AgentState) -> dict:
@@ -230,8 +241,47 @@ def respond_limits(state: AgentState) -> dict:
 def graceful_fail(state: AgentState) -> dict:
     """Ket thuc that bai co ly do. Ton trong `answer` da co san (vd needs_input)."""
     if state.get("answer"):
-        return {"status": state.get("status") or "graceful_fail"}
+        return {
+            "status": state.get("status") or "graceful_fail",
+            "relax_suggestions": state.get("relax_suggestions") or [],
+        }
+
+    diagnosis = _diagnosis_for(state)
+    suggestions = list(state.get("relax_suggestions") or [])
+    if not suggestions:
+        suggestions = build_relax_suggestions(
+            state.get("rejected") or [], state.get("req") or {},
+        )
+
+    lines = [
+        "Không có nhà cung cấp nào đủ bằng chứng và thỏa toàn bộ ràng buộc hiện tại.",
+        f"Nút thắt chính: {diagnosis['replan_reason']}.",
+    ]
+    for item in suggestions:
+        supplier_ids = ", ".join(item.get("supplier_ids") or [])
+        current = item.get("current")
+        suggested = item.get("suggested")
+        constraint = item.get("constraint")
+        if constraint == "budget_max" and all(
+            isinstance(value, (int, float)) and not isinstance(value, bool)
+            for value in (current, suggested)
+        ):
+            detail = f"{current:,.0f} → {suggested:,.0f} VND"
+        elif constraint == "delivery_deadline_days":
+            detail = f"{current} → {suggested} ngày"
+        else:
+            detail = f"{current} → {suggested} sản phẩm"
+        lines.append(
+            f"Gợi ý để bạn cân nhắc, không tự động áp dụng: nới {constraint} "
+            f"từ {detail}, dựa trên {supplier_ids}."
+        )
+    if not suggestions:
+        lines.append(
+            "Chưa có số liệu ứng viên để tính một ngưỡng nới cụ thể; hãy kiểm tra lại "
+            "loại sản phẩm hoặc cung cấp thêm phạm vi tìm kiếm."
+        )
     return {
-        "answer": "Khong tim duoc nha cung cap thoa man rang buoc sau 3 lan lap ke hoach lai.",
+        "answer": "\n".join(lines),
         "status": "graceful_fail",
+        "relax_suggestions": suggestions,
     }

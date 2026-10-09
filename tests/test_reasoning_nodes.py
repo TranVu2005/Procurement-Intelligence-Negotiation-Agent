@@ -77,6 +77,9 @@ class ReasoningNodeTests(unittest.TestCase):
         self.assertIn("leverage_score", ranked[0])
         self.assertIn("negotiation_strategy", ranked[0])
 
+        score_patch = score_rank(state_with(candidates=filtered["candidates"]))
+        self.assertEqual(score_patch["weights_used"]["preset"], "balanced")
+
         tool_results = [
             {"tool": "get_supplier_detail", "status": "ok", "result": candidate},
             {"tool": "compare_price", "status": "ok", "result": {

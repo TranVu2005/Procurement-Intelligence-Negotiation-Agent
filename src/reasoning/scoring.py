@@ -12,7 +12,7 @@ from collections.abc import Iterable
 from typing import Any
 
 
-WEIGHTS = {
+BALANCED_WEIGHTS = {
     "price": 0.30,
     "moq": 0.15,
     "delivery": 0.20,
@@ -20,9 +20,55 @@ WEIGHTS = {
     "trust": 0.20,
 }
 
+WEIGHT_PRESETS = {
+    "balanced": BALANCED_WEIGHTS,
+    "price": {
+        "price": 0.45, "moq": 0.15, "delivery": 0.15,
+        "warranty": 0.10, "trust": 0.15,
+    },
+    "delivery": {
+        "price": 0.20, "moq": 0.10, "delivery": 0.40,
+        "warranty": 0.10, "trust": 0.20,
+    },
+    "quality": {
+        "price": 0.20, "moq": 0.10, "delivery": 0.15,
+        "warranty": 0.25, "trust": 0.30,
+    },
+}
+
+# Backward-compatible public constant used by older tests and documentation.
+WEIGHTS = BALANCED_WEIGHTS
+
+_PRIORITY_REASONS = {
+    "price": "Người dùng ưu tiên giá; tăng trọng số giá lên 45%.",
+    "delivery": "Người dùng ưu tiên giao nhanh; tăng trọng số giao hàng lên 40%.",
+    "quality": "Người dùng ưu tiên chất lượng; tăng trọng số bảo hành và uy tín.",
+    "balanced": "Không có ưu tiên tường minh; dùng bộ trọng số cân bằng mặc định.",
+}
+
 
 class ScoringError(ValueError):
     """Raised when required evidence is absent or malformed."""
+
+
+def resolve_weights(state: dict[str, Any]) -> dict[str, Any]:
+    """Resolve the user priority to a validated, auditable weight preset.
+
+    A may not have merged ``soft_constraints.priority`` yet. Missing or unknown
+    values deliberately fall back to the legacy balanced preset so old sessions
+    and demo cases remain reproducible.
+    """
+
+    soft = state.get("soft_constraints") or {}
+    requested = soft.get("priority") if isinstance(soft, dict) else None
+    preset = requested if requested in WEIGHT_PRESETS else "balanced"
+    weights = dict(WEIGHT_PRESETS[preset])
+    if set(weights) != set(BALANCED_WEIGHTS) or abs(sum(weights.values()) - 1.0) > 1e-9:
+        raise ScoringError(f"invalid weight preset: {preset}")
+    reason = _PRIORITY_REASONS[preset]
+    if requested and requested not in WEIGHT_PRESETS:
+        reason = f"Ưu tiên '{requested}' chưa được hỗ trợ; {reason.lower()}"
+    return {"preset": preset, "weights": weights, "reason": reason}
 
 
 def _normalize(value: str | None) -> str | None:
@@ -91,15 +137,22 @@ def score_breakdown(supplier: dict[str, Any], hard_constraints: dict[str, Any]) 
     }
 
 
-def leverage_score(supplier: dict[str, Any], hard_constraints: dict[str, Any]) -> float:
+def leverage_score(
+    supplier: dict[str, Any],
+    hard_constraints: dict[str, Any],
+    weights: dict[str, float] | None = None,
+) -> float:
     """Calculate a reproducible 0-100 score using the agreed five factors."""
 
     breakdown = score_breakdown(supplier, hard_constraints)
-    available_weight = sum(WEIGHTS[name] for name, value in breakdown.items() if value is not None)
+    selected = weights or BALANCED_WEIGHTS
+    if set(selected) != set(BALANCED_WEIGHTS) or abs(sum(selected.values()) - 1.0) > 1e-9:
+        raise ScoringError("weights must contain the five factors and sum to 1")
+    available_weight = sum(selected[name] for name, value in breakdown.items() if value is not None)
     if available_weight == 0:
         raise ScoringError("no evidence is available for leverage scoring")
     weighted_score = sum(
-        WEIGHTS[name] * value
+        selected[name] * value
         for name, value in breakdown.items()
         if value is not None
     ) / available_weight
@@ -320,11 +373,16 @@ def rank_suppliers(
     """Score eligible suppliers and return best-first, with deterministic ties."""
 
     supplier_list = list(suppliers)
+    weights_used = resolve_weights(state)
+    weights = weights_used["weights"]
     ranked = []
     for supplier in supplier_list:
         breakdown = score_breakdown(supplier, state["hard_constraints"])
         item = dict(supplier)
-        item["leverage_score"] = leverage_score(supplier, state["hard_constraints"])
+        item["leverage_score"] = leverage_score(
+            supplier, state["hard_constraints"], weights=weights,
+        )
+        item["weights_used"] = weights_used
         item["explanation"] = explain_score(supplier, state, breakdown)
         item["negotiation_strategy"] = generate_negotiation_strategy(
             supplier,
@@ -343,14 +401,21 @@ def detect_evidence_conflicts(suppliers: Iterable[dict[str, Any]]) -> list[dict[
     considered a conflict.
     """
 
-    groups: dict[tuple[str | None, str | None], list[dict[str, Any]]] = {}
+    groups: dict[tuple[str | None, str | None, str | None], list[dict[str, Any]]] = {}
     for supplier in suppliers:
-        key = (_normalize(supplier.get("TenNCC")), _normalize(supplier.get("LoaiSanPham")))
+        # Real datasets contain many distinct models from the same supplier and
+        # product category. Product name keeps those models separate. Synthetic
+        # legacy conflict records omit it, so their old grouping still works.
+        key = (
+            _normalize(supplier.get("TenNCC")),
+            _normalize(supplier.get("LoaiSanPham")),
+            _normalize(supplier.get("TenSanPham")),
+        )
         groups.setdefault(key, []).append(supplier)
 
     conflicts = []
     checked_fields = ("Gia", "MOQ", "TonKho", "ThoiGianGiao", "BaoHanh", "DiemUyTin")
-    for (_name, _product), records in groups.items():
+    for (_name, _product, _product_name), records in groups.items():
         if len(records) < 2:
             continue
         differing = {
@@ -420,6 +485,88 @@ def diagnose(rejected_suppliers: Iterable[dict[str, Any]]) -> dict[str, Any]:
         "replan_reason": f"{primary['code']}: {primary['message']}",
         "causes": causes,
     }
+
+
+def build_relax_suggestions(
+    rejected_suppliers: Iterable[dict[str, Any]],
+    req: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Build evidence-based alternatives without changing user constraints.
+
+    Every numeric suggestion is copied from a rejected supplier's violation
+    evidence and carries the relevant supplier id/source. The function never
+    mutates ``req`` and never claims that relaxing one constraint guarantees a
+    final match, because another hard constraint may still reject that supplier.
+    """
+
+    hard = req.get("hard_constraints", req) if isinstance(req, dict) else {}
+    buckets: dict[str, list[dict[str, Any]]] = {
+        "budget_exceeded": [],
+        "delivery_deadline_unmet": [],
+        "quantity_below_moq": [],
+        "stock_below_quantity": [],
+    }
+    for rejected in rejected_suppliers:
+        evidence = rejected.get("evidence") or {}
+        supplier_id = rejected.get("supplier_id") or evidence.get("MaNCC")
+        for violation in rejected.get("violations") or []:
+            code = violation.get("code")
+            actual = violation.get("actual")
+            if code not in buckets or not isinstance(actual, (int, float)) or isinstance(actual, bool):
+                continue
+            buckets[code].append({
+                "actual": actual,
+                "supplier_id": supplier_id,
+                "source_url": evidence.get("nguon_url"),
+            })
+
+    suggestions: list[dict[str, Any]] = []
+
+    def add(
+        code: str,
+        constraint: str,
+        current: Any,
+        chooser,
+        reason: str,
+    ) -> None:
+        entries = buckets[code]
+        if not entries:
+            return
+        suggested = chooser(item["actual"] for item in entries)
+        supporting = [item for item in entries if item["actual"] == suggested]
+        supplier_ids = sorted({item["supplier_id"] for item in supporting if item["supplier_id"]})
+        if not supplier_ids:
+            return
+        suggestions.append({
+            "constraint": constraint,
+            "current": current,
+            "suggested": suggested,
+            "supplier_ids": supplier_ids,
+            "reason": reason,
+            "evidence": [
+                {"MaNCC": item["supplier_id"], "source_url": item["source_url"]}
+                for item in supporting if item["supplier_id"]
+            ],
+        })
+
+    add(
+        "budget_exceeded", "budget_max", hard.get("budget_max"), min,
+        "Mức ngân sách thấp nhất quan sát được trong các phương án bị loại vì vượt ngân sách.",
+    )
+    add(
+        "delivery_deadline_unmet", "delivery_deadline_days",
+        hard.get("delivery_deadline_days"), min,
+        "Thời hạn giao ngắn nhất quan sát được trong các phương án bị loại vì giao trễ.",
+    )
+    add(
+        "quantity_below_moq", "quantity", hard.get("quantity"), min,
+        "MOQ thấp nhất quan sát được; chỉ tăng số lượng nếu nhu cầu thực tế cho phép.",
+    )
+    add(
+        "stock_below_quantity", "quantity", hard.get("quantity"), max,
+        "Mức tồn kho cao nhất quan sát được; chỉ giảm số lượng nếu người dùng chấp nhận.",
+    )
+    return suggestions
 
 
 def _tool_records(value: Any) -> Iterable[dict[str, Any]]:

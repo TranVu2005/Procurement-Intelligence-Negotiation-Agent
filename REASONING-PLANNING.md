@@ -173,3 +173,43 @@ python -m unittest discover -s tests -p "test_response_prompts.py" -v
 python -m unittest discover -s tests -p "test_reasoning_tools_integration.py" -v
 python -m scripts.demo_e2e
 ```
+# Cập nhật hoàn thiện sau chấm điểm — 2026-10-09
+
+## Trọng số theo ưu tiên người dùng
+
+Reasoning có bốn preset trong `src/reasoning/scoring.py::WEIGHT_PRESETS`:
+
+| Preset | Giá | MOQ | Giao hàng | Bảo hành | Uy tín |
+|---|---:|---:|---:|---:|---:|
+| `balanced` | 30% | 15% | 20% | 15% | 20% |
+| `price` | 45% | 15% | 15% | 10% | 15% |
+| `delivery` | 20% | 10% | 40% | 10% | 20% |
+| `quality` | 20% | 10% | 15% | 25% | 30% |
+
+`resolve_weights(req)` đọc `soft_constraints.priority`. Nếu field chưa có hoặc
+không hợp lệ, hệ thống dùng `balanced`, đúng kết quả cũ. `weights_used` được giữ
+trong final state, ranked record, evidence prompt và UI, gồm preset, năm trọng số
+và lý do chọn. Khi bảo hành/uy tín thiếu, phép tính chuẩn hóa lại trên các trọng
+số có bằng chứng; không tự điền 0.
+
+LLM không chọn trọng số và không đổi ranking. A/Perception trích priority; Python
+của B chọn preset và tính điểm tất định; LLM cuối chỉ diễn đạt kết quả đã có.
+
+## Kết quả rỗng và gợi ý nới ràng buộc
+
+`diagnose` gọi `build_relax_suggestions(rejected, req)`. Gợi ý có cấu trúc
+`constraint/current/suggested/supplier_ids/reason/evidence`. Ngưỡng lấy trực tiếp
+từ violation của NCC bị loại: tổng giá thấp nhất, thời gian giao ngắn nhất, MOQ
+thấp nhất hoặc tồn kho cao nhất tùy nguyên nhân.
+
+Gợi ý không được tự ghi vào state. Người dùng phải xác nhận thay đổi, sau đó A
+mới cập nhật constraint và pipeline chạy lại. Nếu tool không trả record nào, hệ
+thống không bịa ngưỡng số mà nói rõ chưa có evidence để tính.
+
+## Sửa conflict detection
+
+Conflict key nay gồm `TenNCC + LoaiSanPham + TenSanPham`. Nhiều model khác nhau
+của cùng NCC không còn bị coi là hai phiên bản mâu thuẫn. Record synthetic cũ
+không có `TenSanPham` vẫn được group như trước để giữ conflict test có chủ đích.
+
+---
