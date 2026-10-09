@@ -144,7 +144,7 @@ sqlite3 src/memory/state.db < src/memory/schema.sql   # (re)init SQLite state DB
 
 ```bash
 python scripts/run_autoeval.py --eval-set tests/eval_set --llm stub --tier pipeline
-# Chạy thủ công sau khi A/B tích hợp và đã cấu hình API key:
+# Chạy thủ công sau khi đã cấu hình API key:
 python scripts/run_autoeval.py --eval-set tests/eval_set --llm real --tier llm --repeat 3 --sleep-between 4
 ```
 
@@ -161,7 +161,7 @@ request, hai bảng tổng hợp theo tầng và spread min/max/stdev khi `--rep
   tổng/trung bình. Case nhiều lượt tính mọi lượt cho số đo vận hành, chấm task
   success ở state cuối. Percentile dùng nearest-rank.
 - Case chưa có field A/B yêu cầu được ghi **không đo được**, không tính là pass.
-  Field mới đang chờ xác nhận tại cuối `interface-contracts.md`.
+  Hợp đồng field và tương thích oracle A ở cuối `interface-contracts.md`.
 - Bảng giá trong `src/eval/scoring.py::MODEL_PRICING` có nguồn và ngày kiểm tra;
   giá chưa xác minh để `None` và báo **chưa cấu hình giá**, vẫn báo token.
 
@@ -238,15 +238,17 @@ script in “chưa có báo giá b2b_quote nào” và thoát 0.
 
 ## Giới hạn còn lại (2026-10)
 
-- Chưa có kết quả LLM thật mới, chưa cấu hình giá token chính thức, chưa có
-  báo giá B2B thật. Không dùng số stub thay thế các bằng chứng này.
-- A/B còn trích ưu tiên, weights_used, relax_suggestions, case mới và test
-  cô lập phiên/bỏ kết quả cũ. Xem `docs/handoff-c-to-ab-2026-10.md`.
+- Chưa có kết quả LLM thật mới, chưa cấu hình giá token chính thức. File A
+  `a_b2b_quotes.csv` có 3 dòng nhưng thiếu metadata quote của schema C;
+  cần xác minh nguồn/ngày/số lượng/kênh trước khi nhập hoặc so sánh B2B.
+- Đã hợp nhất A/B/C vào main: trích ưu tiên, weights_used, relax_suggestions,
+  UI, 22 case A, 9 case B và test cô lập phiên/bỏ kết quả cũ. Xem
+  `docs/integration-main-2026-10-09.md` để biết kiểm tra sau merge.
 - Exception của parser A chưa mang token: C giữ được nếu có, còn thiếu thì
   không đo được; không tự suy ra token.
 - Fan-out detail giữ nguyên vì batch/full search cần đổi hợp đồng và A/B xác nhận.
 - Grader số hiện có là heuristic cho số >=100; không bao quát toàn bộ số nhỏ
   hoặc chứng minh mọi con số trong văn bản đều gắn URL đúng.
-- Baseline stdlib còn 4 lỗi A/B: hai import pytest của live test, một kỳ vọng
-  model cũ và một evidence conflict. C không sửa test/logic A/B để làm xanh.
+- Sau merge: 454 test, còn hai import pytest của live test và một kỳ vọng
+  model cũ. Test evidence conflict đã pass với logic B mới; suite chưa xanh.
 - Báo cáo/log bị gitignore; chỉ add-f từng report cuối sau khi cả nhóm duyệt.

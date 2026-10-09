@@ -40,7 +40,14 @@ class CaseSchemaTests(unittest.TestCase):
                 self.assertIn(case["category"], VALID_CATEGORIES)
                 self.assertIsInstance(case["turns"], list)
                 self.assertTrue(case["turns"])
-                self.assertIn(case["oracle"]["expect_status"], VALID_STATUS)
+                oracle = case["oracle"]
+                self.assertIsInstance(oracle, dict)
+                if "expect_status" in oracle:
+                    self.assertIn(oracle["expect_status"], VALID_STATUS)
+                else:
+                    # Perception cases declare field/intent expectations rather than graph status.
+                    self.assertTrue(oracle.get("must_extract"))
+                    self.assertTrue(oracle.get("must_reach_intent"))
 
     def test_tool_names_in_oracles_actually_exist(self) -> None:
         for filename, case in load_all_cases():

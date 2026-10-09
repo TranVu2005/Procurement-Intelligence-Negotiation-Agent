@@ -17,6 +17,44 @@ def grade(oracle=None, **final):
 
 
 class ExtensionGradingTests(unittest.TestCase):
+    def test_no_match_oracles_accept_intentionally_empty_ranked_and_verdict(self):
+        path = Path(__file__).parent / "eval_set" / "cases_b.jsonl"
+        for line in path.read_text(encoding="utf-8").splitlines():
+            case = json.loads(line)
+            if case["category"] != "no_match":
+                continue
+            with self.subTest(case=case["id"]):
+                suggestions = ([{"constraint": "budget_max", "supplier_ids": ["SRC_TEST"]}]
+                               if case["oracle"].get("must_suggest_relax") else [])
+                result = grade_case(case, {"intent": "search_new", "status": "graceful_fail",
+                                          "answer": "Không có kết quả phù hợp.", "ranked": [],
+                                          "verdict": {}, "relax_suggestions": suggestions})
+                self.assertTrue(result["passed"], result["failures"])
+
+    def test_boolean_no_null_checks_required_request_fields(self):
+        oracle = {"no_null_fields": True}
+        hard = {"product_type": "ghế văn phòng", "quantity": 50,
+                "budget_max": 200000000, "delivery_deadline_days": 14}
+        self.assertTrue(grade(oracle, req={"hard_constraints": hard,
+                                         "soft_constraints": {"region_preference": None}})["passed"])
+        self.assertFalse(grade(oracle, req={"hard_constraints": {**hard, "quantity": None}})["passed"])
+        del hard["quantity"]
+        missing = grade(oracle, req={"hard_constraints": hard})
+        self.assertIsNone(missing["passed"])
+        self.assertIn("no_null_fields: thieu req.hard_constraints.quantity", missing["unmeasurable"])
+
+    def test_merged_case_oracles_can_be_graded_without_status_requirement(self):
+        cases_dir = Path(__file__).parent / "eval_set"
+        for path in sorted(cases_dir.glob("cases*.jsonl")):
+            for line in path.read_text(encoding="utf-8").splitlines():
+                if not line.strip():
+                    continue
+                case = json.loads(line)
+                if "oracle" in case:
+                    with self.subTest(case=case["id"]):
+                        result = grade_case(case, {})
+                        self.assertIn(result["passed"], (False, None))
+
     def test_extraction_checks_fields_and_reports_accuracy(self):
         result = grade({"must_extract": {"hard_constraints": {"quantity": 10, "budget_max": 20}}},
                        req={"hard_constraints": {"quantity": 10, "budget_max": 30}})

@@ -221,7 +221,12 @@ def grade_case(case: dict, final: dict) -> dict:
         if invented:
             failures.append(f"must_not_invent_numbers: so khong truy duoc {invented}")
 
-    for path in oracle.get("no_null_fields") or []:
+    no_null_fields = oracle.get("no_null_fields") or []
+    if no_null_fields is True:
+        # A's boolean shorthand checks mandatory request fields, not optional state fields.
+        no_null_fields = [f"req.hard_constraints.{name}" for name in
+                          ("product_type", "quantity", "budget_max", "delivery_deadline_days")]
+    for path in no_null_fields:
         value = _field(final, path)
         if value is _MISSING:
             unmeasurable.append(f"no_null_fields: thieu {path}")
