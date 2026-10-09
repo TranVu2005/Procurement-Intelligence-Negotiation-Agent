@@ -170,13 +170,13 @@ Bỏ `AgentExecutor` và `create_tool_calling_agent`. Thay bằng `src/graph.py`
 
 Đã ghim theo đúng môi trường chạy được thực tế (Python 3.14): `langchain==1.4.0`, `langchain-core==1.6.2`, `langgraph==1.2.11`, `langchain-google-genai==4.4.0`, `pydantic==2.13.4`, `python-dotenv==1.2.3`, `psutil==7.2.2`.
 
-Đã bỏ `langchain-community` và `langchain-anthropic` (không nơi nào dùng). `google-generativeai==0.8.6` **tạm giữ** vì `src/perception/parser.py` còn import; gỡ sau khi A hoàn tất việc chuyển sang `ChatGoogleGenerativeAI` ở mục 3.1.
+Đã bỏ `langchain-community` và `langchain-anthropic` (không nơi nào dùng). Sau khi parser chuyển sang factory chung `src/llm.py`, `google-generativeai` cũng đã gỡ khỏi requirements; Gemini dùng `langchain-google-genai`.
 
 ---
 
 ## 4. Mock data
 
-`generate_mock_data.py` đã đi đúng hướng: tên công ty và khu vực lấy từ bốn nguồn tổng hợp công khai (có ghi URL ở cuối file), mọi giá trị số được ghi rõ là mock trong docstring. Vấn đề là sự minh bạch đó nằm trong comment chứ không nằm trong dữ liệu, nên agent không trích dẫn được và AutoEval không chấm được.
+`generate_mock_data.py` hiện đọc CSV nguồn và thêm 6 fixture EDGE. Giá có nguồn được giữ nguyên; field nghiệp vụ mô phỏng được khai báo trong `simulated_fields` của từng record để phản hồi và AutoEval kiểm tra được. Dataset/VERSION được sinh cùng nhau; JSON schema minh họa dưới đây mô tả các field provenance.
 
 ### 4.1 Đưa nguồn vào từng record
 

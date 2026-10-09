@@ -13,11 +13,6 @@ langgraph==1.2.11
 langchain-google-genai==4.4.0
 langchain-openai==1.6.2
 
-# --- Con dung tam boi src/perception/parser.py ---
-# Package nay da ngung ho tro (phat FutureWarning). Go bo sau khi A chuyen
-# parser.py sang ChatGoogleGenerativeAI (architecture.md muc 3.1).
-google-generativeai==0.8.6
-
 # --- Ha tang ---
 pydantic==2.13.4
 python-dotenv==1.2.3

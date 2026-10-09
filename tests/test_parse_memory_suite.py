@@ -7,7 +7,7 @@ Tầng này: chạy nhanh, offline, gác hồi quy (không gọi LLM thật).
 AutoEval end-to-end: scripts/run_autoeval.py (chạy run_request() thật).
 
 Chạy:
-    python -m pytest tests/test_parse_memory_suite.py -v
+    python -m unittest tests.test_parse_memory_suite -v
 """
 
 import sys
@@ -100,11 +100,17 @@ class TestParserConstants(unittest.TestCase):
         self.assertIsInstance(MODEL_NAME, str)
         self.assertGreater(len(MODEL_NAME), 0)
 
-    def test_llm_model_name_is_current_value(self):
-        """Phai dung gemini-3.6-flash tu src.llm (canonical), khong phai gia tri cu cua parser."""
-        from src.llm import MODEL_NAME
-        self.assertEqual(MODEL_NAME, "gemini-3.6-flash",
-                         "Ten model phai la gemini-3.6-flash theo src/llm.py (architecture.md §3.1)")
+    def test_gemini_client_uses_canonical_model_configuration(self):
+        """Factory phai truyen model cau hinh vao client, khong goi API."""
+        from unittest.mock import patch
+        from src.llm import get_llm
+
+        with patch.dict(os.environ, {"AGENT_LLM": "", "LLM_PROVIDER": "gemini",
+                                     "GOOGLE_API_KEY": "test-only-key"}), \
+                patch("src.llm.MODEL_NAME", "gemini-test-model"), \
+                patch("langchain_google_genai.ChatGoogleGenerativeAI") as client:
+            self.assertIs(get_llm(), client.return_value)
+            self.assertEqual(client.call_args.kwargs["model"], "gemini-test-model")
 
     def test_missing_field_error_has_fields(self):
         err = MissingFieldError(["so luong", "ngan sach"])

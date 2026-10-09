@@ -213,8 +213,8 @@ retry. Không đổi input/output của 3 tool hiện có — B có thể chọn
 
 ## 4. Dữ liệu nguồn và phiên bản dữ liệu (C sở hữu)
 
-- Schema thu thập: `src/tools/mock_data/sources/README.md` (cột tiếng Anh theo PHAN-CONG-CON-LAI §6,
-  map sang trường record ở bảng trong `docs/superpowers/plans/2026-09-18-role-c-remaining-work.md` Task 6).
+- Schema thu thập: `src/tools/mock_data/sources/README.md`; ánh xạ sang record runtime
+  được thực hiện và validate trong `src/tools/dataset_builder.py`.
 - `src/tools/mock_data/VERSION`: `<ngày build>+sha256.<12 hex> records=<n>`, sinh bởi
   `generate_mock_data.py`; test `tests/test_dataset_files.py` fail nếu VERSION lệch `suppliers.json`.
   AutoEval ghi chuỗi này vào báo cáo.

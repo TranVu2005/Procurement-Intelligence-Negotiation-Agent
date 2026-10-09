@@ -51,7 +51,7 @@ _INTENT_ENTRY = {
     "out_of_scope": "respond_limits",
 }
 
-# Sau replan phai quay lai DUNG node tool cua intent (PHAN-CONG-CON-LAI muc 5.1).
+# Sau replan phai quay lai DUNG node tool cua intent (xem interface-contracts.md).
 # Intent khong co trong bang (out_of_scope, intent la) -> khong goi tool nao.
 _REPLAN_ENTRY = {
     "search_new": "tool_search",

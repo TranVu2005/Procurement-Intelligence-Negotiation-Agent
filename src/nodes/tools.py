@@ -81,6 +81,19 @@ def _fetch_details(state: AgentState, supplier_ids: list[str],
     return details, entries
 
 
+def _compare_candidates(state: AgentState, supplier_ids: list[str], quantity: int,
+                        details: list[dict], entries: list[dict],
+                        step_id: int | None = None) -> dict:
+    """So sanh gia va ghep bang chung theo cung mot duong cho search/compare."""
+    result, entry = run_tool(
+        state, "compare_price", {"supplier_ids": supplier_ids, "quantity": quantity},
+        step_id=step_id,
+    )
+    entries.append(entry)
+    candidates = [] if result.get("error") else merge_supplier_evidence(details, result)
+    return {"tool_results": entries, "candidates": candidates}
+
+
 def tool_search(state: AgentState) -> dict:
     entries = _blocked_confirm_entries(state)
     hard = (state.get("req") or {}).get("hard_constraints") or {}
@@ -115,16 +128,8 @@ def tool_search(state: AgentState) -> dict:
         return {"tool_results": entries, "candidates": [],
                 "status": "needs_input", "answer": _NEED_QUANTITY}
 
-    price_result, price_entry = run_tool(
-        state, "compare_price", {"supplier_ids": supplier_ids, "quantity": quantity},
-        step_id=(compare_step or {}).get("step_id"),
-    )
-    entries.append(price_entry)
-    if price_result.get("error"):
-        return {"tool_results": entries, "candidates": []}
-
-    return {"tool_results": entries,
-            "candidates": merge_supplier_evidence(details, price_result)}
+    return _compare_candidates(state, supplier_ids, quantity, details, entries,
+                               step_id=(compare_step or {}).get("step_id"))
 
 
 def tool_compare(state: AgentState) -> dict:
@@ -148,14 +153,7 @@ def tool_compare(state: AgentState) -> dict:
     if not found_ids:
         return {"tool_results": entries, "candidates": []}
 
-    price_result, price_entry = run_tool(
-        state, "compare_price", {"supplier_ids": found_ids, "quantity": quantity})
-    entries.append(price_entry)
-    if price_result.get("error"):
-        return {"tool_results": entries, "candidates": []}
-
-    return {"tool_results": entries,
-            "candidates": merge_supplier_evidence(details, price_result)}
+    return _compare_candidates(state, found_ids, quantity, details, entries)
 
 
 def tool_detail(state: AgentState) -> dict:

@@ -1,4 +1,4 @@
-"""Loi cua C tim thay khi chay kich ban demo 2026-09-22 (docs/demo-scenarios-2026-09-22.md)."""
+"""Loi cua C tim thay khi chay kich ban demo 2026-09-22 (docs/demo.md)."""
 
 import unittest
 from unittest.mock import patch

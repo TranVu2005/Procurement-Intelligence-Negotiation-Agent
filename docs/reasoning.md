@@ -171,7 +171,7 @@ python -m unittest discover -s tests -p "test_scoring.py" -v
 python -m unittest discover -s tests -p "test_verification.py" -v
 python -m unittest discover -s tests -p "test_response_prompts.py" -v
 python -m unittest discover -s tests -p "test_reasoning_tools_integration.py" -v
-python -m scripts.demo_e2e
+python -m src.agent
 ```
 # Cập nhật hoàn thiện sau chấm điểm — 2026-10-09
 

@@ -9,7 +9,7 @@ Kiểm tra:
   5. Từ chối chốt đơn (input "không, thôi") → pending_confirmation
 
 Chạy:
-    python -m pytest tests/test_gemini_memory_live.py -v -s -m live
+    RUN_LIVE_TESTS=1 python -m unittest tests.test_gemini_memory_live -v
 
 Ghi chú:
   - Dùng run_request() thật — gọi cả graph, không chỉ parser.
@@ -23,7 +23,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-import pytest
+import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -38,17 +38,14 @@ load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 _has_key = bool(os.getenv("GOOGLE_API_KEY") or os.getenv("OPENROUTER_API_KEY") or os.getenv("NARAROUTER_API_KEY"))
 _is_stub = os.getenv("AGENT_LLM", "").lower() == "stub"
 
-pytestmark = pytest.mark.live
-
-if not _has_key or _is_stub:
-    pytestmark = [pytest.mark.live, pytest.mark.skip(reason="Không có API key hoặc đang dùng stub")]
+_live_enabled = os.getenv("RUN_LIVE_TESTS") == "1" and _has_key and not _is_stub
 
 
 # ---------------------------------------------------------------------------
 # Transcript logger
 # ---------------------------------------------------------------------------
 
-_TRANSCRIPT_PATH = Path(__file__).parent.parent / "docs" / "transcript_gemini_live_A.md"
+_TRANSCRIPT_PATH = Path(__file__).parent.parent / "reports" / "transcript_gemini_live.md"
 _TRANSCRIPT_LINES: list[str] = []
 
 
@@ -57,6 +54,8 @@ def _log(line: str = "") -> None:
 
 
 def _flush_transcript() -> None:
+    if not _TRANSCRIPT_LINES:
+        return
     _TRANSCRIPT_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(_TRANSCRIPT_PATH, "a", encoding="utf-8") as f:
         f.write("\n".join(_TRANSCRIPT_LINES) + "\n")
@@ -67,13 +66,16 @@ def _flush_transcript() -> None:
 # Fixture: ghi header section
 # ---------------------------------------------------------------------------
 
-@pytest.fixture(scope="module", autouse=True)
-def transcript_memory_header():
+def setUpModule():
+    if not _live_enabled:
+        return
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     _log(f"\n## Transcript Gemini Live – Memory & Confirmation Tests")
     _log(f"**Thời điểm chạy:** {now}")
     _log("")
-    yield
+
+
+def tearDownModule():
     _flush_transcript()
 
 
@@ -100,13 +102,14 @@ def _cleanup_session(session_id: str) -> None:
 # Test 1: Đổi ngân sách trong cùng session
 # ---------------------------------------------------------------------------
 
-class TestBudgetUpdate:
+@unittest.skipUnless(_live_enabled, "Can RUN_LIVE_TESTS=1, API key va LLM that")
+class TestBudgetUpdate(unittest.TestCase):
     SESSION = "live_mem_budget_01"
 
-    def setup_method(self):
+    def setUp(self):
         _cleanup_session(self.SESSION)
 
-    def teardown_method(self):
+    def tearDown(self):
         _cleanup_session(self.SESSION)
 
     def test_budget_update_same_session(self):
@@ -154,13 +157,14 @@ class TestBudgetUpdate:
 # Test 2: Đổi số lượng trong cùng session
 # ---------------------------------------------------------------------------
 
-class TestQuantityUpdate:
+@unittest.skipUnless(_live_enabled, "Can RUN_LIVE_TESTS=1, API key va LLM that")
+class TestQuantityUpdate(unittest.TestCase):
     SESSION = "live_mem_quantity_01"
 
-    def setup_method(self):
+    def setUp(self):
         _cleanup_session(self.SESSION)
 
-    def teardown_method(self):
+    def tearDown(self):
         _cleanup_session(self.SESSION)
 
     def test_quantity_update_same_session(self):
@@ -206,13 +210,14 @@ class TestQuantityUpdate:
 # Test 3: session_id giữ đúng qua nhiều lượt
 # ---------------------------------------------------------------------------
 
-class TestSessionIdPersistence:
+@unittest.skipUnless(_live_enabled, "Can RUN_LIVE_TESTS=1, API key va LLM that")
+class TestSessionIdPersistence(unittest.TestCase):
     SESSION = "live_mem_sessid_01"
 
-    def setup_method(self):
+    def setUp(self):
         _cleanup_session(self.SESSION)
 
-    def teardown_method(self):
+    def tearDown(self):
         _cleanup_session(self.SESSION)
 
     def test_session_id_persisted_across_turns(self):
@@ -243,13 +248,14 @@ class TestSessionIdPersistence:
 # Test 4: Xác nhận chốt đơn
 # ---------------------------------------------------------------------------
 
-class TestConfirmationAccept:
+@unittest.skipUnless(_live_enabled, "Can RUN_LIVE_TESTS=1, API key va LLM that")
+class TestConfirmationAccept(unittest.TestCase):
     SESSION = "live_mem_confirm_accept_01"
 
-    def setup_method(self):
+    def setUp(self):
         _cleanup_session(self.SESSION)
 
-    def teardown_method(self):
+    def tearDown(self):
         _cleanup_session(self.SESSION)
 
     def test_confirmation_flow_accept(self):
@@ -288,13 +294,14 @@ class TestConfirmationAccept:
 # Test 5: Từ chối chốt đơn
 # ---------------------------------------------------------------------------
 
-class TestConfirmationReject:
+@unittest.skipUnless(_live_enabled, "Can RUN_LIVE_TESTS=1, API key va LLM that")
+class TestConfirmationReject(unittest.TestCase):
     SESSION = "live_mem_confirm_reject_01"
 
-    def setup_method(self):
+    def setUp(self):
         _cleanup_session(self.SESSION)
 
-    def teardown_method(self):
+    def tearDown(self):
         _cleanup_session(self.SESSION)
 
     def test_confirmation_flow_reject(self):
@@ -331,13 +338,14 @@ class TestConfirmationReject:
 # Test 6: Nhiều lượt — đổi cả budget lẫn quantity
 # ---------------------------------------------------------------------------
 
-class TestMultiTurnBudgetAndQuantity:
+@unittest.skipUnless(_live_enabled, "Can RUN_LIVE_TESTS=1, API key va LLM that")
+class TestMultiTurnBudgetAndQuantity(unittest.TestCase):
     SESSION = "live_mem_multi_01"
 
-    def setup_method(self):
+    def setUp(self):
         _cleanup_session(self.SESSION)
 
-    def teardown_method(self):
+    def tearDown(self):
         _cleanup_session(self.SESSION)
 
     def test_multi_turn_budget_and_quantity(self):

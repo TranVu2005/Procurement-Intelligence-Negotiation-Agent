@@ -5,7 +5,7 @@ Chay:
     python scripts/run_demo_scenarios.py KB1 T1       # chi cac kich ban co id bat dau bang ...
 
 Ket qua:
-    docs/demo-run-<ngay>.md          transcript doc duoc (input, state, tool, cau tra loi)
+    reports/demo-run-<ngay>.md       transcript doc duoc (input, state, tool, cau tra loi)
     reports/demo_run_<ngay>.json     du lieu tho de doi chieu
 
 Moi luot co `expect_status` (va tuy chon `expect_top`, `expect_absent`, `expect_tools`,
@@ -274,7 +274,7 @@ def main() -> None:
                   + (f" — inject `{r['inject']}`" if r.get("inject") else ""), ""]
         for number, t in enumerate(r["turns"], 1):
             lines += _md_turn(number, t["turn"], t["summary"], t["problems"])
-    out = ROOT / "docs" / f"demo-run-{TODAY}.md"
+    out = ROOT / "reports" / f"demo-run-{TODAY}.md"
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"\n{passed}/{total} luot PASS -> {out}")
 

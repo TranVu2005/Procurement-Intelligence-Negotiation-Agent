@@ -163,7 +163,7 @@ Mục tiêu: lấy lại 1.1 (Reasoning) và góp phần mục 4 (kết quả r�
 **B.4 — Cập nhật slide và tài liệu reasoning**
 - Slide 10: thêm dòng "Trọng số theo ưu tiên người dùng (4 preset), hiển thị trong câu trả lời".
 - Slide 11: thay bảng 4 dòng hiện tại bằng bảng 2 tầng (lấy số từ báo cáo của C, không tự gõ).
-- Cập nhật `REASONING-PLANNING.md`, `docs/person-b-reasoning-qa.md`.
+- Cập nhật `docs/reasoning.md`, `BAO-CAO-HOAN-THIEN.md`.
 
 **B.5 — Thu 3 báo giá B2B thật** (xem C.4).
 

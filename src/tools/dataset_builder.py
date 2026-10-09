@@ -1,7 +1,7 @@
 """Chuan hoa du lieu nguon (mock_data/sources/*.csv) thanh record suppliers.json.
 
 Owner: Nguoi C. Moi dong CSV = 1 san pham that tren 1 trang ban hang, do nguoi
-thu (hoac script crawl roi nguoi duyet). Schema cot theo PHAN-CONG-CON-LAI muc 6;
+thu (hoac script crawl roi nguoi duyet). Schema cot theo src/tools/mock_data/sources/README.md;
 ten truong record giu nguyen theo interface-contracts.md muc 3.
 
 Nguyen tac so lieu:

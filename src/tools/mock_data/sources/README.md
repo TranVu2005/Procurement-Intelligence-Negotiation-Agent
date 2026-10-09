@@ -1,8 +1,9 @@
 # Du lieu nguon that
 
-Tat ca du lieu nguon nam trong mot file duy nhat: `c_sourced_products.csv` (nguoi thu: C).
-Cac file nhom theo A/B tung dung tam (`ghe_van_phong.csv`, `ban_lam_viec.csv`, `tu_ho_so.csv`,
-`ke.csv`, `sofa.csv`) da bi xoa vi chi co header, khong co du lieu.
+Nguon web hien hanh: `c_sourced_products.csv` (nguoi thu: C).
+`a_b2b_quotes.csv` giu 3 dong thu thap ban dau; can xac minh va bo sung
+quote_date/quote_quantity/quote_channel truoc khi nap theo schema B2B.
+`b2b_quotes_template.csv` la mau header, khong phai bao gia that.
 
 Moi dong la **mot san pham cu the tren mot trang ban hang that**. `generate_mock_data.py`
 doc moi file `*.csv` o day, kiem tra hop le roi sinh ban ghi `SRC###` trong `suppliers.json`.

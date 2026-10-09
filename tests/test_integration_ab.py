@@ -211,7 +211,7 @@ class TestMultiTurnUpdateTriggersReplan(unittest.TestCase):
             make_replan(state, plan, "")
 
     def test_plan_contains_workflow_stages(self):
-        """Plan phải chứa đủ workflow stages theo REASONING-PLANNING.md."""
+        """Plan phải chứa đủ workflow stages theo docs/reasoning.md."""
         state = _state()
         plan = make_plan(state)
 

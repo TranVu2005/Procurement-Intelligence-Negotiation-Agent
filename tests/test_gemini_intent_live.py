@@ -4,13 +4,13 @@
 Đây là live test — gọi Gemini thật (không dùng stub). Chạy khi GOOGLE_API_KEY đã set.
 
 Chạy:
-    python -m pytest tests/test_gemini_intent_live.py -v -s -m live
+    RUN_LIVE_TESTS=1 python -m unittest tests.test_gemini_intent_live -v
 
 Ghi chú:
   - Mỗi test gọi parse_request() / update_state() thật, tốn API call.
   - Timeout mỗi test ~30s (Gemini thường trả về trong 5-15s).
   - Không dùng patch — đây là bài test tích hợp thật sự.
-  - Kết quả được ghi vào docs/transcript_gemini_live_A.md.
+  - Kết quả được ghi vào reports/transcript_gemini_live.md.
 """
 
 import json
@@ -20,7 +20,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-import pytest
+import unittest
 
 # Thêm root vào sys.path để import src.*
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -36,17 +36,14 @@ load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 _has_key = bool(os.getenv("GOOGLE_API_KEY") or os.getenv("OPENROUTER_API_KEY") or os.getenv("NARAROUTER_API_KEY"))
 _is_stub = os.getenv("AGENT_LLM", "").lower() == "stub"
 
-pytestmark = pytest.mark.live
-
-if not _has_key or _is_stub:
-    pytestmark = [pytest.mark.live, pytest.mark.skip(reason="Không có API key hoặc đang dùng stub")]
+_live_enabled = os.getenv("RUN_LIVE_TESTS") == "1" and _has_key and not _is_stub
 
 
 # ---------------------------------------------------------------------------
-# Transcript logger — ghi kết quả vào docs/
+# Transcript logger — ghi kết quả vào reports/
 # ---------------------------------------------------------------------------
 
-_TRANSCRIPT_PATH = Path(__file__).parent.parent / "docs" / "transcript_gemini_live_A.md"
+_TRANSCRIPT_PATH = Path(__file__).parent.parent / "reports" / "transcript_gemini_live.md"
 _TRANSCRIPT_LINES: list[str] = []
 
 
@@ -55,6 +52,8 @@ def _log(line: str = "") -> None:
 
 
 def _flush_transcript() -> None:
+    if not _TRANSCRIPT_LINES:
+        return
     _TRANSCRIPT_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(_TRANSCRIPT_PATH, "a", encoding="utf-8") as f:
         f.write("\n".join(_TRANSCRIPT_LINES) + "\n")
@@ -70,7 +69,7 @@ def _parse(text: str, session_id: str = None) -> tuple[dict, float]:
     from src.perception.parser import parse_request
 
     t0 = time.perf_counter()
-    state = parse_request(text, session_id=session_id)
+    state, _tokens_in, _tokens_out = parse_request(text, session_id=session_id)
     latency_ms = round((time.perf_counter() - t0) * 1000, 1)
     return state, latency_ms
 
@@ -79,14 +78,19 @@ def _parse(text: str, session_id: str = None) -> tuple[dict, float]:
 # Fixture: ghi header transcript khi session bắt đầu
 # ---------------------------------------------------------------------------
 
-@pytest.fixture(scope="module", autouse=True)
-def transcript_header():
+def setUpModule():
+    if not _live_enabled:
+        return
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     _log(f"\n## Transcript Gemini Live – Intent Tests")
     _log(f"**Thời điểm chạy:** {now}")
-    _log(f"**Model:** {os.getenv('NARAROUTER_MODEL', 'gemini-3.6-flash')} (theo LLM_PROVIDER)")
+    from src.llm import model_identity
+    identity = model_identity()
+    _log(f"**Model:** {identity['model']} · provider: {identity['provider']}")
     _log("")
-    yield
+
+
+def tearDownModule():
     _flush_transcript()
 
 
@@ -94,7 +98,8 @@ def transcript_header():
 # Test 1: search_new — câu đầy đủ 4 hard constraints
 # ---------------------------------------------------------------------------
 
-class TestIntentSearchNew:
+@unittest.skipUnless(_live_enabled, "Can RUN_LIVE_TESTS=1, API key va LLM that")
+class TestIntentSearchNew(unittest.TestCase):
     """Test intent search_new với Gemini thật."""
 
     def test_full_hard_constraints_extracted(self):
@@ -149,10 +154,10 @@ class TestIntentSearchNew:
         _log(f"\n### search_new – thiếu field bắt buộc")
         _log(f"- **Input:** `{text}`")
 
-        with pytest.raises(MissingFieldError) as exc_info:
+        with self.assertRaises(MissingFieldError) as exc_info:
             _parse(text, session_id="live_search_03")
 
-        _log(f"- **MissingFieldError.missing_fields:** `{exc_info.value.missing_fields}`")
+        _log(f"- **MissingFieldError.missing_fields:** `{exc_info.exception.missing_fields}`")
         _log(f"- **Kết quả:** ✅ PASS (raise đúng)")
 
     def test_budget_unit_conversion(self):
@@ -180,7 +185,8 @@ class TestIntentSearchNew:
 # Test 2: compare_specific
 # ---------------------------------------------------------------------------
 
-class TestIntentCompareSpecific:
+@unittest.skipUnless(_live_enabled, "Can RUN_LIVE_TESTS=1, API key va LLM that")
+class TestIntentCompareSpecific(unittest.TestCase):
     """Test intent compare_specific với Gemini thật."""
 
     def test_supplier_ids_extracted(self):
@@ -212,14 +218,15 @@ class TestIntentCompareSpecific:
             _log(f"- **Intent:** `{state['intent']}`")
             _log(f"- **Kết quả:** ✅ PASS (không raise)")
         except MissingFieldError as e:
-            pytest.fail(f"compare_specific không nên raise MissingFieldError: {e}")
+            self.fail(f"compare_specific không nên raise MissingFieldError: {e}")
 
 
 # ---------------------------------------------------------------------------
 # Test 3: supplier_detail
 # ---------------------------------------------------------------------------
 
-class TestIntentSupplierDetail:
+@unittest.skipUnless(_live_enabled, "Can RUN_LIVE_TESTS=1, API key va LLM that")
+class TestIntentSupplierDetail(unittest.TestCase):
     """Test intent supplier_detail với Gemini thật."""
 
     def test_supplier_id_extracted(self):
@@ -250,14 +257,15 @@ class TestIntentSupplierDetail:
             _log(f"- **Intent:** `{state['intent']}`")
             _log(f"- **Kết quả:** ✅ PASS")
         except MissingFieldError as e:
-            pytest.fail(f"supplier_detail không nên raise MissingFieldError: {e}")
+            self.fail(f"supplier_detail không nên raise MissingFieldError: {e}")
 
 
 # ---------------------------------------------------------------------------
 # Test 4: out_of_scope
 # ---------------------------------------------------------------------------
 
-class TestIntentOutOfScope:
+@unittest.skipUnless(_live_enabled, "Can RUN_LIVE_TESTS=1, API key va LLM that")
+class TestIntentOutOfScope(unittest.TestCase):
     """Test intent out_of_scope với Gemini thật."""
 
     def test_weather_question_is_out_of_scope(self):
