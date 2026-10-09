@@ -1,6 +1,6 @@
 # Procurement Intelligence & Negotiation Agent
 
-Đồ án cuối khóa AI Guru AEF1. Ứng dụng hỗ trợ tìm và so sánh nhà cung cấp nội thất từ yêu cầu bằng tiếng Việt, sau đó đề xuất phương án mua và đàm phán.
+Ứng dụng hỗ trợ tìm và so sánh nhà cung cấp nội thất từ yêu cầu bằng tiếng Việt, sau đó đề xuất phương án mua và đàm phán.
 
 Ví dụ:
 
