@@ -1,26 +1,70 @@
 # Procurement Intelligence & Negotiation Agent
 
-Agent mua sắm nội thất bằng tiếng Việt: trích yêu cầu, tìm nhà cung cấp, lọc ràng buộc, xếp hạng và đề xuất đàm phán. Pipeline LangGraph dùng Python cho tool, scoring, kiểm chứng và re-plan; LLM xử lý perception và diễn đạt phản hồi. Memory SQLite tách theo session, tracing ghi theo request.
+Đồ án cuối khóa AI Guru AEF1. Ứng dụng hỗ trợ tìm và so sánh nhà cung cấp nội thất từ yêu cầu bằng tiếng Việt, sau đó đề xuất phương án mua và đàm phán.
 
-## Cài đặt và chạy
+Ví dụ:
 
-Chạy từ thư mục gốc repository. Bộ dependency được ghim trong `requirements.txt`; môi trường kiểm tra hiện tại dùng Python 3.14.
+> Tôi cần mua 50 ghế văn phòng, ngân sách 200 triệu đồng, giao trong 14 ngày, ưu tiên giá.
+
+Ứng dụng lọc theo số lượng, ngân sách và thời hạn giao hàng; xếp hạng các phương án phù hợp, kèm giá, nguồn dữ liệu và lý do lựa chọn. Trong cùng cuộc hội thoại, người dùng có thể đổi ngân sách, số lượng hoặc ưu tiên để xem lại kết quả.
+
+## Chức năng
+
+- Tìm nhà cung cấp, so sánh các phương án và xem thông tin từng nhà cung cấp.
+- Xếp hạng theo ưu tiên giá, giao hàng, chất lượng hoặc cân bằng.
+- Hỏi lại khi thiếu thông tin; giải thích khi không có phương án phù hợp.
+- Lưu lịch sử theo phiên, hiển thị số lần gọi mô hình, tool và thời gian xử lý.
+
+Các thay đổi ràng buộc được lấy từ yêu cầu của người dùng. Chốt đơn cần xác nhận.
+
+## Cài đặt
+
+Môi trường đã kiểm tra: Python 3.14. Các lệnh dưới đây dùng PowerShell trên Windows và chạy từ thư mục gốc dự án.
 
 ```powershell
+git clone https://github.com/TranVu2005/Procurement-Intelligence-Negotiation-Agent.git
+cd Procurement-Intelligence-Negotiation-Agent
 python -m venv .venv
 .venv\Scripts\python.exe -m pip install -r requirements.txt
 Copy-Item .env.example .env
-# Điền API key trong .env, sau đó:
+```
+
+Mở `.env` và điền khóa API. Cấu hình mặc định dùng Gemini:
+
+```dotenv
+LLM_PROVIDER=gemini
+GOOGLE_API_KEY=your_api_key
+```
+
+Ứng dụng cũng hỗ trợ các cấu hình sau:
+
+| Nhà cung cấp | `LLM_PROVIDER` | Khóa API | Biến chọn model |
+|---|---|---|---|
+| Gemini | `gemini` | `GOOGLE_API_KEY` | Cấu hình trong `src/llm.py` |
+| OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `OPENROUTER_MODEL` |
+| NaraRouter | `nararouter` | `NARAROUTER_API_KEY` | `NARAROUTER_MODEL` |
+
+`.env` chỉ lưu trên máy, không đưa lên Git.
+
+## Chạy ứng dụng
+
+```powershell
 .venv\Scripts\python.exe -m streamlit run app.py
-# Hoặc giao diện dòng lệnh:
+```
+
+Mở http://127.0.0.1:8501/ để sử dụng. Nhập yêu cầu mua hàng vào ô chat; kết quả gồm bảng xếp hạng, thông tin nguồn, giải thích điểm số và gợi ý khi không tìm được phương án.
+
+Nếu dùng dòng lệnh:
+
+```powershell
 .venv\Scripts\python.exe -m src.agent
 ```
 
-Web mặc định tại http://127.0.0.1:8501/. SQLite được khởi tạo tự động. `.env`, database, log, cache và báo cáo sinh ra được Git bỏ qua.
+SQLite được tạo tự động để lưu phiên hội thoại. Log nằm trong `logs/`, báo cáo nằm trong `reports/`.
 
-`src/llm.py` là nơi cấu hình model. `LLM_PROVIDER` hỗ trợ `gemini` (mặc định, `GOOGLE_API_KEY`), `openrouter` (`OPENROUTER_API_KEY`, tùy chọn `OPENROUTER_MODEL`) và `nararouter` (`NARAROUTER_API_KEY`, tùy chọn `NARAROUTER_MODEL`). Dùng `.env.example` làm mẫu; không ghi key vào mã nguồn hoặc báo cáo.
+## Chạy thử và kiểm tra
 
-Demo offline:
+Có thể chạy thử mà không cần API key bằng chế độ `stub`:
 
 ```powershell
 $env:AGENT_LLM="stub"
@@ -29,21 +73,15 @@ $env:AGENT_STUB_LATENCY_STDDEV_S="0"
 .venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-Stub trả JSON perception cố định và phản hồi cố định; dùng để kiểm tra wiring, không đánh giá khả năng hiểu tiếng Việt. Xóa biến `AGENT_LLM` khi chuyển lại LLM thật.
+Stub trả về dữ liệu trích xuất và câu trả lời cố định. Chế độ này dùng để kiểm tra luồng xử lý, không dùng để đánh giá khả năng hiểu yêu cầu của mô hình. Muốn gọi mô hình thật trở lại, chạy `Remove-Item Env:AGENT_LLM` trước khi khởi động ứng dụng.
 
-## Kiểm thử
-
-Toàn bộ test dùng stdlib `unittest`, không cần pytest:
+Với các biến stub ở trên, chạy toàn bộ test:
 
 ```powershell
-$env:AGENT_LLM="stub"
-$env:AGENT_STUB_LATENCY_MEAN_S="0"
-$env:AGENT_STUB_LATENCY_STDDEV_S="0"
 .venv\Scripts\python.exe -m unittest discover tests "test_*.py"
-.venv\Scripts\python.exe -m unittest tests.test_tools -v
 ```
 
-Hai module `tests/test_gemini_*_live.py` chỉ chạy khi bật `RUN_LIVE_TESTS=1`, có API key và không dùng stub. Chúng gọi API thật, ghi transcript vào `reports/`:
+Test gọi API thật được bỏ qua mặc định. Để chạy riêng các test này sau khi đã cấu hình khóa API:
 
 ```powershell
 Remove-Item Env:AGENT_LLM -ErrorAction SilentlyContinue
@@ -52,67 +90,53 @@ $env:RUN_LIVE_TESTS="1"
 Remove-Item Env:RUN_LIVE_TESTS
 ```
 
-## AutoEval và load test
+Đánh giá bộ câu hỏi và đo tải:
 
 ```powershell
+# Kiểm tra các bước xử lý bằng dữ liệu cố định
 .venv\Scripts\python.exe scripts/run_autoeval.py --eval-set tests/eval_set --llm stub --tier pipeline
-# Sau khi cấu hình API key, đánh giá NLP thật:
+
+# Đánh giá mô hình thật, lặp ba lần
 .venv\Scripts\python.exe scripts/run_autoeval.py --eval-set tests/eval_set --llm real --tier llm --repeat 3 --sleep-between 4
-.venv\Scripts\python.exe scripts/run_loadtest.py --levels 1,5,10 --requests-per-level 10 --llm stub --out-dir reports
+
+# Đo tải với mô hình giả lập
+.venv\Scripts\python.exe scripts/run_loadtest.py --levels 1,5,10 --requests-per-level 10 --llm stub
 ```
 
-- Tầng `pipeline`: constraint satisfaction, citation correctness, failure recovery, tool success; kiểm tra implementation.
-- Tầng `llm`: task success theo nhóm, intent routing, field accuracy và no-invented-numbers. Chỉ kết quả với `llm_mode=real` có giá trị đánh giá NLP.
-- Báo cáo giữ latency avg/p50/p95/max, LLM/tool calls, token và chi phí nếu có pricing đã xác minh. Case thiếu field cần chấm được ghi không đo được.
-- `--repeat` giữ từng lượt và spread; `--sleep-between` áp dụng giữa mọi request. `--out-dir` đổi thư mục báo cáo.
-- `tests/eval_set/cases.jsonl` là bộ legacy chưa có oracle; runner cảnh báo và bỏ qua. Các file A/B/C có oracle là bộ đánh giá hiện hành.
+Kết quả được ghi vào `reports/`. Kết quả stub chỉ phản ánh luồng xử lý; chất lượng ngôn ngữ và thời gian gọi API cần đo bằng mô hình thật.
 
-`llm_ms` gồm perceive/respond và wiring; `tool_ms` gồm retry/backoff; `other_ms` là phần còn lại. Load test stub không đại diện tốc độ API thật. Các output nằm trong `reports/` và `logs/`.
+## Dữ liệu
 
-## Dataset và nguồn
+Dataset hiện có 106 bản ghi: 100 sản phẩm từ nguồn web và 6 bản ghi dùng để kiểm tra tình huống đặc biệt. Dữ liệu được lưu tại `src/tools/mock_data/suppliers.json`, kèm phiên bản và hash trong file `VERSION` cùng thư mục.
 
-Dataset runtime: `src/tools/mock_data/suppliers.json`; hash/ngày build/số bản ghi: `src/tools/mock_data/VERSION`. Dữ liệu nguồn ở `src/tools/mock_data/sources/`; schema được validate trong `src/tools/dataset_builder.py`, mẫu báo giá là `b2b_quotes_template.csv`.
+Mỗi bản ghi có URL nguồn và danh sách `simulated_fields` để phân biệt số liệu có nguồn với số liệu mô phỏng. Thông tin chưa có bằng chứng, như bảo hành hoặc uy tín, được giữ là `null`.
+
+CSV nguồn và mẫu báo giá nằm trong `src/tools/mock_data/sources/`. Sau khi bổ sung dữ liệu hợp lệ, sinh lại dataset bằng:
 
 ```powershell
 .venv\Scripts\python.exe generate_mock_data.py
-.venv\Scripts\python.exe -m unittest tests.test_dataset_builder tests.test_dataset_files -v
 ```
 
-Generator chỉ sinh dataset và VERSION. Bản hiện tại có 100 record `SRC` từ nguồn web và 6 fixture `EDGE`. Giá có nguồn được giữ nguyên; các field nghiệp vụ mô phỏng được khai báo trong `simulated_fields`. Bảo hành/uy tín chưa có bằng chứng giữ null. Fixture EDGE là dữ liệu giả lập có chủ đích. JSON legacy được giữ ở `data/archive/real_data_ghe_ban.json`, không dùng trong runtime.
-
-Làm mới nguồn web:
+Kiểm tra trước khi làm mới nguồn web:
 
 ```powershell
 .venv\Scripts\python.exe scripts/refresh_sources.py --dry-run
-# Có mạng, verify/apply nguồn web rồi build dataset:
-.venv\Scripts\python.exe scripts/refresh_sources.py --cache-dir reports/source_cache
 ```
 
-Dry-run không fetch/ghi file. Mỗi lần refresh dùng snapshot mới theo từng CSV, không đóng dấu ngày hiện tại cho HTML cache cũ. Báo giá B2B thu tay giữ ngày báo giá riêng. `DATA_STALE_DAYS` mặc định 14; thiếu/sai ngày hoặc ngày tương lai có cảnh báo và lý do.
+Bỏ `--dry-run` để cập nhật từ web. Báo giá B2B cần có ngày, số lượng, kênh nhận báo giá và bằng chứng; chỉ áp dụng tại số lượng ghi trong báo giá. Ba dòng trong `a_b2b_quotes.csv` còn thiếu thông tin này và cần kiểm tra trước khi sử dụng.
 
-Để chạy định kỳ, lập lịch lệnh refresh từ thư mục gốc bằng Windows Task Scheduler hoặc cron. Repository không tự tạo lịch.
+## Cấu trúc dự án
 
-Báo giá B2B: dùng header `b2b_quotes_template.csv`, bỏ dòng chú thích, ghi `nguon_type=b2b_quote`, `quote_date`, `quote_quantity`, `quote_channel`, giá VND số thuần và URL bằng chứng đã che thông tin cá nhân. Trường chưa xác minh phải giữ trong `simulated_fields`. Fixture test không nhập vào nguồn runtime.
-
-```powershell
-.venv\Scripts\python.exe scripts/compare_b2b_vs_web.py --llm stub
-```
-
-Báo giá chỉ dùng tại đúng `quote_quantity`; mã QTE tách khỏi SRC. So sánh ghép duy nhất theo NCC, loại và tên sản phẩm, giữ request/thuộc tính ngoài giá từ web và ghi provenance riêng cho giá. Thiếu hoặc không khớp dữ liệu được ghi không đo được; script không xuất lời khuyên mua từ scenario.
-
-## Cấu trúc
-
-| Đường dẫn | Nội dung |
+| Thành phần | Vai trò |
 |---|---|
-| `src/perception/`, `src/memory/` | Trích yêu cầu và lưu phiên |
-| `src/reasoning/`, `src/nodes/` | Planning, orchestration, ranking, verification, phản hồi |
-| `src/tools/`, `src/logging_utils/` | Tool có schema, dataset builder, retry, tracing/redaction |
-| `src/eval/`, `tests/` | Grader và regression/eval case |
-| `scripts/` | AutoEval, load test, crawl/verify/refresh nguồn, demo và so sánh B2B |
-| `docs/reference/`, `data/` | Đề bài PDF và dữ liệu tham chiếu |
+| `app.py` | Giao diện Streamlit |
+| `src/graph.py`, `src/nodes/` | Điều phối các bước xử lý bằng LangGraph |
+| `src/perception/` | Trích yêu cầu từ câu nhập |
+| `src/memory/` | Lưu và đọc phiên hội thoại bằng SQLite |
+| `src/reasoning/` | Lập kế hoạch, lọc, tính điểm và kiểm chứng kết quả |
+| `src/tools/` | Truy vấn nhà cung cấp và xử lý dữ liệu nguồn |
+| `src/llm.py` | Cấu hình mô hình và chế độ stub |
+| `src/eval/`, `tests/` | Chấm kết quả và kiểm thử |
+| `scripts/` | Chạy đánh giá, đo tải và cập nhật dữ liệu |
 
-`README.md` là file Markdown duy nhất được đưa lên GitHub. Tài liệu và ghi chú Markdown khác giữ local; report/log sinh mới nằm trong các thư mục được Git bỏ qua.
-
-## Giới hạn còn lại
-
-Chưa có AutoEval LLM thật ×3 và pricing token đã xác minh. `a_b2b_quotes.csv` có 3 dòng cần xác minh/bổ sung metadata trước khi build/so sánh B2B. Exception parser chưa luôn mang token; thiếu số đo phải báo không đo được. Fan-out detail còn lớn; grader số dùng heuristic cho số ≥100. Gợi ý no-match cần kiểm tra tính hữu ích trước khi thay đổi ràng buộc; agent luôn cần xác nhận chốt đơn.
+Mô hình xử lý câu nhập và viết phản hồi. Các bước lọc ràng buộc, tính giá, xếp hạng và kiểm chứng được thực hiện bằng Python. Khi chưa tìm được phương án phù hợp, ứng dụng đưa ra gợi ý để người dùng cân nhắc thay đổi yêu cầu.
