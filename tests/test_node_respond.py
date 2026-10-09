@@ -80,7 +80,7 @@ class RespondTests(unittest.TestCase):
         # Van phai tra loi duoc tu bang chung, khong duoc bia va khong duoc sap
         self.assertIn("T001", out["answer"])
         self.assertEqual(out["status"], "success")
-        self.assertEqual(out["llm_calls"], 0)
+        self.assertEqual(out["llm_calls"], 1)  # stream da duoc goi, du chua tra chunk
 
     def test_no_evidence_means_no_recommendation(self) -> None:
         with patch("src.nodes.respond.get_llm", return_value=FakeLLM()):

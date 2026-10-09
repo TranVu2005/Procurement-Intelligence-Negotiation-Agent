@@ -143,43 +143,110 @@ sqlite3 src/memory/state.db < src/memory/schema.sql   # (re)init SQLite state DB
 ## AutoEval
 
 ```bash
-python scripts/run_autoeval.py --eval-set tests/eval_set/cases_c.jsonl --llm stub
+python scripts/run_autoeval.py --eval-set tests/eval_set --llm stub --tier pipeline
+# Chạy thủ công sau khi A/B tích hợp và đã cấu hình API key:
+python scripts/run_autoeval.py --eval-set tests/eval_set --llm real --tier llm --repeat 3 --sleep-between 4
 ```
 
-Xuất `reports/autoeval_<timestamp>.json` và `.md`, báo 5 chỉ số: Task Success
-Rate, Constraint Satisfaction Rate, Tool Call Success Rate,
-Citation/Evidence Correctness, Failure Recovery Rate.
+Xuất `reports/autoeval_<timestamp>.json` và `.md`; `--out-dir` đổi nơi lưu.
+`--tier pipeline|llm|all` mặc định `all`. `--sleep-between` áp dụng giữa request,
+kể cả giữa lượt trong case nhiều lượt. JSON giữ kết quả từng case, trace ID từng
+request, hai bảng tổng hợp theo tầng và spread min/max/stdev khi `--repeat > 1`.
+
+- **Tầng 1:** constraint satisfaction, citation correctness, failure recovery,
+  tool call success. Kiểm tra implementation, KHÔNG chứng minh năng lực hiểu ngôn ngữ.
+- **Tầng 2:** task success theo nhóm, intent routing accuracy, field accuracy theo
+  tên field, no-invented-numbers. Số này chỉ có giá trị khi `llm_mode=real`.
+- **Vận hành:** avg/p50/p95/max latency, LLM/tool calls, tokens/request, chi phí
+  tổng/trung bình. Case nhiều lượt tính mọi lượt cho số đo vận hành, chấm task
+  success ở state cuối. Percentile dùng nearest-rank.
+- Case chưa có field A/B yêu cầu được ghi **không đo được**, không tính là pass.
+  Field mới đang chờ xác nhận tại cuối `interface-contracts.md`.
+- Bảng giá trong `src/eval/scoring.py::MODEL_PRICING` có nguồn và ngày kiểm tra;
+  giá chưa xác minh để `None` và báo **chưa cấu hình giá**, vẫn báo token.
 
 Lưu ý: `--llm stub` không làm NLP thật (`perceive` luôn trả về đúng 1 JSON cố
 định bất kể câu hỏi), nên các case adversarial cần phân loại intent đúng
 (hỏi ngoài phạm vi, ngân sách bất khả thi, hỏi thông tin agent không biết) sẽ
 luôn trượt ở chế độ stub — chỉ đo được chính xác bằng `--llm real` (cần
 `GOOGLE_API_KEY` thật). `tests/eval_set/cases.jsonl` là file case cũ chưa có
-`oracle`, script tự bỏ qua; dùng `cases_c.jsonl` hoặc thư mục `tests/eval_set/`
+`oracle`, script cảnh báo số dòng bị bỏ qua và tên file; dùng `cases_c.jsonl` hoặc thư mục `tests/eval_set/`
 để chạy toàn bộ case có oracle.
 
-`tests/run_autoeval.py` (khác file, dispatch bằng `if cid == "case_001"`)
-thuộc tier unit-test cũ, không phải AutoEval báo cáo chính thức.
+`tests/run_parse_and_memory.py` là runner parse/memory cũ của A, khác với AutoEval E2E.
 
 ## Load test
 
 ```bash
-python scripts/run_loadtest.py --levels 1 --requests-per-level 5 --llm stub
+python scripts/run_loadtest.py --levels 1,5,10 --requests-per-level 10 --llm stub --out-dir reports
 ```
 
-## Trạng thái hiện tại (2026-09-19)
+Số đo `llm_ms` là thời gian node perceive + respond, gồm parse/wiring quanh
+LLM; `tool_ms` là tổng thời gian audit tool, gồm retry/backoff; `other_ms` là
+phần còn lại. Trace `logs/<trace_id>.jsonl` có `node_end`, còn `logs/runs.jsonl`
+có tổng kết từng request. Stub latency 0 không đại diện hiệu năng API thật.
 
-- 256/256 unit test pass (`AGENT_LLM=stub python -m unittest discover tests
-  "test_*.py"`).
-- Giao diện Streamlit đã boot qua healthcheck và render bằng AppTest không có
-  exception; hỗ trợ chat, lịch sử, card xếp hạng, provenance, nhãn mô phỏng,
-  confirmation gate và trace/metric.
-- `data/sources_b_tu_ke.csv` là file nguồn thật do Người B bàn giao để C tích
-  hợp; các trường chưa có bằng chứng được ghi thiếu, không tự điền số liệu.
-- Pipeline LangGraph chạy thông cả 4 intent; `mock_data/suppliers.json` đã có
-  `nguon_url`/`nguon_type`/`simulated_fields` đầy đủ nên `verify_output`
-  không còn chặn vì thiếu trích dẫn (`citation_correctness = 1.0` trong
-  AutoEval gần nhất).
-- AutoEval (`cases_c.jsonl`, stub): task_success_rate 0.7 (7/10) — 3 case
-  trượt đều là adversarial, do giới hạn của `StubLLM` (không NLP thật), cần
-  `--llm real` để đo đúng.
+## Làm mới dữ liệu và lịch chạy
+
+```powershell
+.venv\Scripts\python.exe scripts/refresh_sources.py --dry-run
+# Có mạng: verify/apply các CSV web rồi generate suppliers.json và VERSION.
+.venv\Scripts\python.exe scripts/refresh_sources.py --cache-dir reports/source_cache
+```
+
+Dry-run chỉ validate/lập danh sách, không fetch/ghi file. Refresh giữ nguyên
+báo giá B2B thu tay; không cập nhật ngày báo giá chỉ vì URL còn truy cập được.
+Cache của refresh là snapshot riêng cho mỗi lần chạy và mỗi CSV; luôn fetch mới,
+không dùng HTML cũ rồi đóng dấu ngày hiện tại.
+`DATA_STALE_DAYS` mặc định 14. Thiếu/sai `fetched_at` hoặc ngày tương lai được
+đánh stale kèm lý do; respond nối cảnh báo ngày/URL bằng logic deterministic.
+
+Ví dụ lập lịch **tự chạy thủ công**, phiên làm việc của C không tạo task:
+
+```powershell
+$TaskRun = '"D:\Study\AIGURU\FINAL_PROJECT\Procurement-Intelligence-Negotiation-Agent\.venv\Scripts\python.exe" "D:\Study\AIGURU\FINAL_PROJECT\Procurement-Intelligence-Negotiation-Agent\scripts\refresh_sources.py"'
+schtasks /Create /TN "ProcurementRefresh" /TR $TaskRun /SC WEEKLY /D MON /ST 08:00
+```
+
+Cron trên máy POSIX (thay `/path/to/repo` bằng đường dẫn thật):
+
+```cron
+0 8 * * 1 cd /path/to/repo && .venv/bin/python scripts/refresh_sources.py >> /path/to/repo/reports/refresh.log 2>&1
+```
+
+## Nạp báo giá B2B thật
+
+Sao chép header `src/tools/mock_data/sources/b2b_quotes_template.csv` vào CSV
+riêng trong cùng thư mục; bỏ dòng chú thích. A/B mỗi người thu 3 báo giá;
+ghi `nguon_type=b2b_quote`, `quote_date`, `quote_quantity`, `quote_channel`, giá
+VND số thuần, URL bằng chứng đã che thông tin cá nhân. Không thêm số điện thoại
+hay email cá nhân. Trường chưa có bằng chứng vẫn ghi trong `simulated_fields`;
+warranty/trust chưa biết giữ null. Fixture `tests/fixtures/b2b_quotes_test.csv`
+chỉ dùng test, không được đưa vào nguồn production.
+
+```powershell
+.venv\Scripts\python.exe generate_mock_data.py
+.venv\Scripts\python.exe scripts/compare_b2b_vs_web.py --llm stub
+```
+
+Báo giá chỉ dùng ở đúng `quote_quantity`. Mã QTE tách khỏi SRC để không đổi mã
+web khi nạp báo giá. So sánh chỉ ghép khi trùng NCC, loại và tên sản phẩm duy
+nhất; hai scenario dùng cùng điều kiện và thuộc tính ngoài giá từ web, chỉ thay
+giá bằng báo B2B. Provenance giá lưu riêng; không xuất lời khuyên mua từ scenario.
+Trường hợp không khớp/thiếu giá ghi không đo được. Khi chưa có báo giá,
+script in “chưa có báo giá b2b_quote nào” và thoát 0.
+
+## Giới hạn còn lại (2026-10)
+
+- Chưa có kết quả LLM thật mới, chưa cấu hình giá token chính thức, chưa có
+  báo giá B2B thật. Không dùng số stub thay thế các bằng chứng này.
+- A/B còn trích ưu tiên, weights_used, relax_suggestions, case mới và test
+  cô lập phiên/bỏ kết quả cũ. Xem `docs/handoff-c-to-ab-2026-10.md`.
+- Exception của parser A chưa mang token: C giữ được nếu có, còn thiếu thì
+  không đo được; không tự suy ra token.
+- Fan-out detail giữ nguyên vì batch/full search cần đổi hợp đồng và A/B xác nhận.
+- Grader số hiện có là heuristic cho số >=100; không bao quát toàn bộ số nhỏ
+  hoặc chứng minh mọi con số trong văn bản đều gắn URL đúng.
+- Baseline stdlib còn 4 lỗi A/B: hai import pytest của live test, một kỳ vọng
+  model cũ và một evidence conflict. C không sửa test/logic A/B để làm xanh.
+- Báo cáo/log bị gitignore; chỉ add-f từng report cuối sau khi cả nhóm duyệt.

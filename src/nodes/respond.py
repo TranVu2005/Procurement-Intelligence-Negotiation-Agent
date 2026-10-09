@@ -112,6 +112,18 @@ def _deterministic_answer(evidence: str) -> str:
             "ngon ngu):\n" + evidence)
 
 
+def _stale_warning(state: AgentState) -> str:
+    """Canh bao nguon cu, khong sua prompt hay goi them LLM."""
+    lines = []
+    for record in (state.get("ranked") or [])[:5]:
+        if record.get("stale"):
+            fetched = record.get("fetched_at") or "không có ngày lấy dữ liệu"
+            lines.append(f"Lưu ý: giá của {record.get('MaNCC')} lấy ngày {fetched}, "
+                         f"có thể đã thay đổi. Nguồn: {record.get('nguon_url') or 'không có URL'}. "
+                         f"Lý do: {record.get('stale_reason') or 'dữ liệu cũ'}.")
+    return "\n" + "\n".join(lines) if lines else ""
+
+
 def respond(state: AgentState) -> dict:
     evidence = build_evidence_block(state)
 
@@ -139,9 +151,11 @@ def respond(state: AgentState) -> dict:
     ttft_ms = None
     parts: list[str] = []
     tokens_in = tokens_out = 0
+    llm_attempted = False
 
     try:
         llm = get_llm(streaming=True)
+        llm_attempted = True
         for chunk in llm.stream(messages):
             if ttft_ms is None:
                 ttft_ms = round((time.perf_counter() - started) * 1000, 2)
@@ -152,15 +166,17 @@ def respond(state: AgentState) -> dict:
             tokens_out += chunk_out
     except Exception:  # noqa: BLE001 - LLM hong khong duoc lam sap ca request
         return {
-            "answer": _deterministic_answer(evidence),
+            "answer": _deterministic_answer(evidence) + _stale_warning(state),
             "status": "success",
-            "llm_calls": 0,
+            "llm_calls": int(llm_attempted),
+            "tokens_in": tokens_in,
+            "tokens_out": tokens_out,
             "ttft_ms": round((time.perf_counter() - started) * 1000, 2),
         }
 
     answer = "".join(parts).strip() or _deterministic_answer(evidence)
     return {
-        "answer": answer,
+        "answer": answer + _stale_warning(state),
         "status": "success",
         "llm_calls": 1,
         "tokens_in": tokens_in,

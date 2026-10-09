@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parent.parent
 EVAL_DIR = ROOT / "tests" / "eval_set"
 
 VALID_CATEGORIES = {
-    "happy_path", "missing_info", "conflict", "tool_failure", "adversarial", "multi_turn",
+    "happy_path", "missing_info", "conflict", "tool_failure", "adversarial", "multi_turn", "out_of_scope",
 }
 VALID_STATUS = {"success", "graceful_fail", "needs_confirmation", "needs_input", "out_of_scope"}
 VALID_TOOLS = {"search_suppliers", "get_supplier_detail", "compare_price", "confirm_order"}

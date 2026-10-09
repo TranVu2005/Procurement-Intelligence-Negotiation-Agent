@@ -7,6 +7,7 @@ chi la them mot dong JSONL, khong sua code - day la thu rubric phat khi thay
 
 import re
 import statistics
+import math
 from typing import Any
 
 METRIC_NAMES = (
@@ -19,6 +20,24 @@ METRIC_NAMES = (
 
 # Trang thai duoc coi la "ket thuc co kiem soat" khi tinh Failure Recovery Rate
 _RECOVERED_STATUSES = {"success", "graceful_fail", "needs_input", "needs_confirmation"}
+
+# TODO(C): dien gia tu trang pricing chinh thuc; khong lay gia tu tri nho.
+MODEL_PRICING = {
+    "gemini-3.5-flash-lite": {"input_usd_per_million": None, "output_usd_per_million": None,
+                             "source": "https://ai.google.dev/gemini-api/docs/pricing", "checked_at": None},
+    "openrouter/free": {"input_usd_per_million": None, "output_usd_per_million": None,
+                        "source": "https://openrouter.ai/models", "checked_at": None},
+}
+EXTRA_METRICS = ("intent_routing_accuracy", "field_accuracy", "no_invented_numbers")
+_MISSING = object()
+
+
+def _field(value: dict, path: str):
+    for part in path.split("."):
+        if not isinstance(value, dict) or part not in value:
+            return _MISSING
+        value = value[part]
+    return value
 
 
 def _called_tools(final: dict) -> list[str]:
@@ -150,6 +169,8 @@ def grade_case(case: dict, final: dict) -> dict:
     """Cham 1 case theo oracle khai bao. Tra ve ket qua + cac tin hieu de tong hop."""
     oracle: dict[str, Any] = case.get("oracle") or {}
     failures: list[str] = []
+    unmeasurable: list[str] = []
+    field_checks = []
     called = _called_tools(final)
 
     expected_status = oracle.get("expect_status")
@@ -200,13 +221,46 @@ def grade_case(case: dict, final: dict) -> dict:
         if invented:
             failures.append(f"must_not_invent_numbers: so khong truy duoc {invented}")
 
+    for path in oracle.get("no_null_fields") or []:
+        value = _field(final, path)
+        if value is _MISSING:
+            unmeasurable.append(f"no_null_fields: thieu {path}")
+        elif value is None or value == "" or value == [] or value == {}:
+            failures.append(f"no_null_fields: {path} rong/null")
+    for group, expected in (oracle.get("must_extract") or {}).items():
+        for name, wanted in expected.items():
+            path = f"{group}.{name}"
+            actual = _field(final.get("req") or {}, path)
+            measured = actual is not _MISSING
+            correct = measured and actual == wanted
+            field_checks.append({"field": path, "measured": measured, "correct": correct,
+                                 "expected": wanted, "actual": actual if measured else None})
+            if not measured:
+                unmeasurable.append(f"must_extract: thieu {path}")
+            elif not correct:
+                failures.append(f"must_extract: {path}={actual!r}, can {wanted!r}")
+    if oracle.get("expect_priority"):
+        preset = _field(final, "weights_used.preset")
+        if preset is _MISSING:
+            unmeasurable.append("expect_priority: thieu weights_used.preset")
+        elif preset != oracle["expect_priority"]:
+            failures.append(f"expect_priority: {preset!r}, can {oracle['expect_priority']!r}")
+    if oracle.get("must_suggest_relax"):
+        suggestions = final.get("relax_suggestions", _MISSING)
+        if suggestions is _MISSING:
+            unmeasurable.append("must_suggest_relax: thieu relax_suggestions")
+        elif not isinstance(suggestions, list) or not suggestions:
+            failures.append("must_suggest_relax: list rong/khong hop le")
+
     tool_entries = final.get("tool_results") or []
     counted = [e for e in tool_entries if e.get("status") != "blocked"]
     return {
         "id": case.get("id"),
         "category": case.get("category"),
-        "passed": not failures,
+        "passed": False if failures else (None if unmeasurable else True),
         "failures": failures,
+        "unmeasurable": unmeasurable,
+        "tier": case.get("tier", ["pipeline", "llm"]),
         "signals": {
             "has_constraints": bool(constraints),
             "constraints_ok": not constraint_failures,
@@ -218,6 +272,18 @@ def grade_case(case: dict, final: dict) -> dict:
             "recovered": final.get("status") in _RECOVERED_STATUSES,
             "llm_calls": final.get("llm_calls", 0),
             "latency_ms": final.get("latency_ms"),
+            "tokens_in": final.get("tokens_in", 0),
+            "tokens_out": final.get("tokens_out", 0),
+            "model": final.get("model"),
+            "intent_checked": bool(oracle.get("must_reach_intent")),
+            "intent_correct": final.get("intent") == oracle.get("must_reach_intent"),
+            "field_checks": field_checks,
+            "numbers_checked": bool(oracle.get("must_not_invent_numbers")),
+            "numbers_correct": not invented_numbers(final) if oracle.get("must_not_invent_numbers") else None,
+            "requests": final.get("_requests"),
+            "llm_ms": final.get("llm_ms"),
+            "tool_ms": final.get("tool_ms"),
+            "other_ms": final.get("other_ms"),
         },
     }
 
@@ -227,15 +293,16 @@ def _ratio(numerator: int, denominator: int) -> float | None:
     return round(numerator / denominator, 4) if denominator else None
 
 
-def aggregate(results: list[dict]) -> dict:
+def aggregate(results: list[dict], pricing: dict | None = None) -> dict:
     """Tong hop 5 metric bat buoc (architecture.md muc 5.3)."""
     signals = [r["signals"] for r in results]
 
     with_constraints = [s for s in signals if s["has_constraints"]]
     injected = [s for s in signals if s["injected"]]
 
+    measured = [r for r in results if r["passed"] is not None]
     metrics = {
-        "task_success_rate": _ratio(sum(1 for r in results if r["passed"]), len(results)),
+        "task_success_rate": _ratio(sum(1 for r in measured if r["passed"]), len(measured)),
         "constraint_satisfaction_rate": _ratio(
             sum(1 for s in with_constraints if s["constraints_ok"]), len(with_constraints)),
         "tool_call_success_rate": _ratio(
@@ -246,23 +313,87 @@ def aggregate(results: list[dict]) -> dict:
             sum(1 for s in injected if s["recovered"]), len(injected)),
     }
 
-    latencies = sorted(s["latency_ms"] for s in signals if s["latency_ms"] is not None)
+    intents = [s for s in signals if s.get("intent_checked")]
+    numbers = [s for s in signals if s.get("numbers_checked")]
+    fields = [f for s in signals for f in s.get("field_checks", []) if f["measured"]]
+    metrics.update({"intent_routing_accuracy": _ratio(sum(s["intent_correct"] for s in intents), len(intents)),
+                    "field_accuracy": _ratio(sum(f["correct"] for f in fields), len(fields)),
+                    "no_invented_numbers": _ratio(sum(s["numbers_correct"] for s in numbers), len(numbers))})
+    by_category = {}
+    for category in sorted({r.get("category") or "unknown" for r in results}):
+        group = [r for r in results if (r.get("category") or "unknown") == category]
+        count = sum(r["passed"] is not None for r in group)
+        passed = sum(r["passed"] is True for r in group)
+        by_category[category] = {"total_cases": len(group), "passed_cases": passed,
+                                 "measured_cases": count, "unmeasurable_cases": len(group) - count,
+                                 "task_success_rate": _ratio(passed, count)}
+    by_field = {}
+    for name in sorted({f["field"] for s in signals for f in s.get("field_checks", [])}):
+        all_checks = [f for s in signals for f in s.get("field_checks", []) if f["field"] == name]
+        checks = [f for f in all_checks if f["measured"]]
+        correct = sum(f["correct"] for f in checks)
+        by_field[name] = {"checked": len(checks), "correct": correct,
+                          "unmeasurable": len(all_checks) - len(checks), "accuracy": _ratio(correct, len(checks))}
+    requests = [req for s in signals for req in (s.get("requests") or [s])]
+    operational = {}
+    for key in ("latency_ms", "llm_ms", "tool_ms", "other_ms"):
+        stats = distribution_stats([r.get(key) for r in requests])
+        prefix = key.removesuffix("_ms")
+        operational.update({f"{prefix}_{name}_ms": value for name, value in stats.items()})
+    for key in ("llm_calls", "tool_calls", "tokens_in", "tokens_out"):
+        operational[f"avg_{key}"] = _ratio(sum(r.get(key, 0) or 0 for r in requests), len(requests))
+    table = MODEL_PRICING if pricing is None else pricing
+    costs = []
+    for req in requests:
+        price = table.get(req.get("model"), {})
+        incoming, outgoing = price.get("input_usd_per_million"), price.get("output_usd_per_million")
+        costs.append(None if incoming is None or outgoing is None else
+                     ((req.get("tokens_in", 0) or 0) * incoming +
+                      (req.get("tokens_out", 0) or 0) * outgoing) / 1e6)
+    total_cost = sum(costs) if costs and all(c is not None for c in costs) else None
     return {
         "total_cases": len(results),
+        "measured_cases": len(measured),
+        "unmeasurable_cases": [{"id": r["id"], "reasons": r.get("unmeasurable", [])}
+                               for r in results if r.get("unmeasurable")],
+        "total_requests": len(requests),
         "metrics": metrics,
-        "avg_llm_calls": _ratio(sum(s["llm_calls"] for s in signals), len(signals)),
-        "latency_p50_ms": latencies[len(latencies) // 2] if latencies else None,
-        "latency_p95_ms": latencies[int(len(latencies) * 0.95)] if latencies else None,
+        "by_category": by_category,
+        "by_field": by_field,
+        **operational,
+        "estimated_cost_total_usd": total_cost,
+        "estimated_cost_avg_usd": total_cost / len(requests) if total_cost is not None else None,
+        "cost_status": "configured" if total_cost is not None else "chưa cấu hình giá",
+        "pricing": table,
         "failed_cases": [{"id": r["id"], "category": r["category"], "failures": r["failures"]}
-                         for r in results if not r["passed"]],
+                         for r in results if r["passed"] is False],
     }
+
+
+def distribution_stats(values) -> dict:
+    """Percentile nearest-rank; thieu so do thi None, khong coi la 0."""
+    values = sorted(v for v in values if isinstance(v, (int, float)) and math.isfinite(v))
+    return {"avg": round(statistics.mean(values), 4) if values else None,
+            "p50": values[max(0, math.ceil(len(values) * .5) - 1)] if values else None,
+            "p95": values[max(0, math.ceil(len(values) * .95) - 1)] if values else None,
+            "max": max(values) if values else None}
 
 
 def round_spread(round_reports: list[dict]) -> dict:
     """Min/max/do lech chuan tung metric qua cac lan chay lai (architecture.md muc 5.7)."""
     spread: dict = {}
-    for name in METRIC_NAMES:
-        values = [r["metrics"][name] for r in round_reports if r["metrics"][name] is not None]
+    def numeric_leaves(report, prefix=""):
+        out = {}
+        for key, value in report.items():
+            path = f"{prefix}.{key}" if prefix else key
+            if isinstance(value, dict) and key != "pricing":
+                out.update(numeric_leaves(value, "" if key == "metrics" else path))
+            elif isinstance(value, (int, float)) and not isinstance(value, bool):
+                out[path] = value
+        return out
+    flattened = [numeric_leaves(r) for r in round_reports]
+    for name in sorted(set(METRIC_NAMES + EXTRA_METRICS).union(*(r.keys() for r in flattened))):
+        values = [r[name] for r in flattened if name in r]
         spread[name] = None if not values else {
             "min": min(values),
             "max": max(values),

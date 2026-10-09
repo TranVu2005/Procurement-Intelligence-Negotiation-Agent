@@ -359,6 +359,16 @@ def gen_eval_cases():
     ]
 
 
+def generate_dataset(sources_dir=SOURCES_DIR, data_path=OUT_PATH, version_path=VERSION_PATH,
+                     built_on=None):
+    """Sinh dataset + VERSION tu nguon, khong ghi file demo ngoai pham vi refresh."""
+    edge = add_edge_cases(1)
+    sourced = build_source_records(read_source_rows(Path(sources_dir).glob("*.csv")))
+    records = edge + sourced
+    version = write_dataset(records, data_path, version_path, built_on or date.today().isoformat())
+    return records, version
+
+
 def main():
     # 32 ban ghi "bulk" (cong ty/gia random, khong gan voi hanh vi test cu the nao)
     # da bi bo theo yeu cau "toan bo du lieu la that". EDGE giu nguyen: day la
@@ -367,11 +377,9 @@ def main():
     # (thieu DiemUyTin, het hang, nguon mau thuan, MOQ vuot ngan sach, loi tool
     # cuc bo, gioi han replan) - khong co du lieu that nao tai tao dung cac
     # quirk nay nen khong the thay the bang SRC.
-    edge = add_edge_cases(1)
-    sourced = build_source_records(read_source_rows(SOURCES_DIR.glob("*.csv")))
-
-    all_records = edge + sourced
-    version = write_dataset(all_records, OUT_PATH, VERSION_PATH, date.today().isoformat())
+    all_records, version = generate_dataset()
+    edge = [r for r in all_records if r["MaNCC"].startswith("EDGE")]
+    sourced = [r for r in all_records if not r["MaNCC"].startswith("EDGE")]
 
     with open("session_states_sample.json", "w", encoding="utf-8") as f:
         json.dump(gen_session_state_samples(), f, ensure_ascii=False, indent=2)

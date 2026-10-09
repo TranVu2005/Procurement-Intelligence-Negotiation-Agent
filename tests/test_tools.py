@@ -52,8 +52,10 @@ class SearchSuppliersTests(unittest.TestCase):
         with patch_data():
             result = search_suppliers("sofa khong ton tai")
         self.assertEqual(
-            result, {"error": True, "error_type": "no_match", "message": result["message"]}
+            {key: result[key] for key in ("error", "error_type", "message")},
+            {"error": True, "error_type": "no_match", "message": result["message"]}
         )
+        self.assertEqual(result["filter_stats"]["counts"]["product_type"], 0)
 
     def test_simulate_error_passthrough(self) -> None:
         result = search_suppliers("ghế văn phòng", _simulate_error="timeout")
@@ -65,7 +67,9 @@ class GetSupplierDetailTests(unittest.TestCase):
         with patch_data():
             result = get_supplier_detail("T001")
         self.assertEqual(result["MaNCC"], "T001")
-        self.assertEqual(len(result), 13)
+        self.assertTrue(set(FAKE_DATA[0]).issubset(result))
+        self.assertTrue(result["stale"])
+        self.assertEqual(result["stale_reason"], "missing_fetched_at")
 
     def test_unknown_id_is_no_match(self) -> None:
         with patch_data():
