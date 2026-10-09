@@ -1,6 +1,13 @@
 import unittest
 
-from src.ui_viewmodel import format_currency, run_metrics, safe_source_url, supplier_view_models
+from src.ui_viewmodel import (
+    format_currency,
+    relax_suggestion_view_models,
+    run_metrics,
+    safe_source_url,
+    supplier_view_models,
+    weights_view_model,
+)
 
 
 class FormatTests(unittest.TestCase):
@@ -61,6 +68,33 @@ class MetricsTests(unittest.TestCase):
         self.assertEqual(metrics["tool_calls"], 3)
         self.assertTrue(metrics["verifier_passed"])
         self.assertEqual(metrics["trace_id"], "trace-1")
+
+    def test_weights_view_model_exposes_preset_reason_and_percentages(self):
+        view = weights_view_model({
+            "preset": "delivery",
+            "reason": "Người dùng ưu tiên giao nhanh.",
+            "weights": {
+                "price": 0.20, "moq": 0.10, "delivery": 0.40,
+                "warranty": 0.10, "trust": 0.20,
+            },
+        })
+
+        self.assertEqual(view["preset"], "delivery")
+        self.assertEqual(view["weights"]["delivery"], "40%")
+        self.assertIn("giao nhanh", view["reason"])
+
+    def test_relax_suggestion_view_model_formats_values_without_losing_evidence(self):
+        views = relax_suggestion_view_models([{
+            "constraint": "budget_max",
+            "current": 5_000_000,
+            "suggested": 15_000_000,
+            "supplier_ids": ["SRC_SOFA"],
+            "reason": "Mức thấp nhất có bằng chứng.",
+        }])
+
+        self.assertEqual(views[0]["current"], "5,000,000 ₫")
+        self.assertEqual(views[0]["suggested"], "15,000,000 ₫")
+        self.assertEqual(views[0]["supplier_ids"], ["SRC_SOFA"])
 
 
 if __name__ == "__main__":

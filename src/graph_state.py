@@ -33,6 +33,8 @@ class AgentState(TypedDict, total=False):
     rejected: list[dict]
     ranked: list[dict]
     verdict: dict
+    weights_used: dict                                 # preset + five weights + reason (B)
+    relax_suggestions: list[dict]                      # alternatives backed by rejected evidence (B)
     replan_count: int
     replan_reason: str | None                          # tra ve tu diagnose(), doc boi replan()
     answer: str
@@ -73,6 +75,8 @@ def new_state(
         "rejected": [],
         "ranked": [],
         "verdict": {},
+        "weights_used": {},
+        "relax_suggestions": [],
         "replan_count": 0,
         "replan_reason": None,
         "answer": "",

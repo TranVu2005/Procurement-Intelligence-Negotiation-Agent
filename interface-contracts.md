@@ -68,6 +68,30 @@ Lưu trong SQLite, expose ra dạng dict/JSON khi A truyền cho B/C dùng.
 mới nhất từ `updated_at`. Đặc biệt: khi khách nói rõ ưu tiên mới (ví dụ "thôi ưu tiên
 giao nhanh"), `priority` bị ghi đè và `priority_is_default` chuyển về `false`.
 
+### Mở rộng phục vụ hoàn thiện sau chấm điểm (đề xuất 2026-10-09)
+
+Các trường dưới đây tương thích ngược: session cũ không có `priority` được B xử lý
+như `balanced`; consumer phải chấp nhận danh sách gợi ý rỗng.
+
+| Trường | Ai ghi | Ai đọc | Contract |
+|---|---|---|---|
+| `soft_constraints.priority` | A | B | `price \| delivery \| quality \| balanced`; mặc định `balanced`. |
+| `soft_constraints.priority_is_default` | A | B/UI | `true` nếu hệ thống dùng mặc định, `false` nếu người dùng nói rõ. |
+| `weights_used` | B | respond/eval/UI | `{preset, weights, reason}`; `weights` gồm đúng `price, moq, delivery, warranty, trust`, tổng bằng 1. |
+| `relax_suggestions` | B | respond/eval/UI | Danh sách `{constraint, current, suggested, supplier_ids, reason, evidence}`; mọi số gợi ý lấy từ rejected evidence, không tự áp dụng vào state. |
+
+Preset trọng số đã triển khai phía B:
+
+| Preset | Giá | MOQ | Giao | Bảo hành | Uy tín |
+|---|---:|---:|---:|---:|---:|
+| `balanced` | 0.30 | 0.15 | 0.20 | 0.15 | 0.20 |
+| `price` | 0.45 | 0.15 | 0.15 | 0.10 | 0.15 |
+| `delivery` | 0.20 | 0.10 | 0.40 | 0.10 | 0.20 |
+| `quality` | 0.20 | 0.10 | 0.15 | 0.25 | 0.30 |
+
+`relax_suggestions` chỉ là phương án để người dùng cân nhắc. A chỉ cập nhật constraint
+sau một lượt người dùng xác nhận; B/C không được tự động nới điều kiện.
+
 ---
 
 ## 2. Plan Format (B sở hữu — C đọc để thực thi)
@@ -202,7 +226,7 @@ Mỗi người đọc kỹ phần mình sẽ dùng nhiều nhất (A đọc kỹ
 | Người | Đã đọc | Đồng ý | Đề xuất sửa (nếu có) | Ngày ký |
 |---|---|---|---|---|
 | A | ☑ | ☑ | Đồng ý quyết định §8.1: bỏ material/region khỏi plan.steps[0].params; bổ sung `intent`, `supplier_ids`, `supplier_id` vào §1 (17/9/2026) | 15/9/2026 |
-| B | ☑ | ☑ | Đồng ý §8.1; đã nối node reasoning thật và cập nhật ví dụ plan/test theo contract | 16/9/2026 |
+| B | ☑ | ☑ | Đồng ý §8.1; đề xuất/triển khai tương thích ngược `weights_used` + `relax_suggestions`, chờ A/C xác nhận phần mở rộng 09/10 | 09/10/2026 |
 | C | ☑ | ☑ | | 18/9/2026 |
 
 > Sau khi cả 3 tick xong, coi đây là bản khóa (frozen) cho buổi họp 2 (10/9). Muốn đổi field sau mốc này phải báo cả nhóm trước khi sửa code.

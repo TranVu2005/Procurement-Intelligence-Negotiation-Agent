@@ -74,3 +74,48 @@ def run_metrics(final: dict[str, Any] | None) -> dict[str, Any]:
         "verifier_passed": verdict.get("passed"),
         "trace_id": state.get("trace_id") or "",
     }
+
+
+def weights_view_model(weights_used: dict[str, Any] | None) -> dict[str, Any]:
+    """Format the auditable scoring preset without recomputing business logic."""
+
+    source = weights_used or {}
+    raw_weights = source.get("weights") or {}
+    return {
+        "preset": source.get("preset") or "balanced",
+        "reason": source.get("reason") or "Dùng bộ trọng số cân bằng mặc định.",
+        "weights": {
+            name: f"{float(value) * 100:.0f}%"
+            for name, value in raw_weights.items()
+            if isinstance(value, (int, float)) and not isinstance(value, bool)
+        },
+    }
+
+
+def relax_suggestion_view_models(
+    suggestions: list[dict[str, Any]] | None,
+) -> list[dict[str, Any]]:
+    """Format B's suggestions while keeping their supplier evidence visible."""
+
+    views = []
+    for item in suggestions or []:
+        constraint = item.get("constraint")
+        current = item.get("current")
+        suggested = item.get("suggested")
+        if constraint == "budget_max":
+            current_text = format_currency(current)
+            suggested_text = format_currency(suggested)
+        elif constraint == "delivery_deadline_days":
+            current_text = format_optional(current, " ngày")
+            suggested_text = format_optional(suggested, " ngày")
+        else:
+            current_text = format_optional(current, " sản phẩm")
+            suggested_text = format_optional(suggested, " sản phẩm")
+        views.append({
+            "constraint": constraint or "không xác định",
+            "current": current_text,
+            "suggested": suggested_text,
+            "supplier_ids": list(item.get("supplier_ids") or []),
+            "reason": item.get("reason") or "",
+        })
+    return views

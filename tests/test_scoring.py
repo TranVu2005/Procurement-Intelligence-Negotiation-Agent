@@ -1,13 +1,16 @@
 import unittest
 
 from src.reasoning.scoring import (
+    BALANCED_WEIGHTS,
     ScoringError,
+    build_relax_suggestions,
     evaluate_candidates,
     detect_evidence_conflicts,
     filter_hard_constraints,
     generate_negotiation_strategy,
     leverage_score,
     rank_suppliers,
+    resolve_weights,
     score_breakdown,
 )
 
@@ -156,6 +159,77 @@ class ScoringTests(unittest.TestCase):
         self.assertTrue(any("2 lần MOQ" in lever for lever in strategy["evidence_levers"]))
         self.assertTrue(any("bảo hành" in lever.lower() for lever in strategy["evidence_levers"]))
         self.assertTrue(any("Không tự động chốt đơn" in rule for rule in strategy["guardrails"]))
+
+    def test_balanced_priority_preserves_legacy_weights(self) -> None:
+        resolved = resolve_weights(STATE)
+
+        self.assertEqual(resolved["preset"], "balanced")
+        self.assertEqual(resolved["weights"], BALANCED_WEIGHTS)
+        self.assertIn("mặc định", resolved["reason"])
+
+    def test_price_and_delivery_priorities_change_ranking_in_expected_direction(self) -> None:
+        cheap_slow = supplier(
+            "NCC_CHEAP", total_price=20_000_000, ThoiGianGiao=10,
+        )
+        expensive_fast = supplier(
+            "NCC_FAST", total_price=35_000_000, ThoiGianGiao=1,
+        )
+        price_state = {
+            **STATE,
+            "soft_constraints": {**STATE["soft_constraints"], "priority": "price"},
+        }
+        delivery_state = {
+            **STATE,
+            "soft_constraints": {**STATE["soft_constraints"], "priority": "delivery"},
+        }
+
+        price_ranked = rank_suppliers([cheap_slow, expensive_fast], price_state)
+        delivery_ranked = rank_suppliers([cheap_slow, expensive_fast], delivery_state)
+
+        self.assertEqual(price_ranked[0]["MaNCC"], "NCC_CHEAP")
+        self.assertEqual(delivery_ranked[0]["MaNCC"], "NCC_FAST")
+        self.assertEqual(price_ranked[0]["weights_used"]["preset"], "price")
+        self.assertEqual(delivery_ranked[0]["weights_used"]["preset"], "delivery")
+
+    def test_relax_suggestions_use_rejected_supplier_evidence(self) -> None:
+        rejected = [
+            {
+                "supplier_id": "NCC_BUDGET",
+                "violations": [{
+                    "code": "budget_exceeded", "field": "total_price",
+                    "actual": 45_000_000, "required": "<= 40000000",
+                }],
+                "evidence": supplier("NCC_BUDGET", total_price=45_000_000),
+            },
+            {
+                "supplier_id": "NCC_DELIVERY",
+                "violations": [{
+                    "code": "delivery_deadline_unmet", "field": "ThoiGianGiao",
+                    "actual": 12, "required": "<= 10",
+                }],
+                "evidence": supplier("NCC_DELIVERY", ThoiGianGiao=12),
+            },
+        ]
+
+        suggestions = build_relax_suggestions(rejected, STATE)
+
+        by_constraint = {item["constraint"]: item for item in suggestions}
+        self.assertEqual(by_constraint["budget_max"]["suggested"], 45_000_000)
+        self.assertEqual(by_constraint["budget_max"]["supplier_ids"], ["NCC_BUDGET"])
+        self.assertEqual(by_constraint["delivery_deadline_days"]["suggested"], 12)
+        self.assertEqual(by_constraint["delivery_deadline_days"]["supplier_ids"], ["NCC_DELIVERY"])
+
+    def test_distinct_product_models_from_same_supplier_are_not_conflicts(self) -> None:
+        first = supplier(
+            "SRC001", TenNCC="Cùng NCC", TenSanPham="Ghế A",
+            LoaiSanPham="ghế văn phòng", Gia=1_000_000,
+        )
+        second = supplier(
+            "SRC002", TenNCC="Cùng NCC", TenSanPham="Ghế B",
+            LoaiSanPham="ghế văn phòng", Gia=2_000_000,
+        )
+
+        self.assertEqual(detect_evidence_conflicts([first, second]), [])
 
 
 if __name__ == "__main__":

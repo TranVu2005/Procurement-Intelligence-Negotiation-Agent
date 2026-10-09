@@ -28,6 +28,8 @@ Quy tac bat buoc:
 4. Khong hua hen, khong tu chot don. Viec chot don do nguoi dung quyet dinh o buoc sau.
 5. Neu phan BANG CHUNG ghi "KHONG CO BANG CHUNG", hay noi ro la khong co du lieu de
    khuyen nghi, va khong duoc goi y bat ky nha cung cap nao.
+6. Neu BANG CHUNG co bo trong so xep hang, phai neu ten preset va ly do chon; khong
+   duoc tu thay doi cac trong so da tinh.
 
 Tien te: VND, viet dang so thuan."""
 
@@ -79,7 +81,16 @@ def build_evidence_block(state: AgentState) -> str:
     if not ranked:
         return _NO_EVIDENCE
 
-    lines = [_format_supplier(item) for item in ranked[:5]]
+    weights_used = state.get("weights_used") or {}
+    lines = []
+    if weights_used:
+        lines.append(
+            "Bo trong so xep hang da dung: "
+            f"preset={weights_used.get('preset')}; "
+            f"weights={weights_used.get('weights')}; "
+            f"ly_do={weights_used.get('reason')}"
+        )
+    lines.extend(_format_supplier(item) for item in ranked[:5])
     lines.extend(_format_rejected(state.get("rejected") or []))
     claims = (state.get("verdict") or {}).get("claims") or []
     if claims:

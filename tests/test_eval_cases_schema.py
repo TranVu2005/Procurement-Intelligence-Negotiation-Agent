@@ -7,6 +7,7 @@ EVAL_DIR = ROOT / "tests" / "eval_set"
 
 VALID_CATEGORIES = {
     "happy_path", "missing_info", "conflict", "tool_failure", "adversarial", "multi_turn",
+    "priority", "no_match", "full_info", "budget_change", "hard_phrasing",
 }
 VALID_STATUS = {"success", "graceful_fail", "needs_confirmation", "needs_input", "out_of_scope"}
 VALID_TOOLS = {"search_suppliers", "get_supplier_detail", "compare_price", "confirm_order"}
