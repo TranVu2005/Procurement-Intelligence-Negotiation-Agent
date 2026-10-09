@@ -22,3 +22,8 @@ docs/transcript_gemini_live*.md
 
 logs/
 reports/
+
+# Publish only the root README; keep other Markdown documents local.
+*.[mM][dD]
+*.markdown
+!/README.md

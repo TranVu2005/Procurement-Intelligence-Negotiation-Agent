@@ -71,14 +71,14 @@ Remove-Item Env:RUN_LIVE_TESTS
 
 ## Dataset và nguồn
 
-Dataset runtime: `src/tools/mock_data/suppliers.json`; hash/ngày build/số bản ghi: `src/tools/mock_data/VERSION`. Dữ liệu nguồn, schema và template báo giá ở [sources/README.md](src/tools/mock_data/sources/README.md).
+Dataset runtime: `src/tools/mock_data/suppliers.json`; hash/ngày build/số bản ghi: `src/tools/mock_data/VERSION`. Dữ liệu nguồn ở `src/tools/mock_data/sources/`; schema được validate trong `src/tools/dataset_builder.py`, mẫu báo giá là `b2b_quotes_template.csv`.
 
 ```powershell
 .venv\Scripts\python.exe generate_mock_data.py
 .venv\Scripts\python.exe -m unittest tests.test_dataset_builder tests.test_dataset_files -v
 ```
 
-Generator chỉ sinh dataset và VERSION. Bản hiện tại có 100 record `SRC` từ nguồn web và 6 fixture `EDGE`. Giá có nguồn được giữ nguyên; các field nghiệp vụ mô phỏng được khai báo trong `simulated_fields`. Bảo hành/uy tín chưa có bằng chứng giữ null. Fixture EDGE là dữ liệu giả lập có chủ đích. JSON legacy được giữ ở [data/archive](data/archive/README.md), không dùng trong runtime.
+Generator chỉ sinh dataset và VERSION. Bản hiện tại có 100 record `SRC` từ nguồn web và 6 fixture `EDGE`. Giá có nguồn được giữ nguyên; các field nghiệp vụ mô phỏng được khai báo trong `simulated_fields`. Bảo hành/uy tín chưa có bằng chứng giữ null. Fixture EDGE là dữ liệu giả lập có chủ đích. JSON legacy được giữ ở `data/archive/real_data_ghe_ban.json`, không dùng trong runtime.
 
 Làm mới nguồn web:
 
@@ -100,7 +100,7 @@ Báo giá B2B: dùng header `b2b_quotes_template.csv`, bỏ dòng chú thích, g
 
 Báo giá chỉ dùng tại đúng `quote_quantity`; mã QTE tách khỏi SRC. So sánh ghép duy nhất theo NCC, loại và tên sản phẩm, giữ request/thuộc tính ngoài giá từ web và ghi provenance riêng cho giá. Thiếu hoặc không khớp dữ liệu được ghi không đo được; script không xuất lời khuyên mua từ scenario.
 
-## Cấu trúc và tài liệu
+## Cấu trúc
 
 | Đường dẫn | Nội dung |
 |---|---|
@@ -109,9 +109,9 @@ Báo giá chỉ dùng tại đúng `quote_quantity`; mã QTE tách khỏi SRC. S
 | `src/tools/`, `src/logging_utils/` | Tool có schema, dataset builder, retry, tracing/redaction |
 | `src/eval/`, `tests/` | Grader và regression/eval case |
 | `scripts/` | AutoEval, load test, crawl/verify/refresh nguồn, demo và so sánh B2B |
-| `docs/`, `data/` | Tài liệu kỹ thuật, đề bài, trình bày và dữ liệu tham chiếu |
+| `docs/reference/`, `data/` | Đề bài PDF và dữ liệu tham chiếu |
 
-Tài liệu chính: [kiến trúc](architecture.md), [hợp đồng field/tool](interface-contracts.md), [quy tắc](SYSTEM-RULES.md), [reasoning](docs/reasoning.md), [demo](docs/demo.md), [thuyết trình](docs/presentation.md), [đề bài](docs/reference/final-project-assignment.pdf), [báo cáo cuối](BAO-CAO-HOAN-THIEN.md). [Kế hoạch cải thiện sau chấm điểm](docs/ke-hoach-hoan-thien-sau-cham-diem-2026-10-08.md) giữ làm tham chiếu yêu cầu.
+`README.md` là file Markdown duy nhất được đưa lên GitHub. Tài liệu và ghi chú Markdown khác giữ local; report/log sinh mới nằm trong các thư mục được Git bỏ qua.
 
 ## Giới hạn còn lại
 
