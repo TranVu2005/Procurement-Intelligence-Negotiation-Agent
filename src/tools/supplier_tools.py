@@ -8,9 +8,10 @@ Load du lieu tu mock_data/suppliers.json (sinh boi generate_mock_data.py).
 """
 
 import json
+import os
 import time
 import unicodedata
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 from langchain_core.tools import StructuredTool
@@ -19,6 +20,31 @@ from pydantic import BaseModel, Field
 from src.logging_utils.tracer import log_event, log_tool_call, new_trace_id
 
 DATA_PATH = Path(__file__).parent / "mock_data" / "suppliers.json"
+
+
+def _today() -> date:
+    return date.today()
+
+
+def _freshness(record: dict) -> dict:
+    fetched = record.get("fetched_at")
+    reason = None
+    if not fetched:
+        reason = "missing_fetched_at"
+    else:
+        try:
+            fetched_date = date.fromisoformat(str(fetched)[:10])
+            days = int(os.getenv("DATA_STALE_DAYS", "14"))
+            if days < 0:
+                days = 14
+            age = (_today() - fetched_date).days
+            if age < 0:
+                reason = "future_fetched_at"
+            elif age > days:
+                reason = "older_than_threshold"
+        except (ValueError, TypeError):
+            reason = "invalid_fetched_at_or_threshold"
+    return {"stale": reason is not None, "stale_reason": reason}
 
 
 def _load_data():
@@ -73,12 +99,16 @@ def search_suppliers(product_type: str, material: str | None = None, region: str
     data = _load_data()
     norm_product_type = _normalize(product_type)
     matches = [r for r in data if _normalize(r.get("LoaiSanPham")) == norm_product_type]
+    counts = {"product_type": len(matches)}
     if material:
         norm_material = _normalize(material)
         matches = [r for r in matches if _normalize(r.get("ChatLieu")) == norm_material]
+    counts["material"] = len(matches)
     if region:
         norm_region = _normalize(region)
         matches = [r for r in matches if _normalize(r.get("KhuVuc")) == norm_region]
+    counts["region"] = len(matches)
+    filter_stats = {"applied_filters": params, "counts": counts}
 
     if not matches:
         filters = [f"product_type='{product_type}'"]
@@ -87,6 +117,7 @@ def search_suppliers(product_type: str, material: str | None = None, region: str
         if region:
             filters.append(f"region='{region}'")
         result = _error("no_match", f"Khong tim thay nha cung cap voi bo loc: {', '.join(filters)}")
+        result["filter_stats"] = filter_stats
         log_tool_call(trace_id, "search_suppliers", start, "error", params=params)
         return result
 
@@ -106,11 +137,12 @@ def search_suppliers(product_type: str, material: str | None = None, region: str
             "nguon_type": r.get("nguon_type"),
             "fetched_at": r.get("fetched_at"),
             "simulated_fields": r.get("simulated_fields") or [],
+            **_freshness(r),
         }
         for r in matches
     ]
     log_tool_call(trace_id, "search_suppliers", start, "ok", params=params, result_count=len(suppliers))
-    return {"suppliers": suppliers}
+    return {"suppliers": suppliers, "filter_stats": filter_stats}
 
 
 def get_supplier_detail(supplier_id: str, _simulate_error: str | None = None) -> dict:
@@ -137,7 +169,7 @@ def get_supplier_detail(supplier_id: str, _simulate_error: str | None = None) ->
     for r in data:
         if r["MaNCC"] == supplier_id:
             log_tool_call(trace_id, "get_supplier_detail", start, "ok", params=params)
-            return r  # da dung 13 field theo dinh nghia
+            return {**r, **_freshness(r)}
 
     result = _error("no_match", f"Khong tim thay supplier_id='{supplier_id}'")
     log_tool_call(trace_id, "get_supplier_detail", start, "error", params=params)
@@ -202,6 +234,11 @@ def compare_price(supplier_ids: list[str], quantity: int,
             })
             continue
 
+        if record.get("nguon_type") == "b2b_quote" and quantity != record.get("quote_quantity"):
+            comparisons.append({"MaNCC": sid, **_error(
+                "invalid_input", "Gia bao B2B chi ap dung cho dung quote_quantity; can xin bao gia moi")})
+            continue
+
         # Du lieu that co the de null (khong co gia niem yet) -> loi rieng phan tu
         # nay, khong tu dien so va khong lam fail ca response (muc 3 contract)
         missing = [field for field in ("Gia", "MOQ") if not _is_number(record.get(field))]
@@ -225,8 +262,10 @@ def compare_price(supplier_ids: list[str], quantity: int,
                 "discount_applied": f"{pct}%",
                 "total_price": unit_price * quantity,
                 "meets_moq": quantity >= record["MOQ"],
-                "nguon_url": record.get("nguon_url"),
+                "nguon_url": record.get("price_source_url") or record.get("nguon_url"),
                 "simulated_fields": record.get("simulated_fields") or [],
+                "fetched_at": record.get("fetched_at"),
+                **_freshness(record),
             })
         except KeyError as e:
             # dataset thieu field (vd Gia/MOQ) -> loi rieng phan tu nay, khong fail ca response

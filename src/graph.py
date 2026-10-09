@@ -100,33 +100,27 @@ def guard_perceive(func):
     run_request bien thanh graceful_fail.
     """
     def node(state: AgentState) -> dict:
+        def incomplete(exc, answer):
+            partial = getattr(exc, "partial_state", None)
+            partial = dict(partial) if isinstance(partial, dict) else {}
+            out = {"status": "needs_input", "answer": answer, "llm_calls": 1,
+                   "tokens_in": getattr(exc, "tokens_in", 0) or 0,
+                   "tokens_out": getattr(exc, "tokens_out", 0) or 0}
+            if partial:
+                out["req"] = partial
+                if partial.get("intent"):
+                    out["intent"] = partial["intent"]
+                if not state.get("session_id") and partial.get("session_id"):
+                    out["session_id"] = partial["session_id"]
+            return out
         try:
             out = dict(func(state) or {})
         except (MissingFieldError, InvalidProductTypeError) as exc:
-            # A.4: giữ lại intent và req tạm từ partial_state để không mất thông tin
-            # đã trích được; cũng giữ token nếu perceive đã trả về trước khi raise.
-            partial = getattr(exc, "partial_state", None) or {}
-            result: dict = {
-                "status":    "needs_input",
-                "answer":    str(exc),
-                "llm_calls": 1,
-            }
-            if partial.get("intent"):
-                result["intent"] = partial["intent"]
-            if partial:
-                result["req"] = partial
-            if not state.get("session_id") and partial.get("session_id"):
-                result["session_id"] = partial["session_id"]
-            # Tokens: perceive trả trong out trước khi raise — không có ở đây
-            # vì exception bị ném từ parser trước khi perceive trả giá trị.
-            # C sẽ cộng tokens ở guard_perceive phía C (C.2); ở đây giữ 0 là đúng.
-            return result
+            return incomplete(exc, str(exc))
         except json.JSONDecodeError:
             raise
         except ValueError as exc:
-            return {"status": "needs_input",
-                    "answer": f"Thong tin chua hop le: {exc}. Vui long nhap lai.",
-                    "llm_calls": 1}
+            return incomplete(exc, f"Thong tin chua hop le: {exc}. Vui long nhap lai.")
         req = out.get("req") or {}
         if not state.get("session_id") and req.get("session_id"):
             out["session_id"] = req["session_id"]
@@ -166,7 +160,8 @@ def build_graph(overrides: dict | None = None):
 
     graph = StateGraph(AgentState)
     for name, func in nodes.items():
-        graph.add_node(name, guard_perceive(func) if name == "perceive" else func)
+        guarded = guard_perceive(func) if name == "perceive" else func
+        graph.add_node(name, _timed_node(name, guarded))
 
     graph.add_edge(START, "perceive")
     graph.add_conditional_edges("perceive", route_intent, {
@@ -207,6 +202,19 @@ def build_graph(overrides: dict | None = None):
     graph.add_edge("graceful_fail", END)
 
     return graph.compile()
+
+
+def _timed_node(name, func):
+    def node(state):
+        started = time.perf_counter()
+        out = dict(func(state) or {})
+        elapsed = (time.perf_counter() - started) * 1000
+        if name in ("perceive", "respond") and out.get("llm_calls", 0):
+            out["llm_ms"] = elapsed
+        log_event(state.get("trace_id", ""), "node_end", node=name,
+                  elapsed_ms=round(elapsed, 4), component="llm" if name in ("perceive", "respond") else "pipeline")
+        return out
+    return node
 
 
 @lru_cache(maxsize=1)
@@ -280,10 +288,15 @@ def run_request(
         )
 
     final["latency_ms"] = round((time.perf_counter() - started) * 1000, 2)
+    final["llm_ms"] = round(final.get("llm_ms", 0), 4)
+    final["tool_ms"] = round(sum(e.get("latency_ms", 0) or 0 for e in final.get("tool_results") or []
+                                 if e.get("status") != "blocked"), 2)
+    final["other_ms"] = round(max(0, final["latency_ms"] - final["llm_ms"] - final["tool_ms"]), 2)
     final.setdefault("status", "graceful_fail")
     log_event(state["trace_id"], "request_end", status=final["status"],
               llm_calls=final.get("llm_calls", 0), tool_calls=len(final.get("tool_results", [])),
-              latency_ms=final["latency_ms"])
+              latency_ms=final["latency_ms"], llm_ms=final["llm_ms"], tool_ms=final["tool_ms"],
+              other_ms=final["other_ms"])
     write_run_record(final)
 
     # Luu state va agent answer vao DB (best-effort — khong duoc lam gay response)

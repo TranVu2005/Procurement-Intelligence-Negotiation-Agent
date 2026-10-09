@@ -95,10 +95,16 @@ def tool_search(state: AgentState) -> dict:
     result, entry = run_tool(state, "search_suppliers", params,
                              step_id=search_step.get("step_id"))
     entries.append(entry)
+    stats = result.get("filter_stats") or {
+        "applied_filters": {key: params.get(key) for key in ("product_type", "material", "region")},
+        "counts": {key: None for key in ("product_type", "material", "region")},
+    }
     if result.get("error"):
-        return {"tool_results": entries, "candidates": []}
+        return {"tool_results": entries, "candidates": [], "filter_stats": stats}
 
     supplier_ids = [s["MaNCC"] for s in result.get("suppliers", [])]
+    if not supplier_ids:
+        return {"tool_results": entries, "candidates": [], "filter_stats": stats}
     details, detail_entries = _fetch_details(state, supplier_ids)
     entries.extend(detail_entries)
 

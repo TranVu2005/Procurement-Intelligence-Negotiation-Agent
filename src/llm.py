@@ -189,3 +189,17 @@ def usage_of(message) -> tuple[int, int]:
     """(tokens_in, tokens_out) tu usage_metadata; (0, 0) neu provider khong tra."""
     usage = getattr(message, "usage_metadata", None) or {}
     return int(usage.get("input_tokens", 0) or 0), int(usage.get("output_tokens", 0) or 0)
+
+
+def model_identity() -> dict:
+    """Chi doc ten provider/model, khong doc hay tra API key."""
+    if os.getenv("AGENT_LLM", "").lower() == "stub":
+        return {"provider": "stub", "model": "StubLLM"}
+    provider = os.getenv("LLM_PROVIDER", "gemini").lower()
+    if provider == "openrouter":
+        model = os.getenv("OPENROUTER_MODEL", DEFAULT_OPENROUTER_MODEL)
+    elif provider == "nararouter":
+        model = os.getenv("NARAROUTER_MODEL", "agnes-2.5-flash")
+    else:
+        provider, model = "gemini", MODEL_NAME
+    return {"provider": provider, "model": model}

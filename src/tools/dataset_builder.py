@@ -15,6 +15,7 @@ Nguyen tac so lieu:
 from __future__ import annotations
 
 import csv
+from datetime import date
 import hashlib
 import json
 import random
@@ -31,6 +32,7 @@ OPTIONAL_COLUMNS = (
     "material", "moq", "stock", "delivery_days", "warranty_months", "trust_score", "note",
 )
 SOURCE_COLUMNS = REQUIRED_COLUMNS + OPTIONAL_COLUMNS
+B2B_COLUMNS = SOURCE_COLUMNS + ("nguon_type", "quote_date", "quote_quantity", "quote_channel")
 
 VALID_PRODUCT_TYPES = ("ghế văn phòng", "bàn làm việc", "tủ hồ sơ", "kệ", "sofa")
 VALID_REGIONS = ("Ha Noi", "TP.HCM", "Da Nang")
@@ -85,6 +87,8 @@ def read_source_rows(paths: Iterable[Path | str]) -> list[dict]:
                 clean = {k: (v or "").strip() for k, v in raw.items() if isinstance(k, str)}
                 if not any(clean.values()):
                     continue
+                if clean.get("supplier_name", "").startswith("#"):
+                    continue
                 clean["_origin"] = f"{path.name}:{line_no}"
                 rows.append(clean)
     return rows
@@ -106,6 +110,23 @@ def _row_problems(row: dict) -> list[str]:
     for column in _OPTIONAL_NUMERIC:
         if row.get(column) and _parse_optional(column, row[column]) is None:
             problems.append(f"{column} '{row[column]}' khong hop le")
+    source_type = row.get("nguon_type") or SOURCE_NGUON_TYPE
+    if source_type not in (SOURCE_NGUON_TYPE, "b2b_quote"):
+        problems.append("nguon_type khong hop le")
+    if source_type == "b2b_quote":
+        try:
+            date.fromisoformat(row.get("quote_date", ""))
+        except (ValueError, TypeError):
+            problems.append("quote_date phai la ngay ISO hop le")
+        quantity = row.get("quote_quantity", "")
+        if not isinstance(quantity, str) or not quantity.isdigit() or int(quantity) < 1:
+            problems.append("quote_quantity phai la so nguyen duong")
+        if row.get("quote_channel") not in ("email", "zalo", "phone", "web_form"):
+            problems.append("quote_channel khong hop le")
+        if _parse_price(row.get("price", "")) is None:
+            problems.append("bao gia B2B bat buoc co gia that")
+        if any(row.get(key) for key in row if key not in (*B2B_COLUMNS, "_origin")):
+            problems.append("bao gia co cot ngoai schema; khong nhap lien he ca nhan")
     return problems
 
 
@@ -116,11 +137,13 @@ def validate_rows(rows: list[dict]) -> None:
         url = row.get("source_url")
         if not url:
             continue
-        if url in seen:
+        key = (row.get("nguon_type") or SOURCE_NGUON_TYPE, url,
+               row.get("quote_date"), row.get("quote_quantity"))
+        if key in seen:
             # 1 san pham khong duoc lam bang chung cho 2 dong (vd 2 khu vuc khac nhau)
-            problems.append(f"{row.get('_origin', '?')}: source_url trung voi {seen[url]}")
+            problems.append(f"{row.get('_origin', '?')}: source_url trung voi {seen[key]}")
         else:
-            seen[url] = row.get("_origin", "?")
+            seen[key] = row.get("_origin", "?")
     if problems:
         raise SourceValidationError(problems)
 
@@ -159,7 +182,7 @@ def to_record(row: dict, supplier_id: str) -> dict:
         "DiemUyTin": None,
         "KhuVuc": row["region"],
         "nguon_url": row["source_url"],
-        "nguon_type": SOURCE_NGUON_TYPE,
+        "nguon_type": row.get("nguon_type") or SOURCE_NGUON_TYPE,
         "fetched_at": row["collected_at"],
         "nguoi_thu": row["collected_by"],
     }
@@ -173,12 +196,30 @@ def to_record(row: dict, supplier_id: str) -> dict:
             record[field] = _SIMULATORS[field](rng)
             simulated.add(field)
     record["simulated_fields"] = [f for f in _FIELD_ORDER if f in simulated]
+    if record["nguon_type"] == "b2b_quote":
+        record.update(quote_date=row["quote_date"], quote_quantity=int(row["quote_quantity"]),
+                      quote_channel=row["quote_channel"], fetched_at=row["quote_date"])
+        # Null van giu null; danh dau thieu bang chung, khong bia warranty/trust.
+        for column, (field, _kind) in _OPTIONAL_NUMERIC.items():
+            if not row.get(column) and field not in record["simulated_fields"]:
+                record["simulated_fields"].append(field)
+        if not record["ChatLieu"]:
+            record["simulated_fields"].append("ChatLieu")
     return record
 
 
 def build_source_records(rows: list[dict], prefix: str = "SRC") -> list[dict]:
     validate_rows(rows)
-    return [to_record(row, f"{prefix}{index:03d}") for index, row in enumerate(rows, start=1)]
+    records, web_index, quote_index = [], 0, 0
+    for row in rows:
+        if row.get("nguon_type") == "b2b_quote":
+            quote_index += 1
+            sid = f"QTE{quote_index:03d}"
+        else:
+            web_index += 1
+            sid = f"{prefix}{web_index:03d}"
+        records.append(to_record(row, sid))
+    return records
 
 
 def _sha12(text: str) -> str:

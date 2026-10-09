@@ -45,6 +45,8 @@ class AgentState(TypedDict, total=False):
     tokens_in: Annotated[int, operator.add]
     tokens_out: Annotated[int, operator.add]
     ttft_ms: float
+    llm_ms: Annotated[float, operator.add]  # so do noi bo C
+    filter_stats: dict
 
 
 def new_state(
@@ -85,6 +87,7 @@ def new_state(
         "llm_calls": 0,
         "tokens_in": 0,
         "tokens_out": 0,
+        "llm_ms": 0.0,
     }
 
 

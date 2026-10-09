@@ -144,7 +144,8 @@ def verify(rows: list[dict], cache: Path | None) -> list[dict]:
     return report
 
 
-def apply(rows: list[dict], report: list[dict]) -> list[str]:
+def apply(rows: list[dict], report: list[dict], today: str | None = None) -> list[str]:
+    today = today or date.today().isoformat()
     changes = []
     for row, entry in zip(rows, report):
         if entry["http_status"] != 200:
@@ -170,7 +171,7 @@ def apply(rows: list[dict], report: list[dict]) -> list[str]:
         if not row["warranty_months"] and entry["page_warranty"]:
             row["warranty_months"] = str(entry["page_warranty"])
             changes.append(f"{label}: warranty_months -> {entry['page_warranty']}")
-        notes = [f"doi chieu {TODAY}"]
+        notes = [f"doi chieu {today}"]
         if entry["regular_price"]:
             notes.append(f"gia goc gach ngang tren trang {entry['regular_price']}")
         if entry["variant_used"]:
@@ -180,7 +181,7 @@ def apply(rows: list[dict], report: list[dict]) -> list[str]:
         if entry["page_material_text"]:
             notes.append(f"chat lieu tren trang: {entry['page_material_text'][:120]}")
         row["note"] = "; ".join(notes)
-        row["collected_at"] = TODAY
+        row["collected_at"] = today
     return changes
 
 

@@ -230,3 +230,17 @@ Mỗi người đọc kỹ phần mình sẽ dùng nhiều nhất (A đọc kỹ
 | C | ☑ | ☑ | | 18/9/2026 |
 
 > Sau khi cả 3 tick xong, coi đây là bản khóa (frozen) cho buổi họp 2 (10/9). Muốn đổi field sau mốc này phải báo cả nhóm trước khi sửa code.
+
+## ĐỀ XUẤT 2026-10 — chờ A/B xác nhận
+
+Các field dưới đây là bổ sung thử nghiệm của C, chưa coi là hợp đồng đã chốt.
+Không đổi tên/xóa field cũ; phía đọc dùng `.get()` và báo không đo được khi thiếu.
+
+- `filter_stats` trong kết quả search và state: `{"applied_filters": {"product_type": str, "material": str|null, "region": str|null}, "counts": {"product_type": int|null, "material": int|null, "region": int|null}}`. Count là số khớp sau từng bước; `null` nếu lỗi hạ tầng/injection không đo được. Lỗi vẫn giữ `error`, `error_type`, `message`.
+- Record tool: `stale: bool`, `stale_reason: str|null`. Thiếu/sai ngày hoặc ngày tương lai coi là stale; quá `DATA_STALE_DAYS` (mặc định 14) coi là stale. `fetched_at` đi kèm compare để truy nguồn cảnh báo.
+- Dữ liệu báo giá: `nguon_type="b2b_quote"`, `quote_date` (YYYY-MM-DD), `quote_quantity` (int > 0), `quote_channel` (`email|zalo|phone|web_form`). Giá báo chỉ áp cho đúng số lượng báo, không suy ra giá ở số lượng khác.
+- State do B ghi: `weights_used={preset, weights, reason}`, `relax_suggestions=[{constraint,current,suggested,supplier_ids}]`. C khai báo channel để graph không bỏ field nếu B trả về; không tự sinh giá trị.
+- `soft_constraints.priority` do A trích, B đọc: `price|delivery|quality|balanced`, kèm thông tin nguồn ưu tiên; chưa triển khai phía A/B.
+- Oracle eval: `no_null_fields` kiểm tra đường dẫn field ở state cuối; `must_extract` so từng field của `req.hard_constraints`/`req.soft_constraints`; `expect_priority` so `weights_used.preset`; `must_suggest_relax` yêu cầu list `relax_suggestions` không rỗng. Thiếu field chưa triển khai được ghi `unmeasurable`, không tính là pass.
+- Giảm fan-out cần tool batch hoặc search trả full record, đều đổi hợp đồng hiện có: chỉ đề xuất, chưa triển khai.
+- Thử nghiệm so sánh B2B giữ thuộc tính ngoài giá từ web: `price_source_url` ghi nguồn giá, `field_sources={field:url}` ghi provenance từng field. compare_price dùng nguồn giá cho unit_price/total_price. B cần đọc field_sources nếu xuất claim Gia trong scenario; báo cáo thứ hạng không dùng câu trả lời LLM làm chứng cứ.

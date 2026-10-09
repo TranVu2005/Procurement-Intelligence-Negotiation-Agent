@@ -66,7 +66,7 @@ def _append_jsonl(path: Path, record: dict) -> Path:
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
+            handle.write(json.dumps(redact(record), ensure_ascii=False, default=str) + "\n")
     except OSError as exc:  # noqa: BLE001 - log hong thi van phai tra loi nguoi dung
         logger.warning("khong ghi duoc log file %s: %s", path, exc)
     return path
@@ -99,6 +99,9 @@ def write_run_record(final: dict) -> Path:
         "tokens_out": final.get("tokens_out", 0),
         "latency_ms": final.get("latency_ms"),
         "ttft_ms": final.get("ttft_ms"),
+        "llm_ms": final.get("llm_ms"),
+        "tool_ms": final.get("tool_ms"),
+        "other_ms": final.get("other_ms"),
     }
     return _append_jsonl(LOG_DIR / "runs.jsonl", record)
 
